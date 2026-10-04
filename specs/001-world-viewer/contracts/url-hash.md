@@ -7,7 +7,7 @@ index.html#<dataset>/<date>[/<item-id>]
 | Part | Example | Rule |
 |---|---|---|
 | dataset | `russia` | Must be a registered dataset id. Otherwise the viewer uses the default (`ww2`). |
-| date | `1812-09-14`, `1812` | `YYYY`, `YYYY-MM` or `YYYY-MM-DD`. It is clamped into the dataset range. If it is invalid, the range start is used. |
+| date | `1812-09-14`, `1812` | `YYYY`, `YYYY-MM` or `YYYY-MM-DD`. It is clamped into the dataset range. If it is missing or invalid, the dataset's `startAt` is used (or the range start if there is none). |
 | item-id | `borodino-1812` | Must be an event, leader, chapter or book id. Unknown ids are ignored. |
 
 The viewer updates the hash with `history.replaceState` whenever the cursor settles, the selection changes, or the dataset changes.

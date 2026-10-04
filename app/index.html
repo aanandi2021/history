@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Amit's World — History Viewer</title>
+  <link rel="stylesheet" href="css/viewer.css">
+</head>
+<body>
+  <header id="bar">
+    <div class="brand">
+      <span class="series">Amit's Notes of the History of the World</span>
+      <h1 id="ds-title">…</h1>
+    </div>
+    <label class="ctl">Period
+      <select id="dataset" aria-label="Period"></select>
+    </label>
+    <div class="ctl search">
+      <input id="search" type="search" placeholder="Search  ( / )" autocomplete="off" aria-label="Search events, people, books">
+      <ul id="results" role="listbox" hidden></ul>
+    </div>
+    <div class="ctl group">
+      <button id="play" title="Play / pause (space)">▶ Play</button>
+      <select id="speed" aria-label="Speed">
+        <option value="0.5">½×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option>
+      </select>
+    </div>
+    <label class="ctl check" title="During play, the map flies to each chapter"><input id="follow" type="checkbox" checked> Follow chapters</label>
+    <div class="ctl group">
+      <button id="world" title="Whole-world map">🌍 World</button>
+      <button id="fit" title="Show the whole period">↔ Whole period</button>
+    </div>
+    <button id="help-btn" class="ctl" title="Keys and tips">?</button>
+  </header>
+
+  <main id="layout">
+    <section id="left">
+      <div id="map-wrap">
+        <svg id="map" viewBox="0 0 960 470" preserveAspectRatio="xMidYMid meet" role="img" aria-label="World map"></svg>
+        <div id="map-state" class="map-chip"></div>
+        <div id="map-legend"></div>
+        <div id="map-note"></div>
+      </div>
+      <div id="tl-wrap">
+        <svg id="tl" role="img" aria-label="Timeline"></svg>
+      </div>
+    </section>
+    <aside id="panel" aria-live="polite">
+      <div id="card" hidden></div>
+      <div id="meanwhile"></div>
+    </aside>
+  </main>
+
+  <div id="help" hidden>
+    <h3>Getting around</h3>
+    <p><b>Hover</b> the timeline to move through time. <b>Click</b> an empty spot to pin the date there, and click again to let go.</p>
+    <p><b>Click</b> any event, ruler, chapter or book to open its card and links. <b>Chapters</b> (the band at the top of the timeline) zoom the map and timeline together.</p>
+    <p><b>Drag</b> the timeline to pan. <b>Ctrl + wheel</b> (or pinch) zooms it. The map zooms with the wheel.</p>
+    <p>Keys: <kbd>←</kbd> <kbd>→</kbd> previous / next event · <kbd>Space</kbd> play · <kbd>/</kbd> search · <kbd>Esc</kbd> clear.</p>
+    <p>The address bar always holds the current period, date and selection, so you can paste it into an Obsidian note.</p>
+    <button id="help-close">Close</button>
+  </div>
+  <div id="tooltip" hidden></div>
+
+  <script src="vendor/d3.min.js"></script>
+  <script src="vendor/topojson-client.min.js"></script>
+  <script src="data/world-110m.js"></script>
+  <script src="data/ww2.js"></script>
+  <script src="data/russia.js"></script>
+  <script src="js/model.js"></script>
+  <script src="js/viewer.js"></script>
+</body>
+</html>
