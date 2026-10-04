@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A · Swimlanes — WW2 proof of concept</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  .wrap { display: grid; grid-template-columns: 1fr 300px; gap: 0; height: calc(100vh - 92px); }
+  #chart { overflow-y: auto; overflow-x: hidden; border-top: 1px solid var(--rule); position: relative; }
+  aside { border-left: 1px solid var(--rule); border-top: 1px solid var(--rule); padding: 14px 16px; overflow-y: auto; background: var(--panel); }
+  aside h2 { font-size: 15px; margin: 0 0 2px; }
+  aside h3 { font: 600 11px "Segoe UI", sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 14px 0 4px; }
+  aside .ev { margin: 0 0 7px; font-size: 13.5px; }
+  aside .ev .lane { font: 11px "Segoe UI", sans-serif; color: var(--muted); }
+  aside .ev i.sw { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+  aside .hint { color: var(--muted); font-size: 13px; }
+  .controls { padding: 4px 28px 10px; display: flex; gap: 10px; align-items: center; }
+  .cursor-line { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 3; pointer-events: none; }
+  .cursor-tag { font: 600 11px "Segoe UI", sans-serif; fill: var(--ink); }
+  .ev-label { font: 11.5px "Segoe UI", sans-serif; fill: var(--ink); pointer-events: none; }
+  .book-label { font: italic 11.5px Georgia, serif; fill: #fff; pointer-events: none; }
+  .fam-edit { font: 11px "Segoe UI", sans-serif; fill: var(--accent); cursor: pointer; text-decoration: underline; }
+  rect.hit:hover, circle.hit:hover { stroke: var(--ink); stroke-width: 1.2; }
+</style>
+</head>
+<body>
+<header class="page">
+  <h1>The Second World War, 1937–1945</h1>
+  <span class="sub">Variant A · swimlanes with reign bars, books and family · wheel (or Ctrl+wheel if the page scrolls) to zoom, drag to pan, move the mouse for "meanwhile", click to pin</span>
+  <nav><a href="index.html">All mockups</a><a class="on" href="a-swimlanes.html">A</a><a href="b-map-timeline.html">B</a><a href="c-scroll-story.html">C</a></nav>
+</header>
+<div class="controls">
+  <button id="reset">Reset zoom</button>
+  <button id="pin">Unpin cursor</button>
+  <span class="legend" id="legend"></span>
+</div>
+<div class="wrap">
+  <div id="chart"></div>
+  <aside id="side"><h2>Meanwhile…</h2><p class="hint">Move across the chart to see what was happening everywhere on that date, who was in charge, and how old your family were.</p></aside>
+</div>
+
+<script src="vendor/d3.min.js"></script>
+<script src="data/ww2.js"></script>
+<script src="common.js"></script>
+<script>
+const data = H.prepare(window.WW2);
+const tip = H.tooltip();
+const C = data.laneColours, S = data.sideColours;
+const M = { left: 200, right: 24, top: 34 };
+const chartEl = document.getElementById("chart");
+let W = chartEl.clientWidth;
+const x0 = d3.scaleTime().domain(data.range.map(H.parse));
+let x = x0.copy();
+let pinned = null;
+
+document.getElementById("legend").innerHTML =
+  data.lanes.map(l => `<span><i style="background:${C[l.id]}"></i>${l.label}</span>`).join("");
+
+// ---- layout ----------------------------------------------------------
+const ROW = 18, LANE_ROWS = 4, LANE_ROW = 21, GAP = 26;
+const sections = [];
+let y = M.top;
+sections.push({ kind: "leaders", y, h: data.leaders.length * ROW }); y += data.leaders.length * ROW + GAP;
+data.lanes.forEach(l => { sections.push({ kind: "lane", lane: l, y, h: LANE_ROWS * LANE_ROW }); y += LANE_ROWS * LANE_ROW + 8; });
+y += GAP - 8;
+sections.push({ kind: "books", y, h: 3 * ROW + 4 }); y += 3 * ROW + 4 + GAP;
+sections.push({ kind: "family", y, h: data.family.length * ROW }); y += data.family.length * ROW + 20;
+const H_TOTAL = y;
+
+const svg = d3.select(chartEl).append("svg").attr("width", W).attr("height", H_TOTAL);
+const defs = svg.append("defs");
+defs.append("clipPath").attr("id", "clip").append("rect").attr("x", M.left).attr("y", 0).attr("width", W - M.left - M.right).attr("height", H_TOTAL);
+
+const gAxis = svg.append("g").attr("class", "axis").attr("transform", `translate(0,${M.top - 6})`);
+const gGrid = svg.append("g").attr("clip-path", "url(#clip)");
+const gBody = svg.append("g").attr("clip-path", "url(#clip)");
+const gLabels = svg.append("g");
+const gCursor = svg.append("g").attr("clip-path", "url(#clip)");
+
+// static labels in the margin
+sections.forEach(s => {
+  if (s.kind === "leaders") {
+    gLabels.append("text").attr("class", "group-label").attr("x", 12).attr("y", s.y - 8).text("Leaders · reign (solid) and life (faint)");
+    data.leaders.forEach((l, i) => gLabels.append("text").attr("class", "ev-label").attr("x", 12).attr("y", s.y + i * ROW + 12)
+      .text(`${l.name.replace(/^W\. L\. /, "")}`).append("tspan").attr("fill", "#7a746a").text(` · ${l.country}`));
+  } else if (s.kind === "lane") {
+    gLabels.append("rect").attr("x", 0).attr("y", s.y).attr("width", 5).attr("height", s.h).attr("fill", C[s.lane.id]);
+    gLabels.append("text").attr("class", "lane-label").attr("x", 12).attr("y", s.y + 15).text(s.lane.label);
+    if (s.lane.pinned) gLabels.append("text").attr("class", "group-label").attr("x", 12).attr("y", s.y + 31).text("pinned");
+  } else if (s.kind === "books") {
+    gLabels.append("text").attr("class", "group-label").attr("x", 12).attr("y", s.y - 8).text("Books · span of years covered");
+    gLabels.append("text").attr("class", "ev-label").attr("x", 12).attr("y", s.y + 14).attr("fill", "#7a746a").text("solid = in Calibre");
+    gLabels.append("text").attr("class", "ev-label").attr("x", 12).attr("y", s.y + 30).attr("fill", "#7a746a").text("outline = to find");
+  } else if (s.kind === "family") {
+    gLabels.append("text").attr("class", "group-label").attr("x", 12).attr("y", s.y - 8).text("Family");
+    data.family.forEach((f, i) => gLabels.append("text").attr("class", "ev-label").attr("x", 12).attr("y", s.y + i * ROW + 12).text(f.label));
+  }
+});
+
+// ---- rendering --------------------------------------------------------
+function assignRows(items, x0f, x1f, labelW, rows) {
+  const ends = new Array(rows).fill(-Infinity);
+  const right = W - M.right;
+  items.forEach(it => {
+    const lo = x0f(it), hi = x1f(it), lw = labelW(it);
+    it._flip = lw > 0 && hi + lw > right;
+    const a = it._flip ? Math.min(lo, lo - lw) : lo;
+    const b = it._flip ? hi : Math.max(hi, hi + lw);
+    let r = ends.findIndex(e => e + 6 < a);
+    it._hideLabel = false;
+    if (r < 0) { r = ends.indexOf(Math.min(...ends)); it._hideLabel = true; }
+    it._row = r; ends[r] = Math.max(ends[r], it._hideLabel ? hi : b);
+  });
+}
+
+function render() {
+  x.range([M.left, W - M.right]);
+  gAxis.call(d3.axisTop(x).ticks(Math.max(4, (W - M.left) / 110)).tickSizeOuter(0));
+  gGrid.selectAll("line").data(x.ticks(d3.timeYear)).join("line")
+    .attr("x1", d => x(d)).attr("x2", d => x(d)).attr("y1", M.top - 6).attr("y2", H_TOTAL).attr("stroke", "#ece7dc");
+
+  gBody.selectAll("*").remove();
+  const now = new Date();
+
+  sections.forEach(s => {
+    if (s.kind === "leaders") {
+      data.leaders.forEach((l, i) => {
+        const yy = s.y + i * ROW;
+        gBody.append("line").attr("x1", x(l.bornD)).attr("x2", x(l.diedD)).attr("y1", yy + 9).attr("y2", yy + 9)
+          .attr("stroke", S[l.side]).attr("stroke-opacity", .28).attr("stroke-width", 3);
+        gBody.append("rect").attr("class", "hit").attr("x", x(l.startD)).attr("y", yy + 3)
+          .attr("width", Math.max(2, x(l.endD) - x(l.startD))).attr("height", 12).attr("rx", 2).attr("fill", S[l.side])
+          .on("mousemove", ev => tip.show(`<b>${l.name}</b><span class="d">${l.country} · in power ${H.fmt(l.startD)} – ${H.fmt(l.endD)}</span><br><span class="d">Lived ${l.born.slice(0,4)}–${l.died.slice(0,4)}</span>`, ev))
+          .on("mouseleave", tip.hide);
+      });
+    }
+    if (s.kind === "lane") {
+      const evs = data.events.filter(e => e.lane === s.lane.id).sort((a, b) => a.d0 - b.d0);
+      assignRows(evs, e => x(e.d0) - 4, e => x(e.d1 || e.d0) + 4, e => (e.d1 && x(e.d1) - x(e.d0) >= e.title.length * 6.3 + 12) ? 0 : e.title.length * 6.3 + 14, LANE_ROWS);
+      evs.forEach(e => {
+        const yy = s.y + e._row * LANE_ROW + 4;
+        const col = C[e.lane];
+        const g = gBody.append("g");
+        if (e.d1) {
+          const w = Math.max(3, x(e.d1) - x(e.d0));
+          const inside = w >= e.title.length * 6.3 + 12;
+          g.append("rect").attr("class", "hit").attr("x", x(e.d0)).attr("y", yy + (inside ? 0 : 3)).attr("width", w)
+            .attr("height", inside ? 16 : 9).attr("rx", 2).attr("fill", col).attr("fill-opacity", inside ? .22 : .55);
+          if (inside) { g.append("text").attr("class", "ev-label").attr("x", x(e.d0) + 5).attr("y", yy + 12).text(e.title); e._hideLabel = true; }
+        } else {
+          g.append("circle").attr("class", "hit").attr("cx", x(e.d0)).attr("cy", yy + 7.5).attr("r", 4.5).attr("fill", col);
+        }
+        if (!e._hideLabel) {
+          const ex = e.d1 ? x(e.d1) : x(e.d0);
+          const flip = e._flip;
+          g.append("text").attr("class", "ev-label").attr("text-anchor", flip ? "end" : "start")
+            .attr("x", flip ? (e.d1 ? x(e.d0) : ex) - 7 : ex + 7).attr("y", yy + 11.5).text(e.title);
+        }
+        g.style("cursor", "default")
+          .on("mousemove", ev => tip.show(`<b>${e.title}</b><span class="d">${H.when(e)}</span>${e.text ? "<br>" + e.text : ""}`, ev))
+          .on("mouseleave", tip.hide);
+      });
+    }
+    if (s.kind === "books") {
+      const bs = data.books.slice().sort((a, b) => a.d0 - b.d0);
+      assignRows(bs, b => x(b.d0), b => x(b.d1), b => 0, 3);
+      bs.forEach(b => {
+        const yy = s.y + b._row * ROW;
+        const w = Math.max(3, x(b.d1) - x(b.d0));
+        gBody.append("rect").attr("class", "hit").attr("x", x(b.d0)).attr("y", yy + 1).attr("width", w).attr("height", ROW - 3).attr("rx", 2)
+          .attr("fill", b.owned ? "#5b5447" : "#fff").attr("stroke", b.canadian ? C.canada : "#5b5447").attr("stroke-width", b.canadian ? 1.5 : 1)
+          .on("mousemove", ev => tip.show(`<b><i>${b.title}</i></b>${b.author}<br><span class="d">${H.fmtMonth(b.d0)} – ${H.fmtMonth(b.d1)} · ${b.owned ? "in Calibre" : "not yet in Calibre"}${b.canadian ? " · Canadian focus" : ""}</span>`, ev))
+          .on("mouseleave", tip.hide);
+        if (w > b.title.length * 6) gBody.append("text").attr("class", "book-label").attr("x", x(b.d0) + 5).attr("y", yy + 12.5)
+          .attr("fill", b.owned ? "#fff" : "#5b5447").text(b.title);
+      });
+    }
+    if (s.kind === "family") {
+      const fam = H.family.load();
+      data.family.forEach((f, i) => {
+        const yy = s.y + i * ROW, rec = fam[f.id];
+        if (rec && rec.born) {
+          const b = new Date(+rec.born, 6, 1), dd = rec.died ? new Date(+rec.died, 6, 1) : now;
+          gBody.append("rect").attr("x", x(b)).attr("y", yy + 3).attr("width", Math.max(2, x(dd) - x(b))).attr("height", 12).attr("rx", 2)
+            .attr("fill", "#9a8f7a");
+          const end = x.domain()[1];
+          if (b > end) gBody.append("text").attr("class", "ev-label").attr("x", W - M.right - 4).attr("text-anchor", "end").attr("y", yy + 13)
+            .attr("fill", "#7a746a").text(`born ${rec.born} → (${rec.born - end.getFullYear()} years after this view)`);
+        }
+        gBody.append("text").attr("class", "fam-edit").attr("x", M.left + 6).attr("y", yy + 13)
+          .text(rec && rec.born ? "" : "add birth year")
+          .on("click", () => { if (H.family.edit(f)) render(); });
+      });
+    }
+  });
+  if (pinned) drawCursor(pinned);
+}
+
+// ---- meanwhile cursor ---------------------------------------------------
+function drawCursor(date) {
+  gCursor.selectAll("*").remove();
+  const cx = x(date);
+  gCursor.append("line").attr("class", "cursor-line").attr("x1", cx).attr("x2", cx).attr("y1", M.top - 4).attr("y2", H_TOTAL);
+  gCursor.append("text").attr("class", "cursor-tag").attr("x", cx + 5).attr("y", M.top + 8).text(H.fmt(date));
+  updateSide(date);
+}
+function updateSide(date) {
+  const span = Math.max(20, Math.round((x.domain()[1] - x.domain()[0]) / 864e5 / 40));
+  const evs = H.near(data.events, date, span);
+  const inPower = data.leaders.filter(l => l.startD <= date && l.endD >= date);
+  const fam = H.family.load();
+  const lanes = Object.fromEntries(data.lanes.map(l => [l.id, l.label]));
+  let html = `<h2>${H.fmt(date)}</h2><p class="hint">Within ${span} days either side${pinned ? " · pinned" : ""}</p>`;
+  data.lanes.forEach(l => {
+    const here = evs.filter(e => e.lane === l.id);
+    html += `<h3 style="color:${C[l.id]}">${l.label}</h3>` + (here.length ? here.map(e =>
+      `<div class="ev"><i class="sw" style="background:${C[e.lane]}"></i>${e.title}<div class="lane">${H.when(e)}</div></div>`).join("") : `<div class="ev hint">—</div>`);
+  });
+  html += `<h3>In power</h3>` + inPower.map(l => `<div class="ev">${l.name} <span class="lane">${l.country}</span></div>`).join("");
+  const ages = data.family.filter(f => fam[f.id] && fam[f.id].born).map(f => {
+    const a = date.getFullYear() - +fam[f.id].born;
+    return `<div class="ev">${f.label}: ${a >= 0 ? "about " + a : "born in " + (-a) + " years"}</div>`;
+  });
+  if (ages.length) html += `<h3>Family</h3>` + ages.join("");
+  document.getElementById("side").innerHTML = html;
+}
+
+svg.on("mousemove", ev => {
+  if (pinned) return;
+  const [mx] = d3.pointer(ev);
+  if (mx < M.left) return;
+  drawCursor(x.invert(mx));
+});
+svg.on("click", ev => {
+  const [mx] = d3.pointer(ev);
+  if (mx < M.left) return;
+  pinned = pinned ? null : x.invert(mx);
+  if (pinned) drawCursor(pinned);
+});
+document.getElementById("pin").onclick = () => { pinned = null; gCursor.selectAll("*").remove(); };
+
+// ---- zoom -------------------------------------------------------------
+const zoom = d3.zoom().scaleExtent([1, 60]).filter(ev => ev.type === "wheel" ? (ev.ctrlKey || chartEl.scrollHeight <= chartEl.clientHeight + 2) : !ev.button)
+  .on("zoom", ev => { x = ev.transform.rescaleX(x0.copy().range([M.left, W - M.right])); render(); });
+function setExtents() {
+  zoom.translateExtent([[M.left, 0], [W - M.right, H_TOTAL]]).extent([[M.left, 0], [W - M.right, H_TOTAL]]);
+}
+setExtents();
+svg.call(zoom).on("dblclick.zoom", null);
+document.getElementById("reset").onclick = () => svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
+window.addEventListener("resize", () => {
+  W = chartEl.clientWidth; svg.attr("width", W);
+  defs.select("rect").attr("width", W - M.left - M.right);
+  x0.range([M.left, W - M.right]); setExtents(); render();
+});
+x0.range([M.left, W - M.right]);
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>History — visualization mockups</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  main { max-width: 780px; padding: 6px 28px 60px; }
+  .v { border-top: 1px solid var(--rule); padding: 14px 0; }
+  .v h2 { font-size: 18px; margin: 0 0 4px; }
+  .v h2 a { color: var(--ink); }
+  .v p { margin: 4px 0; }
+  .muted { color: var(--muted); font-size: 13.5px; }
+</style>
+</head>
+<body>
+<header class="page"><h1>Amit's Notes of the History of the World</h1><span class="sub">Visualization mockups · WW2 proof of concept · 2026-10-04</span></header>
+<main>
+  <p>Three ways of looking at the same hand-entered WW2 dataset (66 events, 14 leaders, 12 books). All three keep a Canada lane. They are meant to be compared rather than chosen between — the final viewer will probably combine two of them.</p>
+
+  <div class="v">
+    <h2><a href="a-swimlanes.html">A · Swimlanes</a></h2>
+    <p>Ideas 1, 2, 5 together. Leaders' reigns over their lifetimes, five theatre lanes, the books you'd read as bars across the years they cover, and your family's lifetimes. A "meanwhile" cursor follows the mouse and lists what was happening everywhere on that date, who was in power, and how old each family member was.</p>
+    <p class="muted">Best for: understanding simultaneity. Weakest on a phone.</p>
+  </div>
+  <div class="v">
+    <h2><a href="b-map-timeline.html">B · Map + timeline</a></h2>
+    <p>Idea 3. A world map coloured by Axis, occupied, Allied and Soviet control, driven by a slider or Play, with a timeline strip underneath that moves in step.</p>
+    <p class="muted">Best for: geography — seeing why Leningrad, Stalingrad and Singapore mattered. The map is simplified to modern whole-country borders for now.</p>
+  </div>
+  <div class="v">
+    <h2><a href="c-scroll-story.html">C · Scroll story</a></h2>
+    <p>The same events read top to bottom, one row per month, with the theatres as columns and Canada first. Changes of leader appear inline and each year opens with who was in power and which books start there.</p>
+    <p class="muted">Best for: reading through a period on the iPad. Closest to the Obsidian notes themselves.</p>
+  </div>
+  <div class="v">
+    <h2>Idea 6 · Notes drive the viewer</h2>
+    <p>The Obsidian notes stay the source of truth. Each entry carries <code>region</code>, <code>start</code>, <code>end</code>; a build script (<code>scripts/build_data.py</code>) reads them and writes the JSON these pages load. The next step is to give events and books their own frontmatter so the vault fills the lanes rather than a hand-written file.</p>
+  </div>
+</main>
+</body>
+</html>

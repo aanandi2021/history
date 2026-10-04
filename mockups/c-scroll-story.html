@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>C · Scroll story — WW2 proof of concept</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  .grid { display: grid; grid-template-columns: 110px repeat(5, minmax(150px, 1fr)); padding: 0 28px 60px; }
+  .head { position: sticky; top: 0; background: var(--paper); z-index: 2; border-bottom: 1px solid var(--rule); }
+  .head div { padding: 10px 8px 8px; font: 600 12px "Segoe UI", sans-serif; border-top: 4px solid transparent; }
+  .year { grid-column: 1 / -1; position: sticky; top: 42px; z-index: 1; background: var(--paper);
+    font-size: 30px; font-weight: 600; padding: 18px 0 4px; border-bottom: 1px solid var(--rule); display: flex; gap: 18px; align-items: baseline; }
+  .year .power { font: 12px "Segoe UI", sans-serif; color: var(--muted); font-weight: 400; }
+  .month { font: 12px "Segoe UI", sans-serif; color: var(--muted); padding: 10px 8px 0 0; border-top: 1px dotted #e6e0d4; }
+  .cell { padding: 8px 8px 6px; border-top: 1px dotted #e6e0d4; border-left: 1px solid #efeae0; }
+  .cell.canada { background: #fbf1ee; }
+  .card { margin-bottom: 6px; font-size: 13.5px; line-height: 1.35; }
+  .card b { font-weight: 600; }
+  .card .d { display: block; font: 11px "Segoe UI", sans-serif; color: var(--muted); }
+  .card .t { display: block; font-size: 12.5px; color: #4d483f; margin-top: 2px; }
+  .card.span b::after { content: " ⟶"; color: var(--muted); font-weight: 400; }
+  .ongoing { font: 11px "Segoe UI", sans-serif; color: var(--muted); margin-bottom: 4px; }
+  .change { grid-column: 1 / -1; font: 12px "Segoe UI", sans-serif; color: var(--ink); background: var(--panel); padding: 5px 8px; margin: 4px 0; border-left: 3px solid var(--muted); }
+  .bookshelf { grid-column: 1 / -1; font-size: 12.5px; color: var(--muted); padding: 4px 0 8px; }
+  .bookshelf i { color: var(--ink); }
+</style>
+</head>
+<body>
+<header class="page">
+  <h1>The Second World War, 1937–1945</h1>
+  <span class="sub">Variant C · a vertical scroll story by month, Canada always first · works on a phone or iPad</span>
+  <nav><a href="index.html">All mockups</a><a href="a-swimlanes.html">A</a><a href="b-map-timeline.html">B</a><a class="on" href="c-scroll-story.html">C</a></nav>
+</header>
+<div class="grid" id="grid"></div>
+
+<script src="vendor/d3.min.js"></script>
+<script src="data/ww2.js"></script>
+<script src="common.js"></script>
+<script>
+const data = H.prepare(window.WW2);
+const C = data.laneColours;
+const grid = document.getElementById("grid");
+const el = (cls, html, style) => { const d = document.createElement("div"); d.className = cls; if (html) d.innerHTML = html; if (style) d.style.cssText = style; grid.appendChild(d); return d; };
+
+const head = ["", ...data.lanes.map(l => l.label)];
+head.forEach((h, i) => el("head", `<div style="border-top-color:${i ? C[data.lanes[i - 1].id] : "transparent"}">${h}</div>`));
+
+const monthKey = d => d3.timeFormat("%Y-%m")(d);
+const byMonth = d3.group(data.events, e => monthKey(e.d0));
+const changes = data.leaders.flatMap(l => [
+  { d: l.startD, text: `${l.name} takes power (${l.country})` },
+  { d: l.endD, text: `${l.name} leaves power (${l.country})` }
+]).filter(c => c.d >= H.parse("1937-01-01") && c.d < H.parse("1946-01-01"));
+const changesByMonth = d3.group(changes, c => monthKey(c.d));
+const booksByYear = d3.group(data.books, b => b.d0.getFullYear());
+
+for (let y = 1937; y <= 1945; y++) {
+  const mid = new Date(y, 6, 1);
+  const leaders = data.leaders.filter(l => l.startD <= mid && l.endD >= mid && ["Canada", "UK", "USA", "USSR", "Germany", "Japan"].includes(l.country) && !l.name.startsWith("Emperor"));
+  el("year", `${y}<span class="power">Mid-year: ${leaders.map(l => l.name.split(" ").slice(-1)[0] + " (" + l.country + ")").join(" · ")}</span>`);
+  const shelf = booksByYear.get(y);
+  if (shelf) el("bookshelf", "Books starting here: " + shelf.map(b => `<i>${b.title}</i> (${b.author})${b.owned ? " ✅" : ""}`).join(" · "));
+
+  for (let m = 0; m < 12; m++) {
+    const k = `${y}-${String(m + 1).padStart(2, "0")}`;
+    (changesByMonth.get(k) || []).forEach(c => el("change", `${H.fmt(c.d)} · ${c.text}`));
+    const evs = byMonth.get(k);
+    if (!evs) continue;
+    el("month", d3.timeFormat("%B")(new Date(y, m, 1)));
+    data.lanes.forEach(l => {
+      const here = evs.filter(e => e.lane === l.id);
+      const monthStart = new Date(y, m, 1);
+      const ongoing = data.events.filter(e => e.lane === l.id && e.d1 && e.d0 < monthStart && e.d1 >= monthStart && (e.d1 - e.d0) > 120 * 864e5);
+      el("cell" + (l.pinned ? " canada" : ""),
+        (ongoing.length ? `<div class="ongoing">continuing: ${ongoing.map(e => e.title).join(", ")}</div>` : "") +
+        here.map(e => `<div class="card${e.d1 ? " span" : ""}" style="border-left:3px solid ${C[l.id]};padding-left:6px"><b>${e.title}</b><span class="d">${H.when(e)}</span>${e.text ? `<span class="t">${e.text}</span>` : ""}</div>`).join(""));
+    });
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+:root {
+  --ink: #2b2925;
+  --muted: #7a746a;
+  --rule: #d9d3c7;
+  --paper: #fbf9f4;
+  --panel: #f3efe6;
+  --accent: #b22d2d;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--paper); color: var(--ink);
+  font: 15px/1.45 "Iowan Old Style", "Palatino Linotype", Georgia, serif; }
+header.page { padding: 18px 28px 6px; display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
+header.page h1 { font-size: 22px; margin: 0; font-weight: 600; }
+header.page .sub { color: var(--muted); font-size: 13px; }
+header.page nav { margin-left: auto; font-size: 13px; }
+header.page nav a { color: var(--muted); margin-left: 12px; text-decoration: none; }
+header.page nav a.on, header.page nav a:hover { color: var(--ink); text-decoration: underline; }
+.sans { font-family: "Segoe UI", system-ui, sans-serif; }
+.tooltip { position: fixed; pointer-events: none; background: #fffdf8; border: 1px solid var(--rule);
+  padding: 7px 10px; max-width: 300px; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.08); opacity: 0; transition: opacity .1s; z-index: 10; }
+.tooltip b { display: block; }
+.tooltip .d { color: var(--muted); font-size: 12px; }
+.axis text { font: 11px "Segoe UI", system-ui, sans-serif; fill: var(--muted); }
+.axis path, .axis line { stroke: var(--rule); }
+.lane-label { font: 600 12px "Segoe UI", system-ui, sans-serif; fill: var(--ink); }
+.group-label { font: 11px "Segoe UI", system-ui, sans-serif; fill: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.legend { font: 12px "Segoe UI", system-ui, sans-serif; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; }
+.legend i { display: inline-block; width: 11px; height: 11px; margin-right: 5px; vertical-align: -1px; border-radius: 2px; }
+button, select { font: 13px "Segoe UI", system-ui, sans-serif; background: #fff; border: 1px solid var(--rule); padding: 4px 10px; border-radius: 3px; cursor: pointer; color: var(--ink); }
+button:hover { border-color: var(--muted); }
