@@ -52,6 +52,12 @@ window.ARTIFACTS = {
    "date": "2026-10-04",
    "subject": "Implement the world viewer (001): map + swimlanes, chapters, cards, Russia and WW2",
    "stat": "24 files changed, 2757 insertions(+), 41 deletions(-)"
+  },
+  {
+   "hash": "fa0d3ab",
+   "date": "2026-10-04",
+   "subject": "Add the Spec Kit walkthrough (docs/speckit) with this repo as the worked example",
+   "stat": "14 files changed, 1157 insertions(+), 13 deletions(-)"
   }
  ]
 };
