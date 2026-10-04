@@ -21,6 +21,10 @@ The address bar always holds `#period/date/item` (for example `#russia/1812-09-1
 
 Cards link to the matching heading in the vault note (`obsidian://`), to Wikipedia, and to books in Calibre (`calibre://`) or the Ottawa Public Library.
 
+**Amit's Fiction.** A period can list Amit's own writing as a book with `amits: true` and a vault `note`. Any event, ruler or chapter in its years then shows an "Amit's Fiction" section on its card. Items tagged `fic: "<heading>"` (or `fic: { note, heading }` for a sibling research file) also get an "Amit's Fiction" link straight to that heading. A lane with `fiction: true` holds the novel's own storyline. It is labelled as fiction, and each of its events must point into the novel. The first example is *The Unseen Tomorrow* in the Maritime Asia period (`#maritime`), whose research lives in the vault under `Writing/The Unseen Tomorrow/`.
+
+Periods so far: **WW2** (1939–45), **Russia** (1450–1946), **Maritime Asia** (745–865: Bengal, Srivijaya, Java and Tang China).
+
 Family birth years are typed into the Family row and saved in this browser's localStorage only. They are never written to the repo.
 
 ### Tests
@@ -38,7 +42,7 @@ npm test         # data checks, model unit tests, and end-to-end tests in headle
 
 1. Write (or extend) the vault note first. Its `##` headings become link targets.
 2. Copy `app/data/russia.js` as a template. Register it as `window.DATASETS.<id>` and add a `<script>` tag in `app/index.html`.
-3. The first lane must be `{ id: "canada", pinned: true }`. Give every event a date (`YYYY`, `YYYY-MM` or `YYYY-MM-DD`), a lane, and if you can, `at: [lon, lat]` and a `section` matching a heading.
+3. The first lane must be `{ id: "canada", pinned: true }`. Give every event a date (`YYYY`, `YYYY-MM` or `YYYY-MM-DD`; years before 1000 are zero-padded, e.g. `"0778"`), a lane, and if you can, `at: [lon, lat]` and a `section` matching a heading. For periods where only years are known, set `precision: "year"` so the cursor shows a bare year.
 4. For owned books, run `python scripts/calibre_ids.py "Title"` and add `owned: true, calibreId: <id>`.
 5. Run `npm run test:data`. The validator names any problem it finds.
 

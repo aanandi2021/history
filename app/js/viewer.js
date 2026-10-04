@@ -25,13 +25,14 @@
   const laneColour = (lane) => state.ds.colours.lanes[lane] || "#888";
   const sideColour = (side) => state.ds.colours.sides[side] || "#888";
   const itemName = (it) => it.title || it.name;
-  const itemColour = (it) => it.kind === "event" ? laneColour(it.lane) : it.kind === "leader" ? sideColour(it.side) : it.kind === "book" ? (it.canadian ? "#b22d2d" : "#7b6a4f") : "#c9b48a";
+  const itemColour = (it) => it.kind === "event" ? laneColour(it.lane) : it.kind === "leader" ? sideColour(it.side) : it.kind === "book" ? (it.amits ? "#2e7d6b" : it.canadian ? "#b22d2d" : "#7b6a4f") : "#c9b48a";
   function itemWhen(it) {
     if (it.kind === "leader") return it.terms.map((r) => M.fmtRange(r.a, r.b)).join("; ");
     if (it.kind === "event") return M.fmtRange(it.date, it.end, it.approx && !M.isPartial(it.date));
     return M.fmtRange(it.start, it.end);
   }
-  const fmtCursor = (t) => M.fmtDate(M.isoDate(t));
+  // Periods where only years are known (dataset.precision === "year") show the cursor as a bare year.
+  const fmtCursor = (t) => (state.ds && state.ds.precision === "year") ? String(t.getUTCFullYear()) : M.fmtDate(M.isoDate(t));
 
   const tip = $("#tooltip");
   function showTip(ev, html) { tip.innerHTML = html; tip.hidden = false; moveTip(ev); }
@@ -286,7 +287,7 @@
       }
       if (d.showLabel) {
         gi.append("text").attr("x", d.lx).attr("y", cy + 4).attr("text-anchor", d.anchor)
-          .attr("class", d.inside && !opts.darkText ? "in" : null).text(d.en.label);
+          .attr("class", d.inside && !opts.darkText && !it.approx ? "in" : null).text(d.en.label);
       }
     }
   }
@@ -302,8 +303,9 @@
 
     // Axis
     const axisY = 22;
+    const nTicks = Math.max(3, Math.floor((W - GUTTER) / 95)), tf = xs.tickFormat(nTicks);
     root.append("g").attr("class", "axis").attr("transform", `translate(0,${axisY})`)
-      .call(d3.axisTop(xs).ticks(Math.max(3, Math.floor((W - GUTTER) / 95))).tickSizeOuter(0).tickSize(4));
+      .call(d3.axisTop(xs).ticks(nTicks).tickFormat((d) => tf(d).replace(/^0+(?=\d)/, "")).tickSizeOuter(0).tickSize(4));
     labels.append("text").attr("class", "hint").attr("x", 8).attr("y", 14).text("drag to pan · Ctrl+wheel to zoom");
     let y = axisY + 8;
 
@@ -353,7 +355,7 @@
     // Books
     section("Books");
     const bkEntries = ds.books.slice().sort((a, b) => a.t0 - b.t0 || b.t1 - a.t1)
-      .map((b) => ({ ref: b, t0: b.t0, t1: b.t1, label: `${b.title}${b.fiction ? " (fiction)" : ""}${b.owned ? " ✓" : ""}` }));
+      .map((b) => ({ ref: b, t0: b.t0, t1: b.t1, label: b.amits ? `✎ ${b.title} (Amit's fiction)` : `${b.title}${b.fiction ? " (fiction)" : ""}${b.owned ? " ✓" : ""}` }));
     const bkLaid = layoutRows(bkEntries, 10);
     lane("Reading", null, bkLaid, (y0) => drawEntries(body, bkLaid, y0, { alwaysBar: true, h: 11 }), 1);
 
@@ -504,14 +506,16 @@
     const it = state.selected && state.ds.byId.get(state.selected);
     if (!it) { card.hidden = true; card.innerHTML = ""; return; }
     const ds = state.ds;
-    const kindLabel = { event: ds.lanes.find((l) => l.id === it.lane)?.label || "Event", leader: `In power · ${it.country}`, chapter: "Chapter", book: it.fiction ? "Book · fiction" : "Book" }[it.kind];
+    const kindLabel = { event: ds.lanes.find((l) => l.id === it.lane)?.label || "Event", leader: `In power · ${it.country}`, chapter: "Chapter", book: it.amits ? "Amit's Fiction" : it.fiction ? "Book · fiction" : "Book" }[it.kind];
     let h = `<button class="close" title="Close (Esc)" aria-label="Close">×</button><div class="kind">${esc(kindLabel)}</div><h2>${esc(itemName(it))}</h2>`;
     h += `<div class="when" id="card-when">${esc(itemWhen(it))}</div>`;
     if (it.approx) h += `<div class="when">Dates are approximate.</div>`;
-    if (it.kind === "leader") h += `<div class="when">Lived ${esc(M.fmtRange(it.born, it.died))}</div>`;
+    if (it.kind === "leader" && it.born && it.died) h += `<div class="when">Lived ${esc(M.fmtRange(it.born, it.died))}</div>`;
+    if (it.kind === "leader" && it.lifeUnknown) h += `<div class="when">Birth and death dates are not known.</div>`;
     if (it.kind === "book") {
-      h += `<p>${esc(it.author)}${it.owned ? '<span class="tag own">in Calibre</span>' : ""}${it.canadian ? '<span class="tag">Canadian</span>' : ""}${it.fiction ? '<span class="tag">fiction</span>' : ""}</p>`;
+      h += `<p>${esc(it.author)}${it.amits ? '<span class="tag amits">Amit\'s fiction</span>' : ""}${it.owned ? '<span class="tag own">in Calibre</span>' : ""}${it.canadian ? '<span class="tag">Canadian</span>' : ""}${it.fiction && !it.amits ? '<span class="tag">fiction</span>' : ""}</p>`;
     }
+    if (it.kind === "event" && ds.lanes.find((l) => l.id === it.lane)?.fiction) h += `<p><span class="tag amits">from Amit's novel, not history</span></p>`;
     if (it.text) h += `<p>${esc(it.text)}</p>`;
     const links = M.linksFor(ds, it);
     h += `<div class="links">`;
@@ -527,6 +531,15 @@
         const bl = M.linksFor(ds, b).filter((l) => l.kind !== "note")[0];
         return `<li>${itemLink(b)} <span class="d">${esc(b.author)}</span>${b.owned ? '<span class="tag own">owned</span>' : ""}` +
           (bl ? ` <a class="d" data-link="${bl.kind}" href="${esc(bl.href)}"${bl.kind === "library" ? ' target="_blank" rel="noopener"' : ""}>${bl.kind === "calibre" ? "open" : "library ↗"}</a>` : "") + `</li>`;
+      }).join("")}</ul>`;
+    }
+    const mine = M.fictionFor(ds, it);
+    if (mine.length) {
+      const fic = M.ficTarget(ds, it);
+      h += `<h3>Amit's Fiction</h3><ul class="books amits">${mine.map((b) => {
+        const href = fic && (!fic.work || fic.work.id === b.id) ? M.obsidianUrl(fic.note, fic.heading) : M.obsidianUrl(b.note, b.heading);
+        const where = fic && fic.heading && (!fic.work || fic.work.id === b.id) ? ` <span class="d">· ${esc(fic.heading)}</span>` : "";
+        return `<li data-amits="${esc(b.id)}">✎ ${itemLink(b)}${where} <a class="d" data-link="fiction" href="${esc(href)}">open notes</a></li>`;
       }).join("")}</ul>`;
     }
     card.innerHTML = h;

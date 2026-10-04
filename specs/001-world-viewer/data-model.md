@@ -27,10 +27,18 @@ middle of the year or month. `approx: true` marks a full date as approximate as 
 | `mapNote` | string | the on-screen note about map simplifications |
 | `colours` | { lanes, sides } | colour per lane id and per side |
 | `changelog` | {date, text}[] | corrections (Principle II) |
+| `precision` | `"year"`? | the cursor shows a bare year (ancient periods) |
 
 ## Lane
 
-`id`, `label`, `pinned?`.
+`id`, `label`, `pinned?`, `fiction?`. A fiction lane holds the storyline of one of Amit's own works. Its label must say so, and every event in it needs `fic`.
+
+## Amit's Fiction
+
+A book with `amits: true` is Amit's own writing. It needs `note` (the vault path of its main research note) and may have `heading`.
+It never appears in the "Reading" list. Instead, any item in its years shows an "Amit's Fiction" section on its card.
+Any event, leader or chapter may carry `fic`: a heading in that note, or `{ note, heading }` for a sibling file.
+Items with `fic` get a direct "Amit's Fiction" link to it. If a dataset lists more than one work, `work` (a book id or title) chooses which one.
 
 ## Event
 
@@ -49,7 +57,7 @@ middle of the year or month. `approx: true` marks a full date as approximate as 
 ## Leader
 
 `id?`, `name`, `country`, `side` (a key of `colours.sides`), `born`, `died`, either `terms: [[start, end], ...]` or `start` and `end`,
-plus `section?` and `wiki?`. Every term must fall within the person's lifetime.
+plus `section?` and `wiki?`. Every term must fall within the person's lifetime. For rulers whose birth and death are unknown, set `lifeUnknown: true` and leave out `born` and `died`.
 
 ## Chapter
 
@@ -57,7 +65,7 @@ plus `section?` and `wiki?`. Every term must fall within the person's lifetime.
 
 ## Book
 
-`title`, `author`, `start`, `end`, `owned` (boolean), `calibreId?` (required when owned), `section?`, `canadian?`, `fiction?`.
+`title`, `author`, `start`, `end`, `owned` (boolean), `calibreId?` (required when owned), `section?`, `canadian?`, `fiction?`, `amits?`, `note?` (required when `amits`), `heading?`.
 
 ## MapState
 

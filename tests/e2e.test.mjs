@@ -151,6 +151,38 @@ test("US3: Russia cards link to the vault note, Wikipedia and books", async () =
   await context.close();
 });
 
+test("US3: Amit's Fiction — the novel's lane, its links, and history cards that point to it", async () => {
+  const { page, errors, blocked, context } = await open("#maritime/0778/ut-first-gift");
+  await settle(500);
+  assert.match(await page.$eval("#card .kind", (k) => k.textContent), /Amit's fiction/);
+  assert.ok(await page.$("#card .tag.amits"), "marked as fiction, not history");
+  const fic = await page.$eval('#card .links a[data-link="fiction"]', (a) => ({ href: a.href, text: a.textContent, target: a.target }));
+  assert.equal(fic.text, "Amit's Fiction");
+  assert.match(fic.href, /^obsidian:\/\/open\?vault=Fourth%20Vault%20July%202023&file=Writing%2FThe%20Unseen%20Tomorrow%2F/);
+  assert.equal(fic.target, "");
+  // A real event from the novel's years lists the novel under its own heading, after the reading list.
+  await page.evaluate(() => APP.select(APP.state.ds.events.find((e) => e.title === "Borobudur rises").id));
+  await settle(300);
+  const heads = await page.$$eval("#card h3", (h) => h.map((x) => x.textContent));
+  assert.deepEqual(heads.slice(-2), ["Reading", "Amit's Fiction"]);
+  const mine = await page.$eval("#card ul.amits li", (li) => li.textContent);
+  assert.match(mine, /The Unseen Tomorrow/);
+  assert.match(mine, /CENTRAL JAVA - BOROBUDUR REGION/);
+  // The novel is on the books lane, styled as Amit's, and its card opens the vault.
+  assert.ok(await page.evaluate(() => [...document.querySelectorAll("#tl text")].some((t) => t.textContent.includes("Amit's fiction"))));
+  await page.evaluate(() => APP.select("amits-unseen-tomorrow"));
+  await settle(300);
+  const kinds = await page.$$eval("#card .links a[data-link]", (as) => as.map((a) => a.dataset.link));
+  assert.ok(kinds.includes("fiction") && !kinds.includes("calibre") && !kinds.includes("library"), kinds.join());
+  // Years under 1000 read as 778, not 0778.
+  const ticks = await page.$$eval("#tl .axis .tick text", (t) => t.map((x) => x.textContent));
+  assert.ok(ticks.length && ticks.every((t) => !/^0\d/.test(t)), ticks.join());
+  assert.deepEqual(blocked, []);
+  assert.deepEqual(errors, []);
+  await page.screenshot({ path: path.join(SHOTS, "us3-amits-fiction.png") });
+  await context.close();
+});
+
 test("US3: clicking a meanwhile entry selects it; search finds and selects", async () => {
   const { page, context } = await open("#russia/1812-09-14");
   await settle(300);
@@ -233,7 +265,7 @@ test("T029 timing: hover update and dataset switch are quick", async () => {
 });
 
 test("no two bars overlap on the timeline, so every chapter, ruler and book can be clicked", async () => {
-  for (const ds of ["ww2", "russia"]) {
+  for (const ds of ["ww2", "russia", "maritime"]) {
     const { page, context } = await open(`#${ds}`);
     const clashes = await page.evaluate(() => {
       const rects = [...document.querySelectorAll("#tl g.item rect")].map((r) => ({ id: r.closest("[data-id]").dataset.id, b: r.getBoundingClientRect() }))

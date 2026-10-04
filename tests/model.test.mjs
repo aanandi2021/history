@@ -78,6 +78,29 @@ test("links: Obsidian section, Wikipedia, Calibre and library", () => {
   assert.equal(HM.calibreUrl(91), "calibre://show-book/CalibreLibrary/91");
 });
 
+test("Amit's Fiction: novel events link into the novel's notes; history in its years lists the novel", () => {
+  const mt = HM.normalise(D.maritime);
+  const birth = mt.byId.get("ut-birth");
+  const fic = HM.linksFor(mt, birth).find((l) => l.kind === "fiction");
+  assert.equal(fic.label, "Amit's Fiction");
+  assert.ok(fic.href.includes(encodeURIComponent("Writing/The Unseen Tomorrow/the_unseen_tomorrow_MASTER_REFERENCE#2. HISTORICAL TIMELINE (755-825 CE)")));
+  const boro = mt.events.find((e) => e.title === "Borobudur rises");
+  assert.ok(HM.linksFor(mt, boro).find((l) => l.kind === "fiction").href.includes(encodeURIComponent("unseen_tomorrow_locations 1#4. CENTRAL JAVA")));
+  // Any history item in the novel's years shows the novel, but it never crowds out real books.
+  const talas = mt.events.find((e) => e.title === "Baghdad founded");
+  assert.deepEqual(HM.fictionFor(mt, talas).map((b) => b.title), ["The Unseen Tomorrow"]);
+  assert.ok(HM.booksFor(mt, talas).every((b) => !b.amits));
+  const verdun = mt.events.find((e) => e.title === "Treaty of Verdun");
+  assert.deepEqual(HM.fictionFor(mt, verdun), []);
+  // The novel's own card opens the vault, not Calibre or the library.
+  const novel = mt.books.find((b) => b.amits);
+  assert.deepEqual(HM.linksFor(mt, novel).map((l) => l.kind), ["note", "fiction"]);
+  // Leaders with unknown lives validate; fiction lanes need fic headings.
+  const broken = JSON.parse(JSON.stringify(D.maritime));
+  broken.events.find((e) => e.lane === "unseen").fic = undefined;
+  assert.ok(HM.validate(broken).some((m) => /fiction lane need a fic/.test(m)));
+});
+
 test("hash: parse, clamp and fall back (US4)", () => {
   const p = HM.parseHash("#russia/1812-09-14/moscow-burns-1812", D, "ww2");
   assert.equal(p.dataset, "russia");

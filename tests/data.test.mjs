@@ -8,9 +8,8 @@ import { loadDatasets, HM, ROOT } from "./load.mjs";
 const DATASETS = loadDatasets();
 const ids = Object.keys(DATASETS);
 
-test("both datasets are registered", () => {
-  assert.ok(ids.includes("ww2"));
-  assert.ok(ids.includes("russia"));
+test("all datasets are registered", () => {
+  for (const id of ["ww2", "russia", "maritime"]) assert.ok(ids.includes(id), id);
 });
 
 for (const id of ids) {
@@ -47,6 +46,7 @@ for (const id of ids) {
         if (l.kind === "library") assert.match(l.href, /^https:\/\/ottawa\.bibliocommons\.com\/v2\/search\?query=/);
         if (l.kind === "calibre") assert.match(l.href, /^calibre:\/\/show-book\/CalibreLibrary\/\d+$/);
         if (l.kind === "note") assert.match(l.href, /^obsidian:\/\/open\?vault=Fourth%20Vault%20July%202023&file=.+%23.+/);
+        if (l.kind === "fiction") assert.match(l.href, /^obsidian:\/\/open\?vault=Fourth%20Vault%20July%202023&file=Writing%2F.+/);
       }
     }
   });
@@ -56,26 +56,56 @@ for (const id of ids) {
   });
 }
 
-test("russia: sections match headings in the vault note when the vault is mounted", (t) => {
-  const raw = DATASETS.russia;
-  const vault = "A:\\Obsidian External Vaults\\Fourth Vault July 2023";
-  const file = path.join(vault, ...raw.note.split("/")) + ".md";
-  if (!fs.existsSync(file)) { t.skip("vault not mounted"); return; }
-  const headings = new Set(fs.readFileSync(file, "utf8").split(/\r?\n/).filter((l) => l.startsWith("## ")).map((l) => l.slice(3).trim()));
-  const ds = HM.normalise(raw);
-  const missing = new Set();
-  for (const it of ds.byId.values()) if (it.section && !headings.has(it.section)) missing.add(it.section);
-  assert.deepEqual([...missing], []);
-});
+const VAULT = "A:\\Obsidian External Vaults\\Fourth Vault July 2023";
+const vaultFile = (notePath) => path.join(VAULT, ...notePath.split("/")) + ".md";
+const headingsOf = (file) => new Set(fs.readFileSync(file, "utf8").split(/\r?\n/).filter((l) => /^#{2,3} /.test(l)).map((l) => l.replace(/^#+ /, "").trim()));
 
-test("russia: every book in the vault note is in the dataset", (t) => {
-  const raw = DATASETS.russia;
-  const file = path.join("A:\\Obsidian External Vaults\\Fourth Vault July 2023", ...raw.note.split("/")) + ".md";
-  if (!fs.existsSync(file)) { t.skip("vault not mounted"); return; }
-  const titles = [...fs.readFileSync(file, "utf8").matchAll(/^- [^*]+\*([^*]+)\*/gm)].map((m) => m[1].split(":")[0].trim().toLowerCase());
-  const have = raw.books.map((b) => b.title.toLowerCase());
-  const missing = titles.filter((t) => !have.some((h) => h.startsWith(t) || t.startsWith(h.split(":")[0])));
-  assert.deepEqual(missing, []);
+for (const id of ids.filter((i) => DATASETS[i].note)) {
+  test(`${id}: sections match headings in the vault note when the vault is mounted`, (t) => {
+    const raw = DATASETS[id];
+    const file = vaultFile(raw.note);
+    if (!fs.existsSync(file)) { t.skip("vault note not found"); return; }
+    const headings = headingsOf(file);
+    const ds = HM.normalise(raw);
+    const missing = new Set();
+    for (const it of ds.byId.values()) if (it.section && !headings.has(it.section)) missing.add(it.section);
+    assert.deepEqual([...missing], []);
+  });
+
+  test(`${id}: Amit's Fiction links land on real headings in the novel's notes`, (t) => {
+    const raw = DATASETS[id];
+    const ds = HM.normalise(raw);
+    const targets = [];
+    for (const it of ds.byId.values()) {
+      const f = HM.ficTarget(ds, it);
+      if (f) targets.push([it.id, f.note, f.heading]);
+      if (it.amits) targets.push([it.id, it.note, it.heading]);
+    }
+    if (!targets.length) { t.skip("no fiction links"); return; }
+    if (!fs.existsSync(vaultFile(targets[0][1]))) { t.skip("vault not mounted"); return; }
+    const bad = targets.filter(([, note, h]) => !fs.existsSync(vaultFile(note)) || (h && !headingsOf(vaultFile(note)).has(h)));
+    assert.deepEqual(bad, []);
+  });
+
+  test(`${id}: every book in the vault note is in the dataset`, (t) => {
+    const raw = DATASETS[id];
+    const file = vaultFile(raw.note);
+    if (!fs.existsSync(file)) { t.skip("vault note not found"); return; }
+    const titles = [...fs.readFileSync(file, "utf8").matchAll(/^- [^*]+\*([^*]+)\*/gm)].map((m) => m[1].split(":")[0].trim().toLowerCase());
+    const have = raw.books.map((b) => b.title.toLowerCase());
+    const missing = titles.filter((t) => !have.some((h) => h.startsWith(t) || t.startsWith(h.split(":")[0])));
+    assert.deepEqual(missing, []);
+  });
+}
+
+test("maritime: the fiction lane is labelled as fiction and every event in it points into the novel", () => {
+  const raw = DATASETS.maritime;
+  const lane = raw.lanes.find((l) => l.fiction);
+  assert.ok(lane && /fiction/i.test(lane.label));
+  const evs = raw.events.filter((e) => e.lane === lane.id);
+  assert.ok(evs.length >= 8);
+  for (const e of evs) assert.ok(e.fic, e.title);
+  assert.ok(raw.books.some((b) => b.amits && b.title === "The Unseen Tomorrow"));
 });
 
 test("no family birth years are committed to the repository (Principle VII)", () => {

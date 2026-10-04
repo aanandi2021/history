@@ -163,10 +163,26 @@
   /** Books relevant to an item: same vault section first, then those overlapping its dates. */
   function booksFor(ds, item, max = 3) {
     if (item.kind === "book") return [];
-    const same = item.section ? ds.books.filter((b) => b.section && b.section === item.section) : [];
+    const pub = ds.books.filter((b) => !b.amits);
+    const same = item.section ? pub.filter((b) => b.section && b.section === item.section) : [];
     if (same.length) return same.slice(0, max);
-    return ds.books.filter((b) => overlaps(b, item.t0, item.t1))
+    return pub.filter((b) => overlaps(b, item.t0, item.t1))
       .sort((x, y) => (x.t1 - x.t0) - (y.t1 - y.t0)).slice(0, max);
+  }
+
+  /** Amit's own writing that touches this item: anything tagged `fic`, or overlapping in time. */
+  function fictionFor(ds, item) {
+    if (item.kind === "book" && item.amits) return [];
+    return ds.books.filter((b) => b.amits && (item.fic || overlaps(b, item.t0, item.t1)));
+  }
+
+  /** Where an item's `fic` points: a heading in the work's note, or {note, heading} for a sibling file. */
+  function ficTarget(ds, item) {
+    if (!item.fic) return null;
+    const work = ds.books.find((b) => b.amits && (!item.work || b.id === item.work || b.title === item.work));
+    const f = typeof item.fic === "string" ? { heading: item.fic } : item.fic;
+    const note = f.note || (work && work.note);
+    return note ? { note, heading: f.heading || null, work } : null;
   }
 
   // ---- links -------------------------------------------------------------
@@ -196,7 +212,11 @@
     const out = [];
     const note = item.note || ds.note;
     if (item.section && note) out.push({ kind: "note", label: "Open note", href: obsidianUrl(note, item.section) });
-    if (item.kind === "book") {
+    const fic = ficTarget(ds, item);
+    if (fic) out.push({ kind: "fiction", label: "Amit's Fiction", href: obsidianUrl(fic.note, fic.heading) });
+    if (item.kind === "book" && item.amits) {
+      out.push({ kind: "fiction", label: "Open in Amit's Fiction", href: obsidianUrl(item.note, item.heading) });
+    } else if (item.kind === "book") {
       if (item.owned && item.calibreId != null) out.push({ kind: "calibre", label: "Open in Calibre", href: calibreUrl(item.calibreId) });
       out.push({ kind: "library", label: "Ottawa Public Library", href: libraryUrl(item) });
     } else {
@@ -281,12 +301,13 @@
       const w = `leader "${l.name}"`;
       dup(l.id, w);
       if (!sides.has(l.side)) bad(`${w}: unknown side ${l.side}`);
-      if (!okDate(l.born) || !okDate(l.died)) { bad(`${w}: bad life dates`); continue; }
+      const lifeKnown = !l.lifeUnknown;
+      if (lifeKnown && (!okDate(l.born) || !okDate(l.died))) { bad(`${w}: bad life dates (or set lifeUnknown)`); continue; }
       const terms = l.terms || [[l.start, l.end]];
       for (const [a, b] of terms) {
         if (!okDate(a) || !okDate(b)) { bad(`${w}: bad term`); continue; }
         if (parseDate(a) > parseDate(b)) bad(`${w}: term ends before it starts`);
-        if (parseDate(a) < parseDate(l.born) || parseDate(b) > parseDate(l.died)) bad(`${w}: term outside lifetime`);
+        if (lifeKnown && (parseDate(a) < parseDate(l.born) || parseDate(b) > parseDate(l.died))) bad(`${w}: term outside lifetime`);
       }
     }
     for (const c of raw.chapters || []) {
@@ -302,6 +323,15 @@
       dup(b.id, w);
       if (!okDate(b.start) || !okDate(b.end)) bad(`${w}: bad dates`);
       if (b.owned && !Number.isInteger(b.calibreId)) bad(`${w}: owned books need a calibreId`);
+      if (b.amits && !b.note) bad(`${w}: Amit's own work needs a vault note path`);
+    }
+    const fictionLanes = new Set((raw.lanes || []).filter((l) => l.fiction).map((l) => l.id));
+    const works = (raw.books || []).filter((b) => b.amits);
+    for (const it of [...(raw.events || []), ...(raw.chapters || [])]) {
+      const w = `"${it.title}"`;
+      if (fictionLanes.has(it.lane) && !it.fic) bad(`${w}: events in a fiction lane need a fic heading`);
+      if (it.fic && !works.length) bad(`${w}: has fic but the dataset lists none of Amit's works`);
+      if (it.fic && typeof it.fic !== "string" && !(it.fic && typeof it.fic.note === "string")) bad(`${w}: fic must be a heading or {note, heading}`);
     }
     for (const s of raw.mapStates || []) {
       if (!okDate(s.date)) bad(`map state "${s.label}": bad date`);
@@ -314,7 +344,7 @@
 
   return {
     DAY, VAULT, parseDate, isPartial, isoDate, fmtDate, fmtRange, slug, normalise, nearWindow,
-    nearbyEvents, activeLeaders, activeChapters, activeChapter, mapStateAt, booksFor,
+    nearbyEvents, activeLeaders, activeChapters, activeChapter, mapStateAt, booksFor, fictionFor, ficTarget,
     obsidianUrl, wikiUrl, calibreUrl, libraryUrl, linksFor, parseHash, formatHash, search, stepEvent, validate
   };
 });
