@@ -6,12 +6,13 @@
   "scripts": {
     "test": "node --test --test-concurrency=1 tests/*.test.mjs",
     "test:data": "node --test tests/data.test.mjs tests/model.test.mjs",
-    "test:e2e": "node --test tests/e2e.test.mjs",
+    "test:e2e": "node --test tests/e2e.test.mjs tests/walkthrough.test.mjs",
+    "build:walkthrough": "python scripts/build_walkthrough.py",
     "build:notes": "python scripts/build_data.py"
   },
   "devDependencies": {
+    "marked": "^18.0.14",
     "puppeteer": "25.5.0"
   }
 }
-
 

@@ -31,7 +31,7 @@ npm test         # data checks, model unit tests, and end-to-end tests in headle
 ```
 
 `npm run test:data` runs only the fast checks. The end-to-end tests (one per user story in
-`specs/001-world-viewer/spec.md`) save screenshots to `tests/screenshots/` and block all network access to prove the app works offline.
+`specs/001-world-viewer/spec.md`, plus the Spec Kit walkthrough) save screenshots to `tests/screenshots/` and block all network access to prove the pages work offline.
 `node scripts/shot.mjs "#russia/1709" out.png` takes a one-off screenshot and prints any console errors.
 
 ### Adding a period
@@ -70,4 +70,6 @@ The repo is initialised with [Spec Kit](https://github.com/github/spec-kit) (`.s
 The mockups were the exploration before the spec. The first feature, the viewer, then went through every step:
 `.specify/memory/constitution.md`, then `specs/001-world-viewer/` (spec → clarifications → plan, research,
 data model, contracts → tasks → analysis → implementation).
-`docs/speckit/index.html` walks through the same steps using this project as the worked example.
+`docs/speckit/index.html` walks through the same steps using this project as the worked example: what each step is for,
+the prompt (filled in from your own project's details), the real files and commits from here, pitfalls, and a "done when"
+checklist saved in the browser. After editing anything under `specs/`, run `npm run build:walkthrough` to refresh its copy.
