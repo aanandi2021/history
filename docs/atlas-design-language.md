@@ -210,3 +210,19 @@ What was new, in the order it matters for us:
 
 The fidelity plate for round 2 is `atlas/plates/han-china.js`: an overview of Wudi's empire plus a large-scale
 figure of the Hexi Corridor, using every new primitive.
+
+## 13. Scenes: the grammar on the viewer map
+
+The same grammar now has a second renderer. Each chapter on the timeline can carry a scene (`app/scenes/*.js`),
+drawn by `viewer.js` on the zoomable world map instead of on a framed plate. Three things differ from a plate.
+
+- **Zoom is part of the grammar.** A plate is printed at one scale. A scene is seen at many, so layers take
+  `minK`/`maxK`. Distant ports can drop away as you zoom in, and fine detail can appear only when you're close.
+  Symbols and type stay the same size on screen at every zoom.
+- **Arrows can fade.** When a source says only "to India and China", `fade: true` draws the arrow as a gradient
+  that dies out, rather than pointing to a place the source doesn't name. Named ports get their own points.
+- **The text is linked, not keyed.** On a plate the text and map share numbered references. In a scene the
+  chapter's names link one move ahead (`terms`), and a few carry a starred question to ask.
+
+The base map under a scene is still today's coastlines at 1:110m, so city-scale views (Baghdad's round city)
+need their own plate. That's left for later.

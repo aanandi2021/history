@@ -67,8 +67,8 @@
     .on("zoom", (ev) => {
       mapRoot.attr("transform", ev.transform);
       state.mapK = ev.transform.k;
-      scalePins();
       scaleScene();
+      scalePins();
     });
   mapSvg.call(mapZoom).on("dblclick.zoom", null);
 
@@ -316,14 +316,30 @@
     });
     pins.sort((a, b) => (b.d.id === state.selected) - (a.d.id === state.selected) || dist(a.d) - dist(b.d));
     const dots = pins.map((p) => ({ x0: p.x - 5, x1: p.x + 5, y0: p.y - 5, y1: p.y + 5 }));
+    // a pin sitting on a named scene point is already labelled by the scene
+    const named = sceneLayer.selectAll(".focus .sc[data-name]").filter(function () { return !this.closest("[display=none]"); }).data().map((d) => tr.apply([d.x, d.y]));
+    const near = (p) => named.some(([x, y]) => Math.hypot(x - p.x, y - p.y) < 9);
+    // scene labels were placed first; pin labels give way to them (screen boxes converted to map viewBox units)
     const boxes = [];
+    const inv = mapSvg.node().getScreenCTM && mapSvg.node().getScreenCTM();
+    if (inv) {
+      const m = inv.inverse();
+      const toMap = (x, y) => { const q = new DOMPoint(x, y).matrixTransform(m); return [q.x, q.y]; };
+      sceneLayer.selectAll(".focus text").each(function () {
+        if (this.closest("[display=none]")) return;
+        const r = this.getBoundingClientRect();
+        if (!r.width) return;
+        const [x0, y0] = toMap(r.left, r.top), [x1, y1] = toMap(r.right, r.bottom);
+        boxes.push({ x0, x1, y0, y1 });
+      });
+    }
     const overlaps = (r, q) => r.x0 < q.x1 && r.x1 > q.x0 && r.y0 < q.y1 && r.y1 > q.y0;
     pins.forEach((p, i) => {
       const w = p.d.title.length * 6.2 + 4;
       const right = { x0: p.x + 7, x1: p.x + 7 + w, y0: p.y - 8, y1: p.y + 6 };
       const left = { x0: p.x - 7 - w, x1: p.x - 7, y0: p.y - 8, y1: p.y + 6 };
       const free = (r) => !boxes.some((q) => overlaps(r, q)) && !dots.some((q, j) => j !== i && overlaps(r, q));
-      const side = free(right) ? "r" : free(left) ? "l" : p.d.id === state.selected ? "r" : null;
+      const side = near(p) ? null : free(right) ? "r" : free(left) ? "l" : p.d.id === state.selected ? "r" : null;
       if (side) boxes.push(side === "r" ? right : left);
       d3.select(p.n).classed("unlabelled", !side).select("text")
         .attr("display", side ? null : "none")

@@ -71,6 +71,24 @@ and the other way round.
 
 The book scans used for the study stay in `study\`, which is git-ignored, and must never be committed.
 
+## Chapter scenes
+
+The chapter bars nest: shorter chapters sit inside longer ones. Each chapter can also carry a **scene**: a small map
+in the atlas grammar, drawn on the viewer map while that chapter is selected or is the most specific one running.
+Other chapters running at the same time show their areas faintly behind it. Scenes live in `app/scenes/<period>.js`
+and are keyed by chapter id. `ch-abbasid-baghdad` in `scenes/maritime.js` is the worked example.
+
+- Layers use the plate types (`area` with `tier`, `boundary`, `route`, `arrow`, `point`, `label`). There are
+  extras for the viewer: `minK`/`maxK` (detail that appears or goes with map zoom), `fade` (an arrow that fades out
+  when its destination is general), `people` and `year` on points. `bbox` sets the camera, and `caption` describes
+  the map.
+- `terms` link the names in the chapter text "one move ahead": to a vault note if `note` is set, otherwise to
+  Wikipedia. Each name links at its first mention, in the card and in the Now paragraph. Terms with a `star` carry
+  a question worth asking, and the card has a **Copy question** button for each.
+- `tests/scenes.test.mjs` checks that every scene matches a chapter and passes `validateScene`, that every term
+  appears in its chapter's text, and that points sit inside the view. It also checks in the browser that scenes
+  draw, link and respond to zoom.
+
 ## Cause-and-effect boards
 
 `app/board.html#<id>` is a retention game, opened from **⇄ Board** in the viewer header. The board scatters event
