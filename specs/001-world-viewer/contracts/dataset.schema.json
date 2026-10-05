@@ -47,7 +47,11 @@
         "bbox": { "type": "array", "items": { "$ref": "#/$defs/lonlat" }, "minItems": 2, "maxItems": 2 },
         "text": { "type": "string" }, "section": { "type": "string" }, "wiki": { "type": "string" }, "fic": { "$ref": "#/$defs/fic" },
         "id": { "type": "string" },
+        "plate": { "type": "string", "description": "id of the atlas plate that maps this chapter" },
         "parent": { "type": "string", "description": "id of the chapter this one sits inside (e.g. ch-muscovy). Its dates must fall within the parent's." } } } },
+    "plates": { "type": "array", "items": {
+      "type": "object", "required": ["id", "title", "start", "end"],
+      "properties": { "id": { "type": "string" }, "title": { "type": "string" }, "start": { "$ref": "#/$defs/date" }, "end": { "$ref": "#/$defs/date" } } } },
     "mapStates": { "type": "array", "items": {
       "type": "object", "required": ["date", "label", "status"],
       "properties": { "date": { "$ref": "#/$defs/date" }, "label": { "type": "string" },
@@ -56,7 +60,7 @@
     "changelog": { "type": "array" }
   },
   "$defs": {
-    "date": { "type": "string", "pattern": "^\\d{4}(-\\d{2}(-\\d{2})?)?$" },
+    "date": { "type": "string", "pattern": "^(-\\d{1,4}|\\d{4})(-\\d{2}(-\\d{2})?)?$" },
     "lonlat": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
     "fic": { "oneOf": [
       { "type": "string", "description": "heading in the work's main note" },

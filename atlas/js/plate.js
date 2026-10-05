@@ -581,6 +581,28 @@
     host.querySelectorAll(".keyitem").forEach((el) => drawSymbol(d3.select(el.querySelector("svg")), el.dataset.symbol, 11));
   }
 
+  /**
+   * "Where this sits": a strip above the plate linking back to the viewer. The period, the chapters above the plate's
+   * own, what's inside it, what else was happening at the same time, and the period's other plates. Built from the
+   * viewer's own data (window.DATASETS) with HM.plateContext, so it never goes stale.
+   */
+  function renderContext(spec, id) {
+    let box = document.getElementById("context");
+    if (!box) { box = document.createElement("nav"); box.id = "context"; box.setAttribute("aria-label", "Where this plate sits"); $("#host").before(box); }
+    const ctx = spec && spec.viewer && window.HM && window.HM.plateContext ? window.HM.plateContext(window.DATASETS, spec.viewer, id) : null;
+    if (!ctx) { box.hidden = true; box.innerHTML = ""; return; }
+    const a = (it, cls) => `<a class="${cls || ""}" href="${esc(it.href)}" title="${esc(it.dates || "")}">${esc(it.title)}</a>`;
+    const row = (label, items, cls) => items.length ? `<div class="ctx-row ${cls}"><span class="ctx-l">${label}</span>${items.map((it) => a(it) + (it.dates ? ` <span class="ctx-d">${esc(it.dates)}</span>` : "")).join('<span class="ctx-sep">·</span>')}</div>` : "";
+    box.innerHTML =
+      `<div class="ctx-row ctx-crumbs"><span class="ctx-l">Where this sits</span>${a(ctx.period, "ctx-period")}` +
+      ctx.crumbs.map((c, i) => `<span class="ctx-gt">›</span>${a(c, i === ctx.crumbs.length - 1 ? "ctx-here" : "")}`).join("") +
+      (ctx.crumbs.length ? ` <span class="ctx-d">${esc(ctx.crumbs[ctx.crumbs.length - 1].dates)}</span>` : "") + `</div>` +
+      row("Inside it", ctx.inside, "ctx-inside") +
+      row("Meanwhile", ctx.meanwhile, "ctx-meanwhile") +
+      row("Other plates", ctx.plates, "ctx-plates");
+    box.hidden = false;
+  }
+
   function show(id) {
     const host = $("#host");
     const ids = plateIds();
@@ -594,6 +616,7 @@
       home.href = v ? `../app/index.html#${v}` : "../app/index.html";
       home.textContent = v ? "← On the timeline" : "← Amit's World";
     }
+    renderContext(spec, id);
     if (id === "key") { renderKey(host); window.ATLAS.current = { id, errors: [] }; document.title = "Symbol key · Amit's Atlas"; window.ATLAS.ready = true; return; }
         if (!spec) { host.innerHTML = `<p class="empty">${ids.length ? `No plate called “${esc(id)}”.` : "No plates yet."}</p>`; window.ATLAS.current = { id, errors: [`no plate ${id}`] }; window.ATLAS.ready = true; return; }
         const res = render(spec, host);

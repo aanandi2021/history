@@ -9,7 +9,15 @@
 
   const DAY = 86400000;
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const DATE_RE = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/;
+  // Dates are YYYY, YYYY-MM or YYYY-MM-DD. BC years take a minus sign and the historian's numbering, with no
+  // year 0: "-0218" is 218 BC, "-0216-08-02" is 2 Aug 216 BC. Inside, they become astronomical years (218 BC = -217),
+  // which is what JavaScript dates use.
+  const DATE_RE = /^(-\d{1,4}|\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/;
+  const YEAR_ONLY = /^(-\d{1,4}|\d{4})$/, YEAR_MONTH = /^(-\d{1,4}|\d{4})-\d{2}$/;
+  const toAstro = (y) => (y < 0 ? y + 1 : y);
+  const toHist = (Y) => (Y <= 0 ? Y - 1 : Y);
+  /** A year for people: 218 BC, 1812. Takes the astronomical year a Date holds. */
+  const fmtYear = (Y) => (Y <= 0 ? `${1 - Y} BC` : String(Y));
   const VAULT = "Fourth Vault July 2023";
   // Obsidian's id for the A:\ vault (from %APPDATA%\obsidian\obsidian.json). Links use the id, not the name, because a
   // stale OneDrive copy is registered under the same name and Obsidian would open that one instead.
@@ -27,7 +35,8 @@
     if (s instanceof Date) return new Date(s.getTime());
     const m = DATE_RE.exec(String(s || "").trim());
     if (!m) return null;
-    const y = +m[1];
+    if (+m[1] === 0) return null;
+    const y = toAstro(+m[1]);
     if (m[3]) {
       const mo = +m[2] - 1, d = +m[3];
       const t = utc(y, mo, d);
@@ -42,10 +51,11 @@
     return utc(y, 6, 2);
   }
 
-  const isPartial = (s) => typeof s === "string" && /^\d{4}(-\d{2})?$/.test(s);
+  const isPartial = (s) => typeof s === "string" && (YEAR_ONLY.test(s) || YEAR_MONTH.test(s));
 
   function isoDate(t) {
-    const y = String(t.getUTCFullYear()).padStart(4, "0");
+    const h = toHist(t.getUTCFullYear());
+    const y = (h < 0 ? "-" : "") + String(Math.abs(h)).padStart(4, "0");
     return `${y}-${String(t.getUTCMonth() + 1).padStart(2, "0")}-${String(t.getUTCDate()).padStart(2, "0")}`;
   }
 
@@ -54,17 +64,23 @@
     const t = parseDate(s);
     if (!t) return "";
     const str = typeof s === "string" ? s : isoDate(t);
+    const yr = fmtYear(t.getUTCFullYear());
     let out;
-    if (/^\d{4}$/.test(str)) out = String(t.getUTCFullYear());
-    else if (/^\d{4}-\d{2}$/.test(str)) out = `${MONTHS[t.getUTCMonth()]} ${t.getUTCFullYear()}`;
-    else out = `${t.getUTCDate()} ${MONTHS[t.getUTCMonth()]} ${t.getUTCFullYear()}`;
+    if (YEAR_ONLY.test(str)) out = yr;
+    else if (YEAR_MONTH.test(str)) out = `${MONTHS[t.getUTCMonth()]} ${yr}`;
+    else out = `${t.getUTCDate()} ${MONTHS[t.getUTCMonth()]} ${yr}`;
     return (approx ? "c. " : "") + out;
   }
 
   function fmtRange(a, b, approx) {
     if (!b || b === a) return fmtDate(a, approx);
     const ta = parseDate(a), tb = parseDate(b);
-    if (/^\d{4}$/.test(a) && /^\d{4}$/.test(b)) return `${approx ? "c. " : ""}${ta.getUTCFullYear()}–${tb.getUTCFullYear()}`;
+    if (YEAR_ONLY.test(a) && YEAR_ONLY.test(b)) {
+      const ya = ta.getUTCFullYear(), yb = tb.getUTCFullYear(), c = approx ? "c. " : "";
+      if (yb <= 0) return `${c}${1 - ya}–${1 - yb} BC`;
+      if (ya <= 0) return `${c}${1 - ya} BC – AD ${yb}`;
+      return `${c}${ya}–${yb}`;
+    }
     return `${fmtDate(a, approx)} – ${fmtDate(b, approx)}`;
   }
 
@@ -84,7 +100,7 @@
       used.add(id);
       return id;
     };
-    const year = (s) => (parseDate(s) || { getUTCFullYear: () => "" }).getUTCFullYear();
+    const year = (s) => { const t = parseDate(s); if (!t) return ""; const Y = t.getUTCFullYear(); return Y <= 0 ? `${1 - Y}bc` : Y; };
     ds.t0 = parseDate(raw.range[0]);
     ds.t1 = parseDate(raw.range[1]);
     ds.laneOrder = raw.lanes.map((l) => l.id);
@@ -273,9 +289,11 @@
     const fic = ficTarget(ds, item);
     if (fic) out.push({ kind: "fiction", label: "Amit's Fiction", href: obsidianUrl(fic.note, fic.heading) });
     if (item.kind !== "book") {
-      for (const p of ds.plates || []) {
-        if (item.t0 <= p.t1 && item.t1 >= p.t0) out.push({ kind: "plate", label: `Atlas plate: ${p.title}`, href: plateUrl(p.id) });
-      }
+      // A chapter's own plate (its `plate` field) comes first, then any plate whose dates overlap it.
+      const own = item.plate ? [].concat(item.plate) : [];
+      const ps = (ds.plates || []).filter((p) => own.includes(p.id) || (item.t0 <= p.t1 && item.t1 >= p.t0));
+      ps.sort((a, b) => (own.includes(b.id) ? 1 : 0) - (own.includes(a.id) ? 1 : 0));
+      for (const p of ps) out.push({ kind: "plate", label: `Atlas plate: ${p.title}`, href: plateUrl(p.id) });
     }
     if (item.kind === "book" && item.amits) {
       out.push({ kind: "fiction", label: "Open in Amit's Fiction", href: obsidianUrl(item.note, item.heading) });
@@ -441,12 +459,12 @@
   function dateStart(s) {
     const t = parseDate(s);
     if (!t || !isPartial(s)) return t;
-    return /^\d{4}$/.test(s) ? utc(t.getUTCFullYear(), 0, 1) : utc(t.getUTCFullYear(), t.getUTCMonth(), 1);
+    return YEAR_ONLY.test(s) ? utc(t.getUTCFullYear(), 0, 1) : utc(t.getUTCFullYear(), t.getUTCMonth(), 1);
   }
   function dateEnd(s) {
     const t = parseDate(s);
     if (!t || !isPartial(s)) return t;
-    return /^\d{4}$/.test(s) ? utc(t.getUTCFullYear(), 11, 31) : utc(t.getUTCFullYear(), t.getUTCMonth() + 1, 0);
+    return YEAR_ONLY.test(s) ? utc(t.getUTCFullYear(), 11, 31) : utc(t.getUTCFullYear(), t.getUTCMonth() + 1, 0);
   }
 
   /**
@@ -484,9 +502,9 @@
   function stopLabel(stops, i) {
     const s = stops[i], t = parseDate(s.date), y = t.getUTCFullYear();
     const prevY = i ? parseDate(stops[i - 1].date).getUTCFullYear() : null;
-    const yr = i === 0 || y !== prevY ? ` ${y}` : "";
-    if (/^\d{4}$/.test(s.date)) return String(y);
-    if (/^\d{4}-\d{2}$/.test(s.date)) return `${MONTHS[t.getUTCMonth()]}${yr}`;
+    const yr = i === 0 || y !== prevY ? ` ${fmtYear(y)}` : "";
+    if (YEAR_ONLY.test(s.date)) return fmtYear(y);
+    if (YEAR_MONTH.test(s.date)) return `${MONTHS[t.getUTCMonth()]}${yr}`;
     return `${t.getUTCDate()} ${MONTHS[t.getUTCMonth()]}${yr}`;
   }
 
@@ -604,11 +622,39 @@
     return out.sort((a, b) => (a.group === b.group ? 0 : a.group === "who" ? -1 : 1));
   }
 
+  /**
+   * Where an atlas plate sits in the viewer, so a plate can point back to the bigger picture. `viewer` is the plate's
+   * hash ("ancient/-0216/ch-hannibals-war"). Returns null if the period isn't loaded, else { period, crumbs, inside,
+   * meanwhile, plates }: the chapters above and including the plate's, its own sub-chapters, other chapters running
+   * at the same time that aren't part of the same story, and the period's other plates. Each has a title, dates and
+   * an href relative to the atlas page.
+   */
+  function plateContext(datasets, viewer, plateId) {
+    const [dsId, date, chId] = String(viewer || "").split("/").map(decodeURIComponent);
+    const raw = datasets && datasets[dsId];
+    if (!raw) return null;
+    const ds = normalise(raw);
+    const at = parseDate(date) || ds.t0;
+    const link = (t, id) => `../app/index.html${formatHash(dsId, t, id)}`;
+    const item = (c, t) => ({ id: c.id, title: c.title, dates: fmtRange(c.start, c.end, isPartial(c.start)), href: link(t || c.t0, c.id) });
+    const ch = chId && ds.byId.get(chId);
+    const t0 = ch ? ch.t0 : at, t1 = ch ? ch.t1 : at;
+    const crumbs = ch ? [...ancestors(ds, ch).reverse().map((c) => item(c)), item(ch, at)] : [];
+    const inside = ch ? ch.children.map((cid) => item(ds.byId.get(cid))) : [];
+    const meanwhile = ds.chapters
+      .filter((c) => c.t0 <= t1 && c.t1 >= t0 && !(ch && (within(ds, c, ch) || within(ds, ch, c))))
+      .filter((c) => !c.parentId || !ds.chapters.some((p) => p.id === c.parentId && p.t0 <= t1 && p.t1 >= t0 && !(ch && within(ds, p, ch))))
+      .map((c) => item(c, c.t0 > t0 ? c.t0 : t0));
+    const plates = ds.plates.filter((p) => p.id !== plateId).map((p) => ({ id: p.id, title: p.title, dates: fmtRange(p.start, p.end), href: `#${encodeURIComponent(p.id)}` }));
+    return { period: { title: ds.title, href: link(at, ch ? ch.id : null) }, crumbs, inside, meanwhile, plates };
+  }
+
   return {
+    plateContext,
     sceneKey,
     sceneFor, visibleAt, liveAt, itineraryAt, stopLabel, sceneLadder, dateStart, dateEnd, linkTerms, termUrl, validateScene, SCENE_SYMBOLS,
     linkChapters, ancestors, within, openChapters, focusChapter,
-    DAY, VAULT, VAULT_ID, parseDate, isPartial, isoDate, fmtDate, fmtRange, slug, normalise, nearWindow,
+    DAY, VAULT, VAULT_ID, parseDate, isPartial, isoDate, fmtDate, fmtYear, fmtRange, slug, normalise, nearWindow,
     nearbyEvents, activeLeaders, activeChapters, activeChapter, mapStateAt, booksFor, fictionFor, ficTarget,
     obsidianUrl, wikiUrl, calibreUrl, plateUrl, libraryUrl, linksFor, parseHash, formatHash, search, stepEvent, validate
   };

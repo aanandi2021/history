@@ -283,3 +283,11 @@ What the viewer took from it (v0.5.0):
 - **`ally` symbol.** A hollow ring for allied or free cities.
 
 Not built yet: small multiples (the same extent at several dates side by side), coalition and settlement hatches by recipient, and institution diagrams. Institution diagrams belong with the atlas figures, not on the geographic map. A Rome period needs BC dates first, because the model only reads four-digit AD years.
+
+§15 plate follow-up: the first Rome-style standalone plates using this grammar are `rome-italy`, `hannibal` and
+`caesar`. `rome-italy` uses four same-extent Italian panels with dated citizen/allied tiers, colony points,
+roads and battle Xs. `hannibal` uses rival western-Mediterranean spheres, Hannibal and Scipio campaign routes,
+defecting-allied-city rings and the 201 settlement as a second figure. `caesar` pairs a Gaul campaign map with a
+civil-war Mediterranean itinerary, separating Caesar's and Pompey's routes by style and colour. No new renderer
+primitive was needed; the existing area tiers, hatches, roads, wall/teeth lines, routes, battle symbols, halos and
+date tags covered the round 4 plate requirements closely enough.

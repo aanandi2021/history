@@ -32,7 +32,7 @@
     return M.fmtRange(it.start, it.end);
   }
   // Periods where only years are known (dataset.precision === "year") show the cursor as a bare year.
-  const fmtCursor = (t) => (state.ds && state.ds.precision === "year") ? String(t.getUTCFullYear()) : M.fmtDate(M.isoDate(t));
+  const fmtCursor = (t) => (state.ds && state.ds.precision === "year") ? M.fmtYear(t.getUTCFullYear()) : M.fmtDate(M.isoDate(t));
 
   const tip = $("#tooltip");
   function showTip(ev, html) { tip.innerHTML = html; tip.hidden = false; moveTip(ev); }
@@ -654,9 +654,27 @@
 
     // Axis
     const axisY = 22;
-    const nTicks = Math.max(3, Math.floor((W - GUTTER) / 95)), tf = xs.tickFormat(nTicks);
-    root.append("g").attr("class", "axis").attr("transform", `translate(0,${axisY})`)
-      .call(d3.axisTop(xs).ticks(nTicks).tickFormat((d) => tf(d).replace(/^0+(?=\d)/, "")).tickSizeOuter(0).tickSize(4));
+    const nTicks = Math.max(3, Math.floor((W - GUTTER) / 95));
+    const axis = d3.axisTop(xs).tickSizeOuter(0).tickSize(4);
+    const [d0, d1] = xs.domain();
+    if (d0.getUTCFullYear() <= 0 && d1 - d0 > 4 * 365 * M.DAY) {
+      // BC on the axis: round years in the historian's numbering (300 BC, 200 BC, 100 BC, AD 1, 100), not JavaScript's
+      // astronomical ones, which would land on 301 BC and 201 BC.
+      const yrs = (d1 - d0) / (365.25 * M.DAY), raw = yrs / nTicks;
+      const step = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000].find((s) => s >= raw) || 1000;
+      const Y0 = d0.getUTCFullYear(), h0 = Math.ceil((Y0 <= 0 ? Y0 - 1 : Y0) / step) * step;
+      const ticks = [];
+      for (let h = h0; ticks.length < 60; h += step) {
+        const t = M.parseDate(h === 0 ? "0001" : (h < 0 ? "-" : "") + String(Math.abs(h)).padStart(4, "0") + "-01-01");
+        if (t > d1) break;
+        if (t >= d0) ticks.push(t);
+      }
+      axis.tickValues(ticks).tickFormat((d) => { const Y = d.getUTCFullYear(); return Y <= 0 ? `${1 - Y} BC` : Y < 1000 ? `AD ${Y}` : String(Y); });
+    } else {
+      const tf = xs.tickFormat(nTicks);
+      axis.ticks(nTicks).tickFormat((d) => (d.getUTCFullYear() <= 0 && /^-?\d+$/.test(tf(d)) ? M.fmtYear(d.getUTCFullYear()) : tf(d).replace(/^0+(?=\d)/, "")));
+    }
+    root.append("g").attr("class", "axis").attr("transform", `translate(0,${axisY})`).call(axis);
     labels.append("text").attr("class", "hint").attr("x", 8).attr("y", 14).text("drag to pan · Ctrl+wheel to zoom");
     let y = axisY + 8;
 
@@ -908,7 +926,7 @@
     const allLinks = M.linksFor(ds, it);
     const plateLinks = allLinks.filter((l) => l.kind === "plate");
     if (plateLinks.length) {
-      const ps = (ds.plates || []).filter((p) => plateLinks.some((l) => l.href === M.plateUrl(p.id)));
+      const ps = plateLinks.map((l) => (ds.plates || []).find((p) => l.href === M.plateUrl(p.id))).filter(Boolean);
       h += `<div class="plate-tiles" id="card-plates">${ps.map(plateTile).join("")}</div>`;
     }
     const links = allLinks.filter((l) => l.kind !== "plate");

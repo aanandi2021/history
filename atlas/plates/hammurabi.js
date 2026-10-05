@@ -16,6 +16,7 @@
     title: "Mesopotamia in the age of Hammurabi",
     head: "The Early Empires / Mesopotamia (fidelity test)",
     folio: "2",
+    viewer: "ancient/-1760/ch-hammurabi",
     figures: [
       {
         caption: "The balance of power, c. 1780 B.C.",

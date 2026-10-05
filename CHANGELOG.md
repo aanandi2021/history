@@ -12,6 +12,10 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 - Version badge on every page; this changelog; `npm run stamp` and `npm run serve` (port 8766).
 - Atlas round 4 (PDF pp. 74–93, Rome): dated layers that appear as the timeline reaches them, with a growth ladder in the key; campaign itineraries with numbered, dated legs and an arrowhead that moves with the date; fronts with teeth; an ally ring.
 - Muscovy grows tier by tier, Napoleon's 1812 march plays out day by day, and the Eastern Front shows its Dec 1941 and Nov 1942 lines and the Leningrad siege.
+- BC dates (`-0218` = 218 BC, no year 0), with a timeline axis that reads "300 BC … AD 100".
+- New period, the ancient world (1800 BC – AD 500): Hammurabi, Han China, and Rome as a tree from city to empire, through the Punic Wars, Hannibal, Caesar in Gaul, the Pax Romana and the fall of the West.
+- Three Roman plates (Rome conquers Italy, Hannibal's war, Caesar in Gaul), and the Hammurabi and Han plates now open on their chapters.
+- Plates point back to the bigger picture: a "Where this sits" strip on every plate links to the period, the chapters above it, what's inside it, what else was happening, and the period's other plates. A chapter's own plate comes first on its card.
 
 ## 0.4.0 (5 Oct 2026), 6dfd741
 

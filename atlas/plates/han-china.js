@@ -15,6 +15,7 @@
     title: "China under the Han, c. 100 B.C.",
     head: "The Early Empires / China (fidelity test, round 2)",
     folio: "3",
+    viewer: "ancient/-0100/ch-han-china",
     figures: [
       {
         caption: "The Han Empire under Wudi, c. 100 B.C.",
