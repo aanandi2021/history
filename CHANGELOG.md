@@ -10,6 +10,7 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 ## 0.6.0 (in progress, `next`)
 
 - Master timeline across the very top: every period on one strip, the open one highlighted with its from/to years and the current date, in sync with the Period dropdown both ways.
+- Atlas round 5 (PDF pp. 94–113): late Rome, Christianity and the migrations; new plates for Augustus, the high empire's frontiers, and Christianity plus successor peoples; the ancient period now extends to AD 700 with matching viewer chapters.
 
 ## 0.5.0 (5 Oct 2026)
 

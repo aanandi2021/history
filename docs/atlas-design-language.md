@@ -291,3 +291,36 @@ defecting-allied-city rings and the 201 settlement as a second figure. `caesar` 
 civil-war Mediterranean itinerary, separating Caesar's and Pompey's routes by style and colour. No new renderer
 primitive was needed; the existing area tiers, hatches, roads, wall/teeth lines, routes, battle symbols, halos and
 date tags covered the round 4 plate requirements closely enough.
+
+## 16. Round 5: late Rome, Christianity and early medieval peoples (PDF pp. 94–113)
+
+This batch changes the subject from conquest to systems. Rome is no longer only an expanding area or a campaign
+route; it is an administrative settlement, a frontier machine, an economy, a church network and then a field of
+successor peoples. Analyses are in `study/analysis/spread-p094…p112.json` and `round5-findings.md`.
+
+New moves:
+
+- **Administrative colour.** Augustus and the fourth-century empire use colour for legal status and government
+  structure: imperial/senatorial provinces, prefectures, dioceses and client zones. The colour is not a people;
+  it is an office or jurisdiction.
+- **Constitution diagrams.** The Principate and Diocletian/Constantine figures use atlas frames for abstract
+  power diagrams: fields, compartments, node shapes and arrows labelled with verbs. We did not build a renderer
+  for these yet; they remain a documented figure kind.
+- **Genealogy diagrams.** The Julian-Claudian tree treats marriages, dynastic lines and ruler marks as political
+  geography. Also not yet implemented as a plate primitive.
+- **Fort lattices.** The Limes figure makes the frontier from many coloured fort points by reign, with walls and
+  moats as separate lines.
+- **Commodity carpets.** The economic map deliberately uses many glyphs. The crowding is the evidence: grain,
+  oil, metals, animals, textiles and trade routes together show the imperial economy.
+- **Missionary diffusion.** Christianity is mapped with date-horizon areas, centre points, council symbols and
+  travel routes, plus insets when a missionary itinerary is too dense for the main map.
+- **Settlement mosaics.** Germanic and Slavic spreads use soft fields and large labels rather than hard borders.
+  Terrain and swamps are explanatory layers, not decoration.
+
+What we built from it:
+
+- Three new plates: `augustus-principate`, `roman-frontiers` and `christianity-migrations`.
+- The ancient period now runs to AD 700 and adds nested chapters for Augustus, the high empire, late antiquity,
+  and Christianity plus migrations. This keeps the late Roman and early medieval material in the same Rome tree.
+- No new renderer primitive was needed for the delivered plates. The current map primitives handled the chosen
+  plates; institution and genealogy diagrams are the next useful atlas-only primitive.

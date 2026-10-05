@@ -13,7 +13,7 @@ test("masterLayout: every period, in order, with readable from/to years and no o
   assert.equal(L.periods.length, Object.keys(DS).length);
   const anc = L.periods.find((p) => p.id === "ancient");
   assert.equal(anc.from, "1800 BC");
-  assert.equal(anc.to, "AD 500");
+  assert.equal(anc.to, "AD 700");
   const ww2 = L.periods.find((p) => p.id === "ww2");
   assert.equal(`${ww2.from} – ${ww2.to}`, "1937 – 1945");
   for (const a of L.periods) for (const b of L.periods) {
@@ -52,7 +52,7 @@ test("e2e: the strip highlights the open period, follows the dropdown, and opens
   }));
   let s = await on();
   assert.deepEqual(s.on, ["ancient"]);
-  assert.deepEqual(s.years, ["1800 BC", "AD 500"]);
+  assert.deepEqual(s.years, ["1800 BC", "AD 700"]);
   await page.select("#dataset", "russia");
   s = await on();
   assert.deepEqual(s.on, ["russia"], "dropdown → strip");

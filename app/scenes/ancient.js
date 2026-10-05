@@ -8,6 +8,7 @@ window.SCENES = window.SCENES || {};
     [ROME]: "Rome", [CARTHAGE]: "Carthage", [GREEK]: "Greek and Hellenistic kingdoms", [GAUL]: "Gauls and Celts", [SAMNITE]: "Samnites and Italian allies",
     [GERMAN]: "Germanic peoples", [GOTH]: "Goths", [HUN]: "Huns", [VANDAL]: "Vandals", [PERSIA]: "Parthia and Persia", [HAN]: "Han China",
     [XIONGNU]: "Xiongnu", [BABYLON]: "Babylon", [MARI]: "Mari", [ELAM]: "Elam", [ASSYRIA]: "Assyria", [SEA]: "Sea routes", [ROAD]: "Roads"
+    , "#d8b84a": "Senatorial provinces and Christian regions", "#e0a080": "Eastern Roman Empire", "#79a85a": "Slavic settlement zones", "#6f8f5f": "Frankish kingdom"
   };
 
   window.SCENES.ancient = {
@@ -285,14 +286,122 @@ window.SCENES = window.SCENES || {};
         { type: "label", style: "water", text: "Mediterranean", at: [16, 35] }
       ],
       terms: [
-        { t: "empire at its height", wiki: "Roman Empire" },
+        { t: "imperial system", wiki: "Roman Empire" },
         { t: "roads", wiki: "Roman roads" },
         { t: "legions", wiki: "Roman legion" },
         { t: "Augustus", wiki: "Augustus" },
         { t: "Trajan", wiki: "Trajan", star: "Why did Trajan's widest empire not become Rome's permanent shape?" },
         { t: "Hadrian", wiki: "Hadrian" },
         { t: "Marcus Aurelius", wiki: "Marcus Aurelius" },
-        { t: "Danube", wiki: "Danube" }
+        { t: "frontier armies", wiki: "Roman army" }
+      ]
+    },
+
+    "ch-augustus-principate": {
+      caption: "Augustus turns civil-war victory into a provincial and frontier settlement. Borders are approximate.",
+      bbox: [[-10, 26], [43, 52]],
+      layers: [
+        { type: "area", name: "Imperial provinces", tier: "core", colour: ROME, labelAt: [15, 39], around: [[-3, 38], [4, 45], [9, 47], [16, 45], [24, 41], [31, 37], [30, 31], [18, 33], [8, 36]] },
+        { type: "area", name: "Senatorial provinces", tier: "influence", colour: "#d8b84a", labelAt: [17, 36], around: [[10, 37], [14, 39], [23, 38], [30, 31], [10, 36]] },
+        { type: "area", name: "Client kingdoms", tier: "influence", colour: PERSIA, labelAt: [34, 37], around: [[31, 39], [38, 39], [40, 34], [34, 31]] },
+        { type: "arrow", colour: ROME, name: "Actium and Egypt", labelAt: [22, 37], path: [[12.5, 41.9], [17.94, 40.64], [20.72, 38.95], [29.92, 31.2]] },
+        { type: "route", style: "road", colour: ROAD, name: "Augustan roads", labelAt: [7, 44], from: "-0016", path: [[1.25, 41.12], [4.83, 45.76], [12.5, 41.9]] },
+        { type: "front", colour: GERMAN, name: "Rhine after Teutoburg", side: "r", from: "0009", path: [[6.7, 51.4], [7.4, 49.0], [6.0, 46.5]] },
+        { type: "front", colour: GERMAN, name: "Danube frontier", side: "r", path: [[10.5, 47], [16.37, 48.21], [19.7, 45.0], [22.0, 44.8]] },
+        { type: "point", symbol: "capital", name: "Rome", year: "Augustus", at: [12.5, 41.9] },
+        { type: "point", symbol: "battle", name: "Actium", year: "31 BC", at: [20.72, 38.95] },
+        { type: "point", symbol: "large-city", name: "Alexandria", year: "30 BC", at: [29.92, 31.2] },
+        { type: "point", symbol: "battle", name: "Teutoburg", year: "AD 9", from: "0009", at: [8.9, 52.1] }
+      ],
+      terms: [
+        { t: "Augustus", wiki: "Augustus" },
+        { t: "Principate", wiki: "Principate" },
+        { t: "Imperial provinces", wiki: "Roman province" },
+        { t: "Senate", wiki: "Roman Senate" },
+        { t: "Danube", wiki: "Danube" },
+        { t: "Teutoburg", wiki: "Battle of the Teutoburg Forest", star: "Why did Teutoburg make the Rhine a Roman frontier?" }
+      ]
+    },
+
+    "ch-high-empire-frontiers": {
+      caption: "The high empire is a network of provinces, walls, legion roads and pressure frontiers. Borders are approximate.",
+      bbox: [[-12, 24], [47, 56]],
+      layers: [
+        { type: "area", name: "Roman Empire c. 100", tier: "core", colour: ROME, labelAt: [18, 39], around: [[-7, 36], [0, 45], [10, 51], [22, 47], [35, 42], [43, 36], [40, 29], [28, 31], [15, 32], [4, 34]] },
+        { type: "area", name: "Trajanic conquests", tier: "conquest", from: "0106", until: "0118", colour: ROME, labelAt: [38, 37], around: [[24.8, 46.5], [35, 34], [42, 38], [45, 34], [42, 30], [36, 31]] },
+        { type: "area", name: "Parthia", tier: "influence", colour: PERSIA, labelAt: [47, 35], around: [[42, 31], [48, 38], [56, 37], [57, 30], [49, 28]] },
+        { type: "front", colour: GERMAN, name: "Rhine-Danube limes", side: "r", path: [[6, 50.5], [8, 49], [12, 48.5], [16, 48.2], [20, 47], [25, 45.5], [29, 44.2]] },
+        { type: "front", colour: GERMAN, name: "Hadrian's Wall", side: "l", from: "0122", path: [[-3.1, 55.0], [-2.3, 55.0], [-1.5, 55.05], [-0.7, 54.98]] },
+        { type: "arrow", colour: ROME, name: "Trajan east", labelAt: [35, 37], from: "0114", until: "0118", path: [[36.2, 36.2], [41.21, 37.07], [44.58, 33.1]] },
+        { type: "arrow", colour: PERSIA, name: "Parthian pressure", labelAt: [39, 35], from: "0162", path: [[42.0, 36.2], [40.73, 34.75], [36.2, 36.2]] },
+        { type: "point", symbol: "capital", name: "Rome", at: [12.5, 41.9] },
+        { type: "point", symbol: "fortress", name: "Dacia", year: "106", at: [25.0, 45.8] },
+        { type: "point", symbol: "fortress", name: "Hadrian's Wall", year: "122", from: "0122", at: [-2.3, 55.0] },
+        { type: "point", symbol: "fortress", name: "Dura-Europos", from: "0162", at: [40.73, 34.75] },
+        { type: "point", symbol: "treaty", name: "Citizenship", year: "212", from: "0212", at: [12.5, 41.9], dy: 22 }
+      ],
+      terms: [
+        { t: "high empire", wiki: "Roman Empire" },
+        { t: "Trajan", wiki: "Trajan" },
+        { t: "Hadrian", wiki: "Hadrian" },
+        { t: "Rhine", wiki: "Rhine" },
+        { t: "Danube", wiki: "Danube" },
+        { t: "Euphrates", wiki: "Euphrates" },
+        { t: "Severan", wiki: "Severan dynasty", star: "Why did a wider citizenship not make the empire easier to govern?" }
+      ]
+    },
+
+    "ch-late-antiquity": {
+      caption: "Late Rome rebuilds authority while Persia, Goths and Huns press on the old map. Borders are approximate.",
+      bbox: [[-12, 27], [43, 57]],
+      layers: [
+        { type: "area", name: "Western prefectures", tier: "core", colour: ROME, labelAt: [5, 43], around: [[-7, 36], [0, 45], [8, 50], [16, 47], [19, 41], [15, 36], [6, 35]] },
+        { type: "area", name: "Eastern prefectures", tier: "core", colour: "#e0a080", labelAt: [28, 39], around: [[18, 40], [24, 45], [34, 42], [39, 36], [33, 31], [23, 35]] },
+        { type: "area", name: "Sasanian Persia", tier: "influence", colour: PERSIA, labelAt: [43, 34], around: [[37, 31], [45, 38], [54, 36], [55, 29], [46, 28]] },
+        { type: "front", colour: GERMAN, name: "East-West division", side: "r", from: "0395", path: [[18.5, 47], [18.6, 43.5], [19.2, 40.5], [19.2, 36.0]] },
+        { type: "arrow", colour: GOTH, name: "Gothic settlement", labelAt: [24, 43], from: "0376", path: [[27.8, 43.8], [26.56, 41.68], [21, 44.5], [12.5, 41.9]] },
+        { type: "arrow", colour: HUN, name: "Huns", labelAt: [21, 48.5], from: "0375", path: [[34, 49], [29, 47], [21, 45], [11, 48], [4.1, 48.3]] },
+        { type: "point", symbol: "capital", name: "Constantinople", year: "330", from: "0330", at: [28.98, 41.01] },
+        { type: "point", symbol: "capital", name: "Ravenna", year: "404", from: "0404", at: [12.2, 44.42] },
+        { type: "point", symbol: "battle", name: "Adrianople", year: "378", from: "0378", at: [26.56, 41.68] },
+        { type: "point", symbol: "battle", name: "Catalaunian Plains", year: "451", from: "0451", at: [4.1, 48.3] }
+      ],
+      terms: [
+        { t: "Late antiquity", wiki: "Late antiquity" },
+        { t: "Diocletian", wiki: "Diocletian" },
+        { t: "Constantine", wiki: "Constantine the Great" },
+        { t: "Christianity", wiki: "Christianity in late antiquity" },
+        { t: "Persian", wiki: "Sasanian Empire" },
+        { t: "frontier peoples", wiki: "Migration Period" }
+      ]
+    },
+
+    "ch-christianity-migrations": {
+      caption: "Christian centres and migrating peoples share the same late Roman geography. Borders are approximate.",
+      bbox: [[-10, 27], [43, 57]],
+      layers: [
+        { type: "area", name: "Christianized regions", tier: "influence", colour: "#d8b84a", labelAt: [20, 38], around: [[-5, 40], [3, 45], [12, 47], [20, 45], [29, 42], [36, 37], [31, 31], [15, 35], [5, 36]] },
+        { type: "area", name: "Slavic settlement zones", tier: "influence", from: "0600", colour: "#79a85a", labelAt: [22, 47], around: [[14, 50], [19, 50], [24, 49], [27, 46], [23, 43], [19, 42], [16, 45]] },
+        { type: "area", name: "Frankish kingdom", tier: "influence", from: "0500", colour: "#6f8f5f", labelAt: [5, 49], around: [[1, 49], [4, 50.5], [7, 49.5], [8, 47], [4, 46], [1, 47]] },
+        { type: "arrow", colour: GOTH, name: "Goths", from: "0376", path: [[27.8, 43.8], [26.56, 41.68], [20, 43.5], [12.5, 41.9], [1.44, 43.6]] },
+        { type: "arrow", colour: VANDAL, name: "Vandals", from: "0406", path: [[7, 50], [2, 47], [-3, 41], [-5, 36], [2, 35], [10.31, 36.85], [12.5, 41.9]] },
+        { type: "route", style: "dashed", colour: "#111111", name: "Pauline route memory", until: "0400", path: [[36.2, 36.2], [27.34, 37.94], [22.93, 37.94], [12.5, 41.9]], head: true },
+        { type: "point", symbol: "capital", name: "Rome", at: [12.5, 41.9] },
+        { type: "point", symbol: "capital", name: "Constantinople", at: [28.98, 41.01] },
+        { type: "point", symbol: "treaty", name: "Nicaea", year: "325", from: "0325", at: [29.72, 40.43] },
+        { type: "point", symbol: "city", name: "Hippo", year: "Augustine", from: "0395", at: [7.75, 36.88] },
+        { type: "point", symbol: "large-city", name: "Prague", from: "0600", at: [14.42, 50.08] },
+        { type: "point", symbol: "large-city", name: "Kiev", from: "0600", at: [30.52, 50.45] }
+      ],
+      terms: [
+        { t: "Christianity", wiki: "Christianity in late antiquity" },
+        { t: "Constantine", wiki: "Constantine the Great" },
+        { t: "Councils", wiki: "First seven ecumenical councils" },
+        { t: "Goths", wiki: "Goths" },
+        { t: "Vandals", wiki: "Vandals" },
+        { t: "Huns", wiki: "Huns" },
+        { t: "Franks", wiki: "Franks" },
+        { t: "Slavic-speaking peoples", wiki: "Early Slavs", star: "Why does the post-Roman map become a mosaic of peoples instead of provinces?" }
       ]
     },
 

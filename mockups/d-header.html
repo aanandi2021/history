@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup D — header: status bar, one control row, master strip</title>
+<style>
+  :root { --paper: #f7f4ee; --panel: #fffdf8; --ink: #2b2a27; --muted: #8a7d68; --line: #e0d8c8; --accent: #8c3b3b; --strip: #efe9dc;
+    --font: system-ui, "Segoe UI", sans-serif; --serif: Georgia, "Times New Roman", serif; }
+  html, body { margin: 0; height: 100%; background: var(--paper); color: var(--ink); font: 13px/1.4 var(--font); }
+  body { display: flex; flex-direction: column; }
+
+  /* 1 · status bar: small, quiet, always one line. Left = what's selected (with its path); right = series + version. */
+  #status { display: flex; align-items: center; gap: 10px; height: 22px; padding: 0 14px; font-size: 11.5px; color: var(--muted);
+    background: var(--panel); border-bottom: 1px solid var(--line); white-space: nowrap; overflow: hidden; }
+  #status .kind { font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+  #status .path a { color: var(--muted); text-decoration: none; }
+  #status .path a:hover { color: var(--accent); text-decoration: underline; }
+  #status .path .gt { margin: 0 4px; color: #c3b8a2; }
+  #status .name { color: var(--ink); font-weight: 600; }
+  #status .dates { color: var(--muted); }
+  #status .x { cursor: pointer; color: #b5a88f; padding: 0 3px; }
+  #status .x:hover { color: var(--accent); }
+  #status .series { margin-left: auto; font-size: 10.5px; color: #a89c86; }
+  #status .none { font-style: italic; color: #a89c86; }
+
+  /* 2 · one fixed control row. The period picker is the only title; the date is the cursor. Nothing here changes width with content. */
+  #bar { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  .picker { position: relative; display: flex; align-items: baseline; gap: 8px; cursor: pointer; padding: 3px 8px 3px 6px; border-radius: 6px; max-width: 46vw; }
+  .picker:hover { background: #f3ede1; }
+  .picker h1 { margin: 0; font: 700 21px/1.1 var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .picker .yrs { font: 15px var(--serif); color: var(--muted); white-space: nowrap; }
+  .picker .caret { color: var(--accent); font-size: 12px; }
+  .picker select { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 14px; } /* native menu, invisible chrome */
+  .cursor-date { font: 600 15px var(--serif); color: var(--accent); white-space: nowrap; padding-left: 12px; border-left: 1px solid var(--line); }
+  .spacer { flex: 1; }
+  #bar input[type=search] { width: 220px; padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; background: #fff; font: inherit; }
+  .btn { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 5px 10px; font: inherit; color: var(--ink); cursor: pointer; text-decoration: none; }
+  .btn:hover { border-color: var(--accent); }
+  .btn.accent { color: var(--accent); }
+
+  /* 3 · master strip */
+  #master { background: var(--strip); border-bottom: 1px solid var(--line); padding: 0 14px; }
+  #master svg { display: block; width: 100%; overflow: visible; }
+  .m-axis line { stroke: #b9ad96; } .m-axis text { font-size: 9.5px; fill: var(--muted); }
+  .m-break { stroke: #cfc4ae; stroke-dasharray: 2 2; }
+  .m-period { cursor: pointer; }
+  .m-period rect { fill: #d9cdb4; stroke: #b9ad96; stroke-width: .6; }
+  .m-period:hover rect { fill: #cdb88f; }
+  .m-period text { font-size: 10px; fill: #5a4f3e; pointer-events: none; }
+  .m-period.on rect { fill: var(--accent); stroke: var(--accent); }
+  .m-period.on text { fill: #fff; font-weight: 600; }
+  .m-years { font-size: 10.5px; font-weight: 700; fill: var(--accent); }
+  .m-zoom { fill: none; stroke: var(--ink); stroke-width: 1.4; }
+  .m-zoom-l { font-size: 9px; fill: var(--ink); }
+  .m-cur { fill: var(--ink); }
+  .m-gap { font-size: 9px; fill: #b5a88f; font-style: italic; }
+  .m-scale { font-size: 9px; fill: #a39780; font-style: italic; }
+
+  /* placeholders for the rest of the viewer */
+  #layout { flex: 1; display: grid; grid-template-columns: 1fr 360px; min-height: 0; }
+  #left { display: grid; grid-template-rows: 1fr auto 1fr; border-right: 1px solid var(--line); min-height: 0; }
+  .ph { display: grid; place-items: center; color: #b5a88f; font: italic 14px var(--serif); background: repeating-linear-gradient(45deg, #f3eee4 0 12px, #f7f4ee 12px 24px); position: relative; }
+  .map-corner { position: absolute; top: 10px; left: 10px; }
+  /* timeline toolbar: playback + zoom live on the thing they move */
+  #tl-bar { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--panel); font-size: 12px; }
+  #tl-bar select { font: inherit; padding: 3px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
+  #tl-bar .zoomlab { margin-left: auto; color: var(--muted); }
+
+  /* the mockup's own controls: not part of the design */
+  #demo { position: fixed; right: 380px; bottom: 16px; background: #2b2a27; color: #f7f4ee; border-radius: 10px; padding: 10px 12px; font-size: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.25); max-width: 430px; }
+  #demo b { display: block; margin-bottom: 6px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #e2c9a5; }
+  #demo button { margin: 2px 3px 2px 0; border: 0; border-radius: 5px; padding: 4px 8px; background: #4a463f; color: #fff; font: inherit; cursor: pointer; }
+  #demo button:hover { background: var(--accent); }
+  #demo p { margin: 8px 0 0; color: #cfc6b5; line-height: 1.45; }
+</style>
+</head>
+<body>
+
+<div id="status" aria-live="polite"></div>
+
+<header id="bar">
+  <label class="picker" title="Choose a period (or click one on the strip below)">
+    <h1 id="p-title"></h1><span class="yrs" id="p-yrs"></span><span class="caret">▾</span>
+    <select id="period" aria-label="Period"></select>
+  </label>
+  <span class="cursor-date" id="date" title="The date you're on (the red line on the timeline)"></span>
+  <span class="spacer"></span>
+  <input type="search" placeholder="Search  ( / )">
+  <a class="btn accent" href="#">⇄ Board</a>
+  <button class="btn">?</button>
+</header>
+
+<nav id="master" aria-label="Master timeline"><svg id="strip"></svg></nav>
+
+<main id="layout">
+  <section id="left">
+    <div class="ph">map<div class="map-corner"><button class="btn">🌍 World</button></div></div>
+    <div id="tl-bar">
+      <button class="btn">▶ Play</button>
+      <select><option>½×</option><option selected>1×</option><option>2×</option><option>4×</option></select>
+      <label><input type="checkbox" checked> Follow chapters</label>
+      <button class="btn">↔ Whole period</button>
+      <span class="zoomlab" id="zoomlab"></span>
+    </div>
+    <div class="ph">timeline (lanes, chapters, people)</div>
+  </section>
+  <aside class="ph">panel: Now · Meanwhile · card</aside>
+</main>
+
+<div id="demo">
+  <b>Mockup: pretend to click something</b>
+  <div>
+    <button data-sel="none">nothing</button>
+    <button data-sel="chapter">a chapter</button>
+    <button data-sel="part">a part</button>
+    <button data-sel="leader">a person</button>
+    <button data-sel="event">an event</button>
+    <button data-sel="book">a book</button>
+  </div>
+  <div style="margin-top:4px">
+    <button data-zoom="whole">timeline: whole period</button>
+    <button data-zoom="punic">zoomed to the Punic Wars</button>
+    <button data-zoom="cannae">zoomed to 216 BC</button>
+  </div>
+  <p>Top line: whatever is selected, with its path (click a step to go there; × clears). Row two: the period picker <i>is</i> the title, plus the date. Strip: every period; the black bracket is what the lower timeline shows. Playback sits on the timeline; World on the map.</p>
+</div>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  // Years are astronomical (1 BC = 0, 218 BC = -217), as in the viewer.
+  const Y = (y) => (y <= 0 ? `${1 - y} BC` : y < 1000 ? `AD ${y}` : String(y));
+  const PERIODS = [
+    { id: "ancient", title: "The ancient world", sub: "Hammurabi to the fall of Rome", y0: -1799, y1: 500, from: "1800 BC", to: "AD 500", date: "2 Aug 216 BC", cur: -215.4 },
+    { id: "maritime", title: "Maritime Asia", sub: "Bengal, Srivijaya and Java · with The Unseen Tomorrow", y0: 745, y1: 865, from: "AD 745", to: "AD 865", date: "AD 800", cur: 800 },
+    { id: "russia", title: "Russia", sub: "Muscovy to Stalin", y0: 1450, y1: 1946, from: "1450", to: "1945", date: "24 Jun 1812", cur: 1812.5 },
+    { id: "ww2", title: "The Second World War", sub: "", y0: 1937, y1: 1946, from: "1937", to: "1945", date: "19 Nov 1942", cur: 1942.9 }
+  ];
+  const ZOOMS = { whole: null, punic: [-263, -145, "the Punic Wars, 264–146 BC"], cannae: [-215.9, -214.9, "216 BC"] };
+  const SEL = {
+    none: null,
+    chapter: { kind: "Chapter", path: ["The ancient world", "Rome, from city to empire", "The Punic Wars"], name: "Hannibal's war", dates: "218–201 BC" },
+    part: { kind: "Part", path: ["The ancient world"], name: "Rome, from city to empire", dates: "509 BC – AD 476" },
+    leader: { kind: "Person", path: ["Rome & the Mediterranean"], name: "Scipio Africanus", dates: "236–183 BC · consul 205, 194" },
+    event: { kind: "Event", path: ["Rome & the Mediterranean", "Hannibal's war"], name: "Battle of Cannae", dates: "2 Aug 216 BC" },
+    book: { kind: "Book", path: ["Reading"], name: "Mary Beard, SPQR", dates: "covers 753 BC – AD 212" }
+  };
+  let period = PERIODS[0], zoom = "whole", sel = "chapter";
+
+  const select = $("#period");
+  for (const p of PERIODS) select.add(new Option(`${p.title}${p.sub ? ": " + p.sub : ""}  (${p.from} – ${p.to})`, p.id));
+  select.addEventListener("change", () => setPeriod(select.value));
+  for (const b of document.querySelectorAll("[data-sel]")) b.onclick = () => { sel = b.dataset.sel; status(); };
+  for (const b of document.querySelectorAll("[data-zoom]")) b.onclick = () => { zoom = b.dataset.zoom; strip(); };
+  window.addEventListener("resize", strip);
+
+  function setPeriod(id) {
+    period = PERIODS.find((p) => p.id === id);
+    select.value = id;
+    if (id !== "ancient") { zoom = "whole"; sel = "none"; }
+    $("#p-title").textContent = period.title;
+    $("#p-title").title = period.sub;
+    $("#p-yrs").textContent = `${period.from} – ${period.to}`;
+    $("#date").textContent = period.date;
+    status(); strip();
+  }
+
+  function status() {
+    const s = SEL[sel], el = $("#status");
+    const series = `<span class="series">Amit's Notes of the History of the World · v0.6.0-dev (mockup)</span>`;
+    if (!s) { el.innerHTML = `<span class="none">Nothing selected. Click anything on the map or timeline.</span>${series}`; return; }
+    el.innerHTML = `<span class="kind">${s.kind}</span>
+      <span class="path">${s.path.map((p) => `<a href="#">${p}</a>`).join('<span class="gt">›</span>')}<span class="gt">›</span></span>
+      <span class="name">${s.name}</span><span class="dates">${s.dates}</span><span class="x" title="Clear selection (Esc)">×</span>${series}`;
+    el.querySelector(".x").onclick = () => { sel = "none"; status(); };
+  }
+
+  // Same scale as the viewer: equal width between breaks, so short modern periods stay visible.
+  function strip() {
+    const svg = $("#strip"), W = svg.clientWidth || 1000, pad = 4;
+    const breaks = [-1799, -499, 500, 1000, 1500, 1800, 1900, 1946], n = breaks.length - 1;
+    const f = (y) => { if (y <= breaks[0]) return 0; if (y >= breaks[n]) return 1; let i = 0; while (i < n - 1 && y > breaks[i + 1]) i++; return (i + (y - breaks[i]) / (breaks[i + 1] - breaks[i])) / n; };
+    const x = (y) => pad + f(y) * (W - 2 * pad);
+    const rows = { ancient: 0, maritime: 0, russia: 0, ww2: 1 }, top = 15, rowH = 13, axisY = top + 2 * rowH + 2, H = axisY + 14;
+    let h = "";
+    // gaps: say what they are
+    h += `<text class="m-gap" x="${(x(500) + x(745)) / 2}" y="${top + 9}" text-anchor="middle">not yet covered</text>`;
+    h += `<text class="m-gap" x="${(x(865) + x(1450)) / 2}" y="${top + 9}" text-anchor="middle">not yet covered</text>`;
+    // axis + breaks
+    h += `<g class="m-axis"><line x1="${x(breaks[0])}" x2="${x(breaks[n])}" y1="${axisY}" y2="${axisY}"/>`;
+    breaks.forEach((b, i) => {
+      h += `<line class="m-break" x1="${x(b)}" x2="${x(b)}" y1="${top - 2}" y2="${axisY + 3}"/>`;
+      h += `<text x="${x(b)}" y="${axisY + 11}" text-anchor="${i === 0 ? "start" : i === n ? "end" : "middle"}">${i === n ? "1945" : Y(b)}</text>`;
+    });
+    h += `</g>`;
+    h += `<text class="m-scale" x="${x(1900) - 4}" y="${top - 4}" text-anchor="end">scale stretches toward the present ›</text>`;
+    // periods (every one labelled: inside if it fits, else a short tag)
+    for (const p of PERIODS) {
+      const x0 = x(p.y0), w = Math.max(4, x(p.y1) - x0), on = p.id === period.id, y = top + rows[p.id] * rowH;
+      const short = { ancient: "The ancient world", maritime: "Maritime Asia", russia: "Russia", ww2: "WW2" }[p.id];
+      const fits = w > short.length * 5.8 + 8;
+      h += `<g class="m-period${on ? " on" : ""}" data-id="${p.id}"><title>${p.title}${p.sub ? ": " + p.sub : ""}, ${p.from} – ${p.to}</title>
+        <rect x="${x0}" y="${y}" width="${w}" height="${rowH - 3}" rx="2"/>
+        <text x="${fits ? x0 + 4 : x0 - 4}" y="${y + rowH - 6}" text-anchor="${fits ? "start" : "end"}" style="${fits ? "" : "fill:#5a4f3e;font-weight:400"}">${short}</text></g>`;
+    }
+    // the open period's from/to
+    const fx = x(period.y0), tx = x(period.y1);
+    if (tx - fx > 110) h += `<text class="m-years" x="${fx}" y="10">${period.from}</text><text class="m-years" x="${tx}" y="10" text-anchor="end">${period.to}</text>`;
+    else { const lab = `${period.from} – ${period.to}`, half = lab.length * 3.2, mid = Math.min(W - pad - half, Math.max(pad + half, (fx + tx) / 2)); h += `<text class="m-years" x="${mid}" y="10" text-anchor="middle">${lab}</text>`; }
+    // zoom bracket: the stretch the lower timeline shows, under the open bar
+    const z = ZOOMS[zoom], zy = top + rows[period.id] * rowH + rowH - 1;
+    const [a, b] = z ? [z[0], z[1]] : [period.y0, period.y1];
+    const za = x(a), zb = Math.max(za + 3, x(b));
+    h += `<path class="m-zoom" d="M${za},${zy - 4} V${zy + 1} H${zb} V${zy - 4}"/>`;
+    $("#zoomlab").textContent = z ? `Showing ${z[2]}` : `Showing the whole period`;
+    // cursor: a small triangle on the axis instead of a heavy line
+    const cx = x(period.cur);
+    h += `<path class="m-cur" d="M${cx},${axisY - 1} l-4,-6 h8 z"/>`;
+    svg.setAttribute("height", H);
+    svg.innerHTML = h;
+    for (const g of svg.querySelectorAll(".m-period")) g.onclick = () => setPeriod(g.dataset.id);
+  }
+
+  setPeriod("ancient");
+})();
+</script>
+</body>
+</html>

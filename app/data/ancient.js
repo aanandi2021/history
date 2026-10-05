@@ -14,6 +14,10 @@
     caesar: "Caesar in Gaul",
     pax: "The empire at its height",
     fall: "The fall of the West",
+    aug: "Augustus and the Principate",
+    high: "The high empire and its frontiers",
+    late: "Late antiquity",
+    church: "Christianity and the migrations",
     india: "India and Persia"
   };
 
@@ -74,15 +78,27 @@
     E("med", "-0049-01-10", "Caesar crosses the Rubicon", [12.35, 44.06], { section: S.republic, wiki: "Crossing the Rubicon", text: "The crossing began the civil war against Pompey and the Senate." }),
     E("med", "-0044-03-15", "Ides of March", [12.48, 41.89], { section: S.republic, wiki: "Assassination of Julius Caesar", text: "Senators killed Caesar in Rome, hoping to save the republic." }),
     E("med", "-0031-09-02", "Actium", [20.72, 38.95], { section: S.republic, wiki: "Battle of Actium", text: "Octavian defeated Antony and Cleopatra and became Rome's sole master." }),
-    E("med", "-0027", "Augustus begins the principate", [12.5, 41.9], { section: S.pax, wiki: "Augustus", text: "The republic's forms remained, but real power rested with Augustus." }),
-    E("med", "0117", "Roman empire reaches its widest extent", [35.0, 37.0], { section: S.pax, wiki: "Trajan", text: "Trajan's conquests briefly carried Roman rule into Dacia, Armenia and Mesopotamia." }),
-    E("med", "0180", "Marcus Aurelius dies", [14.5, 45.3], { section: S.pax, wiki: "Marcus Aurelius", text: "His death is a conventional end point for the high empire." }),
+    E("med", "-0027", "Augustus begins the principate", [12.5, 41.9], { section: S.aug, wiki: "Augustus", text: "The republic's forms remained, but real power rested with Augustus." }),
+    E("med", "0009", "Teutoburg Forest", [8.9, 52.1], { section: S.aug, wiki: "Battle of the Teutoburg Forest", text: "Arminius destroyed three Roman legions and fixed the Rhine as Rome's practical northern frontier." }),
+    E("med", "0043", "Claudius conquers southern Britain", [-0.1, 51.5], { section: S.high, wiki: "Roman conquest of Britain", text: "Britain became an imperial province after Claudius' invasion." }),
+    E("med", "0070", "Jerusalem captured", [35.23, 31.78], { section: S.high, wiki: "Siege of Jerusalem (70 CE)", text: "Titus took Jerusalem during the Jewish revolt." }),
+    E("med", "0117", "Roman empire reaches its widest extent", [35.0, 37.0], { section: S.high, wiki: "Trajan", text: "Trajan's conquests briefly carried Roman rule into Dacia, Armenia and Mesopotamia." }),
+    E("med", "0122", "Hadrian's Wall begun", [-2.3, 55.0], { section: S.high, wiki: "Hadrian's Wall", text: "Hadrian marked the northern edge of Roman Britain with a permanent frontier work." }),
+    E("med", "0180", "Marcus Aurelius dies", [14.5, 45.3], { section: S.high, wiki: "Marcus Aurelius", text: "His death is a conventional end point for the high empire." }),
+    E("med", "0212", "Caracalla extends citizenship", [12.5, 41.9], { section: S.high, wiki: "Constitutio Antoniniana", text: "Free inhabitants of the empire received Roman citizenship." }),
+    E("med", "0235", "The soldier-emperor crisis begins", [11.1, 49.9], { section: S.late, wiki: "Crisis of the Third Century", text: "Armies, frontier wars and short-lived emperors pulled the old imperial order apart." }),
+    E("med", "0284", "Diocletian takes power", [29.0, 40.8], { section: S.late, wiki: "Diocletian", text: "Diocletian rebuilt the empire as a more openly absolute and administrative monarchy." }),
+    E("med", "0313", "Edict of Milan", [9.19, 45.46], { section: S.church, wiki: "Edict of Milan", text: "Constantine and Licinius granted Christianity legal toleration." }),
+    E("med", "0325", "Council of Nicaea", [29.72, 40.43], { section: S.church, wiki: "First Council of Nicaea", text: "The first ecumenical council formulated a creed against Arian teaching." }),
+    E("med", "0330", "Constantinople dedicated", [28.98, 41.01], { section: S.late, wiki: "Constantinople", text: "Constantine's new capital made the eastern empire visible as a second Roman centre." }),
     E("med", "0376", "Goths cross the Danube", [27.8, 43.8], { section: S.fall, wiki: "Gothic War (376-382)", text: "Gothic refugees entered the empire under pressure from the Huns." }),
     E("med", "0378-08-09", "Adrianople", [26.56, 41.68], { section: S.fall, wiki: "Battle of Adrianople", text: "A Gothic army killed Emperor Valens and much of the eastern field army." }),
     E("med", "0410-08-24", "Alaric sacks Rome", [12.5, 41.9], { section: S.fall, wiki: "Sack of Rome (410)", text: "Rome was sacked for the first time in almost eight centuries." }),
     E("med", "0451", "Catalaunian Plains", [4.1, 48.3], { section: S.fall, wiki: "Battle of the Catalaunian Plains", text: "Aetius and his Gothic allies checked Attila in Gaul." }),
     E("med", "0455", "Vandals sack Rome", [12.5, 41.9], { section: S.fall, wiki: "Sack of Rome (455)", text: "The Vandals came from North Africa by sea." }),
-    E("med", "0476-09-04", "Romulus Augustulus deposed", [11.34, 44.5], { section: S.fall, wiki: "Romulus Augustulus", text: "Odoacer deposed the young western emperor and ruled Italy in his own name." })
+    E("med", "0476-09-04", "Romulus Augustulus deposed", [11.34, 44.5], { section: S.fall, wiki: "Romulus Augustulus", text: "Odoacer deposed the young western emperor and ruled Italy in his own name." }),
+    E("med", "0568", "Lombards enter Italy", [13.0, 45.0], { section: S.church, wiki: "Lombards", text: "Lombard movement into Italy showed how far the western Roman map had become a set of successor kingdoms." }),
+    E("med", "0600", "Slavic settlement across the Balkans", [21.0, 44.0], { approx: true, section: S.church, wiki: "Early Slavs", text: "Slavic-speaking groups settled widely in eastern Europe and the Balkans." })
   ];
 
   const R = (name, country, side, start, end, section, extra) => Object.assign({ name, country, side, start, end, wiki: name, lifeUnknown: true }, section ? { section } : {}, extra || {});
@@ -100,12 +116,14 @@
     R("Hannibal", "Carthage", "carthage", "-0221", "-0202", S.hannibal, { wiki: "Hannibal" }),
     R("Scipio Africanus", "Rome", "rome", "-0210", "-0183", S.hannibal, { wiki: "Scipio Africanus" }),
     R("Julius Caesar", "Rome", "rome", "-0059", "-0044", S.republic, { wiki: "Julius Caesar" }),
-    R("Augustus", "Roman Empire", "rome", "-0027", "0014", S.pax, { wiki: "Augustus" }),
-    R("Trajan", "Roman Empire", "rome", "0098", "0117", S.pax, { wiki: "Trajan" }),
-    R("Marcus Aurelius", "Roman Empire", "rome", "0161", "0180", S.pax, { wiki: "Marcus Aurelius" }),
-    R("Diocletian", "Roman Empire", "rome", "0284", "0305", S.fall, { wiki: "Diocletian" }),
-    R("Constantine", "Roman Empire", "rome", "0306", "0337", S.fall, { wiki: "Constantine the Great" }),
-    R("Theodosius I", "Roman Empire", "rome", "0379", "0395", S.fall, { wiki: "Theodosius I" }),
+    R("Augustus", "Roman Empire", "rome", "-0027", "0014", S.aug, { wiki: "Augustus" }),
+    R("Trajan", "Roman Empire", "rome", "0098", "0117", S.high, { wiki: "Trajan" }),
+    R("Hadrian", "Roman Empire", "rome", "0117", "0138", S.high, { wiki: "Hadrian" }),
+    R("Marcus Aurelius", "Roman Empire", "rome", "0161", "0180", S.high, { wiki: "Marcus Aurelius" }),
+    R("Septimius Severus", "Roman Empire", "rome", "0193", "0211", S.high, { wiki: "Septimius Severus" }),
+    R("Diocletian", "Roman Empire", "rome", "0284", "0305", S.late, { wiki: "Diocletian" }),
+    R("Constantine", "Roman Empire", "rome", "0306", "0337", S.late, { wiki: "Constantine the Great" }),
+    R("Theodosius I", "Roman Empire", "rome", "0379", "0395", S.late, { wiki: "Theodosius I" }),
     R("Alaric", "Visigoths", "goths", "0395", "0410", S.fall, { wiki: "Alaric I" }),
     R("Attila", "Huns", "huns", "0434", "0453", S.fall, { wiki: "Attila" }),
     R("Romulus Augustulus", "Western Roman Empire", "rome", "0475", "0476", S.fall, { wiki: "Romulus Augustulus" })
@@ -114,14 +132,18 @@
   const chapters = [
     { id: "ch-hammurabi", title: "Mesopotamia in the age of Hammurabi", start: "-1800", end: "-1595", plate: "hammurabi", bbox: [[35, 28], [50, 38]], section: S.hamm, text: "Hammurabi ruled Babylon when Mesopotamia was a land of rival river kingdoms. Babylon, Mari, Larsa, Elam and Assyria fought and bargained along the Euphrates and Tigris. The Code of Hammurabi presented the king as a just ruler, even though it also records a hard social order. After Hammurabi, Babylon's power faded before the Hittite sack in 1595 BC." },
     { id: "ch-han-china", title: "Han China", start: "-0206", end: "0220", plate: "han-china", bbox: [[72, 18], [125, 45]], section: S.han, text: "Han China turned the short Qin empire into a durable imperial order. Emperor Wu fought the Xiongnu, opened the Hexi Corridor and sent Zhang Qian west toward the Silk Road. Later the capital moved to Luoyang, and the Eastern Han held together for almost two centuries. The Yellow Turban rebellion showed how weak the dynasty had become before it ended in 220." },
-    { id: "ch-rome", title: "Rome, from city to empire", start: "-0509", end: "0476", bbox: [[-10, 30], [45, 56]], section: S.rome, text: "Rome began this story as a city on the Tiber and ended it as the memory of an empire. The Republic conquered Italy, fought Carthage, broke the Hellenistic kingdoms and absorbed the Mediterranean. Civil war then made room for Augustus and the Roman Empire. In the west, pressure from Goths, Vandals and Huns helped turn imperial rule into successor kingdoms." },
+    { id: "ch-rome", title: "Rome, from city to empire", start: "-0509", end: "0700", bbox: [[-10, 30], [45, 56]], section: S.rome, text: "Rome began this story as a city on the Tiber and ended it as the memory of an empire. The Republic conquered Italy, fought Carthage, broke the Hellenistic kingdoms and absorbed the Mediterranean. Civil war then made room for Augustus and the Roman Empire. In the west, pressure from Goths, Vandals and Huns helped turn imperial rule into successor kingdoms while the eastern empire continued around Constantinople." },
     { id: "ch-rome-conquers-italy", title: "Rome conquers Italy", start: "-0509", end: "-0264", parent: "ch-rome", plate: "rome-italy", bbox: [[6, 36], [19, 46.5]], section: S.italy, text: "Rome spent the early Republic turning neighbours into allies, subjects and colonies. The Latin League settlement tied Latium to Rome, and the Samnite Wars opened the central mountains. The Via Appia carried soldiers and settlers south. By the time Tarentum fell, Rome controlled Italy south of the Po." },
     { id: "ch-punic-wars", title: "The Punic Wars", start: "-0264", end: "-0146", parent: "ch-rome", bbox: [[-8, 30], [22, 45]], section: S.punic, text: "The Punic Wars were Rome's long struggle with Carthage for the western Mediterranean. Sicily was the prize of the First Punic War, and Sardinia, Corsica and Spain followed. Carthage remained dangerous because of Hannibal and because its sea power linked Africa, Spain and the islands. In 146 BC Rome destroyed Carthage and made Africa a province." },
     { id: "ch-hannibals-war", title: "Hannibal's war", start: "-0218", end: "-0201", parent: "ch-punic-wars", plate: "hannibal", bbox: [[-6, 35], [18, 46]], section: S.hannibal, text: "Hannibal opened the Second Punic War by marching from New Carthage across the Ebro, the Rhone and the Alps. He beat Roman armies at Trebia, Trasimene and Cannae, then spent years in southern Italy. Rome survived by avoiding another Cannae and by sending Scipio to Spain and Africa. At Zama, Scipio defeated Hannibal and ended Carthage's chance to win." },
     { id: "ch-end-of-the-republic", title: "The end of the republic", start: "-0133", end: "-0027", parent: "ch-rome", bbox: [[-10, 30], [35, 48]], section: S.republic, text: "The late Republic was strained by land hunger, armies loyal to commanders, and repeated civil war. The Gracchi made reform violent, and Sulla showed that a Roman army could take Rome. Caesar crossed the Rubicon, defeated Pompey and became dictator. The Ides of March did not restore the Republic; Actium left Octavian in control." },
     { id: "ch-caesar-in-gaul", title: "Caesar in Gaul", start: "-0058", end: "-0050", parent: "ch-end-of-the-republic", plate: "caesar", bbox: [[-6, 42], [10, 53]], section: S.caesar, text: "Caesar in Gaul began with the Helvetii at Bibracte and became a conquest of almost the whole region. He beat the Belgae on the Sabis, bridged the Rhine and crossed to Britain twice. The hardest year came in 52 BC, when Vercingetorix won at Gergovia and then lost at Alesia. Gaul gave Caesar money, soldiers and a reputation large enough to threaten Rome." },
-    { id: "ch-pax-romana", title: "The empire at its height", start: "-0027", end: "0180", parent: "ch-rome", bbox: [[-10, 24], [45, 56]], section: S.pax, text: "The empire at its height was held by roads, legions, taxes and cities. Augustus made monarchy look like restored order, and later emperors governed through provinces and frontier armies. Trajan pushed Roman power to its widest extent, while Hadrian marked limits with walls and inspections. Marcus Aurelius spent his last years fighting on the Danube rather than enjoying peace in Rome." },
-    { id: "ch-fall-of-the-west", title: "The fall of the West", start: "0376", end: "0476", parent: "ch-rome", bbox: [[-10, 32], [32, 56]], section: S.fall, text: "The fall of the West began with Gothic refugees crossing the Danube in 376. Adrianople killed an emperor and showed that the Roman army could fail badly inside imperial territory. Rome was sacked by Alaric in 410 and by Vandals in 455, while Attila and the Huns shook both halves of the empire. In 476 Odoacer deposed Romulus Augustulus, and western imperial rule gave way to kingdoms." }
+    { id: "ch-pax-romana", title: "The imperial system", start: "-0027", end: "0235", parent: "ch-rome", bbox: [[-10, 24], [45, 56]], section: S.pax, text: "The imperial system was held by roads, legions, taxes, provincial cities and the staged modesty of the princeps. Augustus made monarchy look like restored order. Later emperors governed through provinces and frontier armies, while Trajan, Hadrian and Marcus Aurelius showed the system at its widest and most strained." },
+    { id: "ch-augustus-principate", title: "Augustus and the Principate", start: "-0027", end: "0014", parent: "ch-pax-romana", plate: "augustus-principate", bbox: [[-10, 26], [43, 52]], section: S.aug, text: "Augustus ended the civil wars by making monarchy look like a rescue of the Republic. The Principate gave him real command while preserving old forms. Imperial provinces, legions, grain supply and patronage belonged to the princeps, while the Senate kept older honours and pacified provinces. The frontier moved on the Danube and in Germany, but Teutoburg fixed the Rhine as a practical limit." },
+    { id: "ch-high-empire-frontiers", title: "The high empire and its frontiers", start: "0014", end: "0235", parent: "ch-pax-romana", plate: "roman-frontiers", bbox: [[-12, 24], [47, 56]], section: S.high, text: "The high empire was a frontier system as much as a Mediterranean state. Trajan carried Roman power to its widest extent, Hadrian marked limits with walls, and the Rhine, Danube, Euphrates and Britain became zones of forts, roads and negotiated pressure. By the Severan age, citizenship had widened while the army and the frontiers consumed more of the state's energy." },
+    { id: "ch-late-antiquity", title: "Late antiquity", start: "0235", end: "0700", parent: "ch-rome", bbox: [[-12, 27], [43, 57]], section: S.late, text: "Late antiquity rebuilt the Roman world under pressure. Soldier emperors, Persian wars and frontier breaks forced a more military and bureaucratic state. Diocletian and Constantine divided command, multiplied provinces and made new capitals. Christianity then spread through the imperial network while frontier peoples settled inside and beyond the old borders." },
+    { id: "ch-christianity-migrations", title: "Christianity and the migrations", start: "0300", end: "0700", parent: "ch-late-antiquity", plate: "christianity-migrations", bbox: [[-10, 27], [43, 57]], section: S.church, text: "Christianity first spread along the cities and roads of the Roman world, then became legal and imperial under Constantine. Councils, bishops and missionary centres formed a second network over the same map as the provinces. At the same time Goths, Vandals, Huns, Franks, Lombards and Slavic-speaking peoples turned Roman frontiers into routes and settlement zones." },
+    { id: "ch-fall-of-the-west", title: "The fall of the West", start: "0376", end: "0476", parent: "ch-late-antiquity", bbox: [[-10, 32], [32, 56]], section: S.fall, text: "The fall of the West began with Gothic refugees crossing the Danube in 376. Adrianople killed an emperor and showed that the Roman army could fail badly inside imperial territory. Rome was sacked by Alaric in 410 and by Vandals in 455, while Attila and the Huns shook both halves of the empire. In 476 Odoacer deposed Romulus Augustulus, and western imperial rule gave way to kingdoms while the eastern empire continued around Constantinople." }
   ];
 
   const B = (title, author, start, end, section, extra) => Object.assign({ title, author, start, end, owned: false }, section ? { section } : {}, extra || {});
@@ -131,6 +153,9 @@
     B("The Fall of Carthage", "Adrian Goldsworthy", "-0264", "-0146", S.punic),
     B("Caesar", "Adrian Goldsworthy", "-0100", "-0044", S.caesar),
     B("How Rome Fell", "Adrian Goldsworthy", "0180", "0476", S.fall),
+    B("The Roman Empire at Bay", "David S. Potter", "0180", "0395", S.late),
+    B("The Inheritance of Rome", "Chris Wickham", "0400", "0700", S.church),
+    B("The Rise of Western Christendom", "Peter Brown", "0200", "0700", S.church),
     B("The Fall of the Roman Empire", "Peter Heather", "0376", "0476", S.fall),
     B("The Fate of Rome", "Kyle Harper", "0165", "0700", S.fall),
     B("The Roman Revolution", "Ronald Syme", "-0060", "0014", S.republic),
@@ -152,9 +177,9 @@
   window.DATASETS = window.DATASETS || {};
   window.DATASETS.ancient = {
     id: "ancient",
-    title: "The ancient world: Hammurabi to the fall of Rome",
-    subtitle: "1800 BC - AD 500",
-    range: ["-1800-01-01", "0500-01-01"],
+    title: "The ancient and late-antique world",
+    subtitle: "1800 BC - AD 700",
+    range: ["-1800-01-01", "0701-01-01"],
     startAt: "-0218",
     precision: "year",
     mapNote: "No historical borders. Today's countries are a backdrop. Dates before about 500 BC are often approximate; Hammurabi follows the middle chronology.",
@@ -171,12 +196,15 @@
       { id: "han-china", title: "China under the Han", start: "-0206", end: "0220" },
       { id: "rome-italy", title: "Rome conquers Italy", start: "-0390", end: "-0264" },
       { id: "hannibal", title: "Hannibal's war", start: "-0218", end: "-0201" },
-      { id: "caesar", title: "Caesar in Gaul and the civil war", start: "-0058", end: "-0044" }
+      { id: "caesar", title: "Caesar in Gaul and the civil war", start: "-0058", end: "-0044" },
+      { id: "augustus-principate", title: "Augustus and the Principate", start: "-0027", end: "0014" },
+      { id: "roman-frontiers", title: "The Roman empire and its frontiers", start: "0096", end: "0235" },
+      { id: "christianity-migrations", title: "Christianity and the migrations", start: "0300", end: "0700" }
     ],
     colours: {
       lanes: { canada: "#b22d2d", neareast: "#9a6a38", med: "#8c3b3b", india: "#6b8c3f", china: "#b36b2e" },
       sides: { rome: "#8c3b3b", carthage: "#3f6e8c", han: "#b36b2e", xiongnu: "#7a5a8c", babylon: "#9a6a38", assyria: "#6d5a45", mari: "#2f7f8c", elam: "#8a7a5a", maurya: "#6b8c3f", qin: "#5d6f9c", goths: "#6b6b6b", huns: "#4b4642" }
     },
-    changelog: [{ date: "2026-10-05", text: "First version: ancient-world dataset and chapter map scenes." }]
+    changelog: [{ date: "2026-10-05", text: "Round 5: extended to AD 700 with Augustus, the high empire, Christianity and the migrations." }]
   };
 })();
