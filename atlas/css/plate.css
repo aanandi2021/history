@@ -1,0 +1,60 @@
+/* Amit's Atlas: a two-page spread in the manner of a pocket historical atlas. */
+:root {
+  --ink: #1f1d1a; --paper: #fbf8f0; --rule: #cfc6b0; --hot: #fff1b8; --accent: #8a3b1f;
+  --serif: Georgia, "Times New Roman", serif; --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #d9d4c7; color: var(--ink); font-family: var(--sans); }
+
+.bar { position: sticky; top: 0; z-index: 5; display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+  padding: 8px 16px; background: #2b2722; color: #f3ead6; font-size: 13px; }
+.bar a { color: #f3d79a; text-decoration: none; }
+.bar select, .bar button { font: inherit; padding: 3px 8px; border-radius: 3px; border: 1px solid #6d6355; background: #f7f1e3; color: var(--ink); cursor: pointer; }
+.bar .hint { opacity: .7; font-size: 12px; }
+
+#host { padding: 18px; }
+.spread { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; max-width: 1320px; margin: 0 auto;
+  background: var(--paper); box-shadow: 0 2px 14px rgba(0,0,0,.25); }
+.page { padding: 18px 26px 26px; min-width: 0; }
+.plate-page { border-right: 1px solid var(--rule); box-shadow: inset -12px 0 14px -14px rgba(0,0,0,.35); }
+.head { font-family: var(--serif); font-size: 12px; letter-spacing: .04em; border-bottom: 1px solid var(--ink); padding-bottom: 3px; margin-bottom: 10px; }
+.head.right { text-align: right; }
+.head .folio { font-weight: 700; }
+
+.fig-box { margin: 0 0 12px; }
+.fig-box svg { display: block; width: 100%; height: auto; }
+.fig-box figcaption { font-family: var(--serif); font-weight: 700; font-size: 14px; margin-top: 5px; }
+
+.text-page { font-family: var(--serif); font-size: 13.5px; line-height: 1.42; columns: 2 250px; column-gap: 22px; column-rule: 1px solid var(--rule); }
+.text-page .head, .text-page h1 { column-span: all; }
+.text-page h1 { font-size: 21px; margin: 2px 0 8px; }
+.text-page .intro { font-style: italic; column-span: all; margin: 0 0 10px; }
+.text-page h2 { font-size: 14px; margin: 12px 0 4px; break-after: avoid; text-transform: uppercase; letter-spacing: .06em; }
+.entry { margin: 0 0 6px; text-align: justify; hyphens: auto; break-inside: avoid; padding: 1px 3px; border-radius: 2px; }
+.entry .date { font-family: var(--sans); font-size: 12px; }
+.entry.linked { cursor: help; }
+.entry .see { color: var(--accent); font-size: 10px; }
+.entry.hot { background: var(--hot); }
+.sources, .from { font-size: 11.5px; margin-top: 10px; color: #4b443a; }
+.from a { color: var(--accent); }
+
+/* cross-highlighting between text and map */
+.layer { transition: opacity .15s; }
+.focus .layer:not(.hot) { opacity: .22; }
+.layer.hot path, .layer.hot circle, .layer.hot rect { filter: drop-shadow(0 0 2px #fff6a8); }
+
+.errors { background: #fff3f0; border: 2px solid #b8341f; padding: 12px 18px; max-width: 900px; margin: 0 auto; }
+.empty { text-align: center; }
+
+/* the symbol key */
+.keysheet { max-width: 1100px; margin: 0 auto; background: var(--paper); padding: 20px 30px; box-shadow: 0 2px 14px rgba(0,0,0,.25); }
+.keysheet h1 { font-family: var(--serif); font-size: 22px; margin: 0 0 4px; }
+.keysheet p { font-family: var(--serif); margin: 0 0 14px; }
+.keysheet h2 { font-family: var(--serif); font-size: 14px; text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--ink); }
+.keygrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px 16px; margin-bottom: 14px; }
+.keyitem { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+.keyitem svg { flex: none; }
+.keyitem code { color: #7a6f5f; font-size: 11px; }
+
+@media (max-width: 900px) { .spread { grid-template-columns: 1fr; } .plate-page { border-right: 0; } }
+@media print { .bar { display: none; } #host { padding: 0; } .spread { box-shadow: none; } }

@@ -48,6 +48,26 @@ npm test         # data checks, model unit tests, and end-to-end tests in headle
 
 The format is described in `specs/001-world-viewer/data-model.md` and `contracts/dataset.schema.json`.
 
+## The atlas
+
+`atlas/index.html` draws **plates** in the style of Kinder & Hilgemann's *Penguin Atlas of World History*: framed
+maps with soft realm washes, hatched rivals, banner arrows, dotted trade lanes, the book's symbol key and a small
+local legend on the left page, and date-led text on the right. Hovering a text entry lights up its map layers,
+and the other way round.
+
+- `docs/atlas-design-language.md` is the grammar, reverse-engineered from the first ten spreads of Vol. 1.
+- `atlas/plates/*.js` are the plates (`maritime-monsoon` is mapified from the Maritime Asia note; `hammurabi` is a
+  fidelity test on the book's own ground). `atlas/index.html#key` shows every symbol.
+- `.github/skills/mapify/SKILL.md` is the Copilot CLI skill that turns a vault note into a plate. It's linked into
+  `~/.copilot/skills/mapify` with a directory junction, so it loads from any folder.
+- `node scripts/plate_check.mjs <id> [--out <dir>]` validates a plate, runs the renderer's self-review (label
+  collisions, labels under the legend, arrow labels that don't fit), screenshots it, and exports each figure as
+  SVG and PNG for Obsidian.
+- `node scripts/build_basemap.mjs [ne-dir]` rebuilds `atlas/data/base-50m.js` (Natural Earth 1:50m land, rivers, lakes;
+  download `ne_50m_rivers_lake_centerlines.geojson` and `ne_50m_lakes.geojson` into `ne-dir`, default `%TEMP%\ne`).
+
+The book scans used for the study stay outside the repo (`C:\Users\amita\atlas-study\`) and must never be committed.
+
 ## Mockups
 
 `mockups/` holds the three variants that came before the viewer, built on a hand-entered WW2 dataset:

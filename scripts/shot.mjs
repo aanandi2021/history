@@ -12,10 +12,10 @@ page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") 
 page.on("pageerror", (e) => errs.push("pageerror: " + e.message));
 page.on("requestfailed", (r) => errs.push("requestfailed: " + r.url()));
 await page.goto(url);
-await page.waitForFunction("(window.APP && window.APP.ready) || (window.WALK && window.WALK.ready)", { timeout: 5000 }).catch(() => errs.push("APP.ready never set"));
-if (process.env.EVAL) await page.evaluate(process.env.EVAL);
+await page.waitForFunction("(window.APP && window.APP.ready) || (window.WALK && window.WALK.ready) || (window.ATLAS && window.ATLAS.ready)", { timeout: 8000 }).catch(() => errs.push("ready flag never set"));
+if (process.env.EVAL) console.log("eval:", JSON.stringify(await page.evaluate(process.env.EVAL)));
 await new Promise((r) => setTimeout(r, 1200));
-await page.screenshot({ path: out });
+await page.screenshot({ path: out, fullPage: !!process.env.FULL });
 console.log(errs.join("\n") || "no console errors");
 console.log("hash now:", await page.evaluate(() => location.hash));
 await browser.close();

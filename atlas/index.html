@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amit's Atlas</title>
+<link rel="stylesheet" href="css/plate.css">
+</head>
+<body>
+<header class="bar">
+  <a class="home" href="../app/index.html" title="Back to the timeline viewer">← Amit's World</a>
+  <b>Amit's Atlas</b>
+  <label>Plate <select id="plate" aria-label="Plate"></select></label>
+  <button id="svg" type="button" title="Download the first figure as a standalone SVG">Figure SVG</button>
+  <button id="key" type="button" title="Every symbol the atlas uses">Symbol key</button>
+  <span class="hint">Hover a map element or a ▸ entry to see how map and text refer to each other.</span>
+</header>
+<main id="host"></main>
+<script src="../app/vendor/d3.min.js"></script>
+<script src="../app/vendor/topojson-client.min.js"></script>
+<script src="data/base-50m.js"></script>
+<script src="js/plate-model.js"></script>
+<script>window.PLATES = {};</script>
+<script src="plates/maritime-monsoon.js"></script>
+<script src="plates/hammurabi.js"></script>
+<script src="js/plate.js"></script>
+</body>
+</html>
