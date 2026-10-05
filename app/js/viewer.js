@@ -472,6 +472,13 @@
     return `<a class="it" href="#" data-id="${esc(it.id)}">${esc(itemName(it))}</a>${extra}`;
   }
 
+  /** A plate as a picture, not a button: thumbnail, title, and where it goes. */
+  function plateTile(p) {
+    return `<a class="plate-tile" data-link="plate" data-plate="${esc(p.id)}" href="${esc(M.plateUrl(p.id))}">` +
+      `<img src="plates/${esc(p.id)}.jpg" alt="" loading="lazy" onerror="this.remove()">` +
+      `<span class="pt-k">Atlas plate</span><span class="pt-t">${esc(p.title)}</span><span class="pt-go">Open the map →</span></a>`;
+  }
+
   function renderPanel() {
     const ds = state.ds, t = state.cursor;
     if (!t) return;
@@ -483,7 +490,12 @@
     const span = w > 300 * M.DAY ? `±${Math.round(w / (365.25 * M.DAY))} yr` : w > 45 * M.DAY ? `±${Math.round(w / (30.4 * M.DAY))} months` : `±${Math.round(w / M.DAY)} days`;
     let h = `<h2 id="cursor-date">${esc(fmtCursor(t))}</h2><div class="when">${state.pinned ? "Pinned. Click the timeline again to let go." : "Hover the timeline, or click to pin."} Showing ${span}.</div>`;
     if (chapters.length) {
-      h += `<h3>Chapter</h3><div>${chapters.map((c) => `<span class="chip" data-id="${esc(c.id)}">${esc(c.title)}</span>`).join("")}</div>`;
+      // the most specific chapter (shortest span) tells the story of this moment
+      const now = chapters.filter((c) => c.text).sort((a, b) => (a.t1 - a.t0) - (b.t1 - b.t0))[0];
+      if (now) h += `<div class="now" id="now"><div class="now-h">Now · <a class="it" href="#" data-id="${esc(now.id)}">${esc(now.title)}</a></div><p>${esc(now.text)}</p></div>`;
+      const plates = (ds.plates || []).filter((p) => t >= p.t0 && t <= p.t1);
+      if (plates.length) h += `<div class="plate-tiles" id="panel-plates">${plates.map(plateTile).join("")}</div>`;
+      h += `<h3>Chapter</h3><div>${chapters.map((c) => `<span class="chip${c === now ? " on" : ""}" data-id="${esc(c.id)}">${esc(c.title)}</span>`).join("")}</div>`;
     }
     h += `<h3>Meanwhile</h3><div id="meanwhile-groups">`;
     for (const g of groups) {
@@ -517,7 +529,13 @@
     }
     if (it.kind === "event" && ds.lanes.find((l) => l.id === it.lane)?.fiction) h += `<p><span class="tag amits">from Amit's novel, not history</span></p>`;
     if (it.text) h += `<p>${esc(it.text)}</p>`;
-    const links = M.linksFor(ds, it);
+    const allLinks = M.linksFor(ds, it);
+    const plateLinks = allLinks.filter((l) => l.kind === "plate");
+    if (plateLinks.length) {
+      const ps = (ds.plates || []).filter((p) => plateLinks.some((l) => l.href === M.plateUrl(p.id)));
+      h += `<div class="plate-tiles" id="card-plates">${ps.map(plateTile).join("")}</div>`;
+    }
+    const links = allLinks.filter((l) => l.kind !== "plate");
     h += `<div class="links">`;
     for (const l of links) {
       const ext = l.kind === "wiki" || l.kind === "library";

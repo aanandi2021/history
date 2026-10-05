@@ -69,7 +69,7 @@ and the other way round.
 - `node scripts/build_basemap.mjs [ne-dir]` rebuilds `atlas/data/base-50m.js` (Natural Earth 1:50m land, rivers, lakes;
   download `ne_50m_rivers_lake_centerlines.geojson` and `ne_50m_lakes.geojson` into `ne-dir`, default `%TEMP%\ne`).
 
-The book scans used for the study stay outside the repo (`C:\Users\amita\atlas-study\`) and must never be committed.
+The book scans used for the study stay in `study\`, which is git-ignored, and must never be committed.
 
 ## Mockups
 

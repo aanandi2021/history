@@ -127,3 +127,20 @@ kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4p
   #left { grid-template-rows: 300px 520px; border-right: 0; }
   #panel { border-top: 1px solid var(--line); }
 }
+
+/* "Now": the story of the moment under the cursor */
+#panel .now { margin: 10px 0 6px; padding: 8px 10px; background: #fbf6ea; border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; }
+#panel .now-h { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+#panel .now-h a { color: var(--accent); text-decoration: none; font-weight: 600; }
+#panel .now p { margin: 4px 0 0; font: 14px/1.5 var(--serif); }
+#panel .chip.on { border-color: var(--accent); background: #f6e9e2; }
+
+/* plates are pictures */
+.plate-tiles { display: grid; gap: 8px; margin: 8px 0; }
+.plate-tile { display: grid; grid-template-columns: 112px 1fr; grid-template-rows: auto auto 1fr; column-gap: 10px; align-items: start;
+  text-decoration: none; color: var(--ink); background: #fffaf0; border: 1px solid #c9b78f; border-radius: 8px; padding: 6px; box-shadow: 0 1px 3px rgba(60, 40, 10, 0.12); }
+.plate-tile:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(140, 59, 59, 0.25); }
+.plate-tile img { grid-row: 1 / 4; width: 112px; height: 84px; object-fit: cover; object-position: 60% 35%; border-radius: 4px; border: 1px solid #b9a77f; }
+.plate-tile .pt-k { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #8a6a2a; }
+.plate-tile .pt-t { font: 600 14px/1.25 var(--serif); }
+.plate-tile .pt-go { align-self: end; font-size: 12px; color: var(--accent); }

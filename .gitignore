@@ -1,3 +1,6 @@
 node_modules/
 tests/screenshots/
 
+
+# Atlas study files (book page renders, OCR text, analyses). Copyrighted source: never commit.
+study/

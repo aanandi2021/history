@@ -168,7 +168,7 @@ cd A:\coding\history; node --test tests/atlas.test.mjs
 
 The tests validate every plate, check coverage, render each one headless with the network blocked, and require
 zero self-review warnings. Then commit the plate file and the `index.html` line (with the Copilot trailers), and
-push. Never commit anything from `C:\Users\amita\atlas-study\`: those are scans of a copyrighted book.
+push. Never commit anything from `study\` (git-ignored): those are scans of a copyrighted book.
 
 ## Known limits (say so rather than fake it)
 

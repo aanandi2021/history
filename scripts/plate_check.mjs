@@ -1,5 +1,5 @@
 // Check, screenshot and export an atlas plate.
-//   node scripts/plate_check.mjs <plate-id> [--out <dir>]
+//   node scripts/plate_check.mjs <plate-id> [--out <dir>] [--thumb]
 // Prints validation errors, self-review warnings and map/text coverage as JSON, writes a full-spread PNG to
 // tests/screenshots/atlas-<id>.png, and with --out also writes <id>-fig<N>.svg and <id>-fig<N>.png per figure
 // (for embedding in an Obsidian note). Exit code 1 if the plate has errors or warnings.
@@ -13,6 +13,8 @@ const args = process.argv.slice(2);
 const id = args.find((a) => !a.startsWith("--"));
 const outIdx = args.indexOf("--out");
 const out = outIdx >= 0 ? path.resolve(args[outIdx + 1]) : null;
+// --thumb writes app/plates/<id>.jpg (the first figure, small) for the timeline viewer's plate tile
+const thumb = args.includes("--thumb");
 if (!id) { console.error("usage: node scripts/plate_check.mjs <plate-id> [--out <dir>]"); process.exit(2); }
 
 const browser = await puppeteer.launch({ headless: true });
@@ -46,6 +48,14 @@ if (out && !report.errors.length) {
     await box.screenshot({ path: pngPath });
     report.exports.push(svgPath, pngPath);
   }
+}
+if (thumb && !report.errors.length) {
+  await page.setViewport({ width: 1440, height: 1000, deviceScaleFactor: 1 });
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => r())));
+  const thumbPath = path.join(ROOT, "app", "plates", `${id}.jpg`);
+  fs.mkdirSync(path.dirname(thumbPath), { recursive: true });
+  await (await page.$("svg.fig")).screenshot({ path: thumbPath, type: "jpeg", quality: 72 });
+  report.thumb = thumbPath;
 }
 await browser.close();
 console.log(JSON.stringify(report, null, 2));

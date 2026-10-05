@@ -281,3 +281,24 @@ test("no two bars overlap on the timeline, so every chapter, ruler and book can 
     await context.close();
   }
 });
+
+test("the side panel tells the story of the moment and shows plates as pictures", async () => {
+  const { page, errors, context } = await open("#maritime/0800/ut-first-gift");
+  await settle(400);
+  const now = await page.$eval("#now", (el) => ({ head: el.querySelector(".now-h").textContent, text: el.querySelector("p").textContent }));
+  assert.match(now.head, /Now/);
+  assert.ok(now.text.length > 80, "the Now paragraph has real prose");
+  for (const where of ["#panel-plates", "#card-plates"]) {
+    const tile = await page.$eval(`${where} a.plate-tile`, (a) => ({ href: a.getAttribute("href"), img: !!a.querySelector("img") && a.querySelector("img").naturalWidth > 0, title: a.querySelector(".pt-t").textContent }));
+    assert.equal(tile.href, "../atlas/index.html#maritime-monsoon", where);
+    assert.ok(tile.img, `${where}: the thumbnail loads`);
+    assert.equal(tile.title, "The monsoon road");
+  }
+  assert.equal(await page.$$eval("#card .links a[data-link=plate]", (a) => a.length), 0, "no plain plate button any more");
+  // outside any plate's span: no tile
+  await page.evaluate(() => APP.loadDataset("russia"));
+  await settle(400);
+  assert.equal(await page.$("#panel-plates"), null);
+  assert.deepEqual(errors, []);
+  await context.close();
+});

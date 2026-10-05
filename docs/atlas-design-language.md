@@ -5,8 +5,7 @@ What makes a Kinder & Hilgemann plate (*The Penguin Atlas of World History*, Vol
 (PDF pages 14–33: the Palaeolithic to the Neo-Babylonian empire) plus the book's own symbol key (PDF p. 9),
 and a second pass over the next ten (PDF pages 34–53: the Indo-Europeans to Greek colonization), in §12.
 
-The study files (page renders, OCR text, and one JSON analysis per spread) live in `C:\Users\amita\atlas-study\`,
-**outside this repo**. The book is under copyright, so the scans, crops and analyses never get committed. This
+The study files (page renders, OCR text, and one JSON analysis per spread) live in `study\`, which is **git-ignored**. The book is under copyright, so the scans, crops and analyses never get committed. This
 document describes the grammar in our own words. It doesn't reproduce any of the book's content.
 
 ## The numbers from ten spreads
