@@ -7,28 +7,18 @@
   <link rel="stylesheet" href="css/viewer.css">
 </head>
 <body>
+  <div id="status" aria-live="polite"><span class="series">Amit's Notes of the History of the World</span></div>
   <header id="bar">
     <div class="brand">
-      <span class="series">Amit's Notes of the History of the World</span>
-      <h1 id="ds-title">…</h1>
+      <label class="picker" title="Choose a period (or click one on the strip below)">
+        <h1 id="ds-title">…</h1><span class="yrs" id="ds-years"></span><span class="caret" aria-hidden="true">▾</span>
+        <select id="dataset" aria-label="Period"></select>
+      </label>
     </div>
-    <label class="ctl">Period
-      <select id="dataset" aria-label="Period"></select>
-    </label>
+    <span id="cursor-date" title="The date you're on (the red line on the timeline)"></span>
     <div class="ctl search">
       <input id="search" type="search" placeholder="Search  ( / )" autocomplete="off" aria-label="Search events, people, books">
       <ul id="results" role="listbox" hidden></ul>
-    </div>
-    <div class="ctl group">
-      <button id="play" title="Play / pause (space)">▶ Play</button>
-      <select id="speed" aria-label="Speed">
-        <option value="0.5">½×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option>
-      </select>
-    </div>
-    <label class="ctl check" title="During play, the map flies to each chapter"><input id="follow" type="checkbox" checked> Follow chapters</label>
-    <div class="ctl group">
-      <button id="world" title="Whole-world map">🌍 World</button>
-      <button id="fit" title="Show the whole period">↔ Whole period</button>
     </div>
     <a id="board-link" class="ctl" href="board.html#ww1-origins" title="Cause-and-effect board: draw what led to what">⇄ Board</a>
     <button id="help-btn" class="ctl" title="Keys and tips">?</button>
@@ -46,6 +36,16 @@
         <div id="scene-key" hidden></div>
         <div id="map-legend"></div>
         <div id="map-note"></div>
+        <button id="world" class="map-btn" title="Whole-world map">🌍 World</button>
+      </div>
+      <div id="tl-bar">
+        <button id="play" title="Play / pause (space)">▶ Play</button>
+        <select id="speed" aria-label="Speed">
+          <option value="0.5">½×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option>
+        </select>
+        <label class="check" title="During play, the map flies to each chapter"><input id="follow" type="checkbox" checked> Follow chapters</label>
+        <button id="fit" title="Show the whole period">↔ Whole period</button>
+        <span id="tl-showing"></span>
       </div>
       <div id="tl-wrap">
         <svg id="tl" role="img" aria-label="Timeline"></svg>

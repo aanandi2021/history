@@ -18,14 +18,30 @@ button:hover { border-color: var(--muted); }
 button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 select, input[type=search] { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px; }
 
-/* ---- header */
-#bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 8px 14px; border-bottom: 1px solid var(--line); background: var(--panel); }
-.brand { margin-right: auto; min-width: 220px; }
-.brand .series { display: block; font-size: 11px; color: var(--muted); letter-spacing: .02em; }
-.brand h1 { margin: 0; font: 600 18px/1.2 var(--serif); }
+/* ---- header: a quiet status line (what's selected, with its path), then one fixed row whose title is the period picker */
+#status { display: flex; align-items: center; gap: 6px; height: 22px; padding: 0 14px; font-size: 11.5px; color: var(--muted);
+  background: var(--panel); border-bottom: 1px solid var(--line); white-space: nowrap; overflow: hidden; }
+#status .kind { font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-right: 2px; }
+#status .path a, #status a.name { color: var(--muted); text-decoration: none; cursor: pointer; }
+#status .path a:hover, #status a.name:hover { color: var(--accent); text-decoration: underline; }
+#status .gt { margin: 0 4px; color: #c3b8a2; }
+#status a.name { color: var(--ink); font-weight: 600; }
+#status .dates { color: var(--muted); margin-left: 4px; }
+#status .x { cursor: pointer; color: #b5a88f; padding: 0 3px; border: 0; background: none; font: inherit; }
+#status .x:hover { color: var(--accent); }
+#status .none { font-style: italic; color: #a89c86; }
+#status .series { margin-left: auto; font-size: 10.5px; color: #a89c86; }
+#bar { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-bottom: 1px solid var(--line); background: var(--panel); white-space: nowrap; }
+.brand { min-width: 0; flex: 0 1 auto; }
+/* The title is the period dropdown: a native <select> laid invisibly over it, so it opens the normal menu. */
+.picker { position: relative; display: flex; align-items: baseline; gap: 8px; padding: 3px 26px 3px 7px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; min-width: 0; }
+.picker:hover, .picker:focus-within { background: #f3ede1; border-color: var(--line); }
+.picker h1 { margin: 0; font: 700 20px/1.15 var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.picker .yrs { font: 15px var(--serif); color: var(--muted); white-space: nowrap; }
+.picker .caret { position: absolute; right: 7px; top: 50%; transform: translateY(-50%); color: var(--accent); font-size: 13px; }
+.picker select { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; font-size: 14px; }
+#cursor-date { font: 600 15px var(--serif); color: var(--accent); padding-left: 12px; border-left: 1px solid var(--line); margin-right: auto; }
 .ctl { display: flex; align-items: center; gap: 6px; color: var(--muted); }
-.ctl.group { gap: 4px; }
-.ctl.check { cursor: pointer; }
 .search { position: relative; }
 #search { width: 210px; }
 #results { position: absolute; top: 100%; left: 0; z-index: 30; margin: 4px 0 0; padding: 4px 0; list-style: none; width: 340px; max-height: 360px; overflow: auto;
@@ -36,8 +52,13 @@ select, input[type=search] { background: var(--panel); border: 1px solid var(--l
 #results .d { margin-left: auto; color: var(--muted); font-size: 11px; white-space: nowrap; }
 
 /* ---- layout */
-#layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(100vh - 58px - 60px); min-height: 520px; }
-#left { display: grid; grid-template-rows: minmax(220px, 48fr) minmax(160px, 52fr); height: 100%; min-height: 0; min-width: 0; border-right: 1px solid var(--line); }
+#layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(100vh - 23px - 45px - 60px); min-height: 520px; }
+#left { display: grid; grid-template-rows: minmax(220px, 48fr) auto minmax(160px, 52fr); height: 100%; min-height: 0; min-width: 0; border-right: 1px solid var(--line); }
+/* Playback and zoom live on the timeline they move; World lives on the map. */
+#tl-bar { display: flex; align-items: center; gap: 8px; padding: 4px 10px; border-bottom: 1px solid var(--line); background: var(--panel); font-size: 12px; color: var(--muted); white-space: nowrap; }
+#tl-bar .check { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+#tl-showing { margin-left: auto; overflow: hidden; text-overflow: ellipsis; }
+.map-btn { position: absolute; left: 10px; top: 38px; font-size: 12px; padding: 2px 8px; background: rgba(255,253,248,.92); }
 #map-wrap { position: relative; background: var(--sea); border-bottom: 1px solid var(--line); overflow: hidden; }
 #map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; }
 #map:active { cursor: grabbing; }
@@ -137,7 +158,7 @@ kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4p
 
 @media (max-width: 1000px) {
   #layout { grid-template-columns: 1fr; height: auto; }
-  #left { grid-template-rows: 300px 520px; border-right: 0; }
+  #left { grid-template-rows: 300px auto 520px; border-right: 0; }
   #panel { border-top: 1px solid var(--line); }
 }
 
@@ -239,8 +260,11 @@ ul.terms .copy-ask { margin-left: 6px; font-size: 11px; padding: 1px 6px; }
 #master .m-period:hover rect { fill: #cdb88f; }
 #master .m-period text { font-size: 10px; fill: #5a4f3e; pointer-events: none; }
 #master .m-period.on rect { fill: var(--accent); stroke: var(--accent); }
-#master .m-period.on text { fill: #fff; font-weight: 600; }
-#master .m-slice { fill: var(--accent); opacity: .09; pointer-events: none; }
+#master .m-period.on text { fill: var(--accent); font-weight: 600; }
+#master .m-period.on text.in { fill: #fff; }
 #master .m-from, #master .m-to { font-size: 10.5px; font-weight: 700; fill: var(--accent); }
-#master .m-cursor { stroke: var(--ink); stroke-width: 1.6; pointer-events: none; }
+#master .m-cursor { fill: var(--ink); pointer-events: none; }
+#master .m-zoom { fill: none; stroke: var(--ink); stroke-width: 1.4; pointer-events: none; }
+#master .m-gap { font-size: 9px; fill: #b5a88f; font-style: italic; }
+#master .m-scale { font-size: 9px; fill: #a39780; font-style: italic; cursor: help; }
 #master .m-note { font-size: 9px; fill: #a39780; font-style: italic; }

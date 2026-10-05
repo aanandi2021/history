@@ -666,7 +666,8 @@
       const t0 = parseDate(d.range[0]), t1 = parseDate(d.range[1]);
       const ey = t1.getUTCFullYear(), jan1 = t1.getUTCMonth() === 0 && t1.getUTCDate() === 1;
       const endYear = jan1 && toHist(ey) % 5 !== 0 ? ey - 1 : ey;
-      return { id, title: d.title, short: d.title.split(":")[0], from: masterYear(t0.getUTCFullYear()), to: masterYear(endYear), y0: yearOf(t0), y1: yearOf(t1) };
+      const extra = d.subtitle && d.subtitle.includes("·") ? d.subtitle.split("·").slice(1).join("·").trim() : "";
+      return { id, title: d.title, full: extra ? `${d.title} (with ${extra})` : d.title, short: d.title.split(":")[0], from: masterYear(t0.getUTCFullYear()), to: masterYear(endYear), y0: yearOf(t0), y1: yearOf(t1) };
     }).sort((a, b) => a.y0 - b.y0 || b.y1 - a.y1);
     if (!periods.length) return { periods, breaks: [], y0: 0, y1: 1 };
     const y0 = Math.min(...periods.map((p) => p.y0)), y1 = Math.max(...periods.map((p) => p.y1));

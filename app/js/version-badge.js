@@ -10,7 +10,7 @@
     el.id = "version-badge";
     el.textContent = `v${v.version}`;
     el.title = `Version ${v.version}, built on ${v.branch} after commit ${v.commit}, stamped ${v.stamped}. Served from ${where}.`;
-    const host = document.querySelector("#bar .brand .series");
+    const host = document.querySelector("#status .series, #bar .brand .series");
     if (host) { el.className = "vb-inline"; host.append(" · ", el); }
     else {
       el.className = "vb-corner";

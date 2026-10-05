@@ -512,6 +512,7 @@
       .on("zoom", (ev) => {
         xs = ev.transform.rescaleX(xs0);
         renderTimeline();
+        updateMasterZoom();
         if (state.cursor) { drawScene(state.cursor); renderPins(state.cursor); }
       });
     tlSvg.call(tlZoom).on("dblclick.zoom", null);
@@ -900,6 +901,7 @@
   }
 
   function renderCard() {
+    renderStatus();
     const card = $("#card");
     const it = state.selected && state.ds.byId.get(state.selected);
     if (!it) { card.hidden = true; card.innerHTML = ""; return; }
@@ -1144,37 +1146,56 @@
   });
 
   // ---------------------------------------------------------------- master timeline
-  // Every period on one strip (HM.masterLayout). The open period is highlighted with its from/to years, the cursor
-  // is a tick, and clicking a period opens it, the same as choosing it from the Period dropdown.
+  // Every period on one strip (HM.masterLayout). The open period is red with its from/to years; a black bracket under
+  // it is the stretch the lower timeline shows; a small triangle is the date you're on. Clicking a period opens it,
+  // the same as choosing it from the title.
   const master = { layout: M.masterLayout(window.DATASETS) };
   function renderMaster() {
     const svg = d3.select("#master-svg");
     if (svg.empty()) return;
     const W = svg.node().clientWidth || 1000, L = master.layout, pad = 6;
     const x = (y) => pad + M.masterX(L, y) * (W - 2 * pad);
-    const rowH = 14, top = 14, axisY = top + L.rows * rowH + 3;
-    master.x = x;
+    const rowH = 14, top = 15, axisY = top + L.rows * rowH + 3;
+    master.x = x; master.top = top; master.rowH = rowH; master.axisY = axisY;
     svg.attr("height", axisY + 14);
     svg.selectAll("*").remove();
     const ax = svg.append("g").attr("class", "m-axis");
     ax.append("line").attr("x1", x(L.y0)).attr("x2", x(L.y1)).attr("y1", axisY).attr("y2", axisY);
     L.breaks.forEach((b, i) => {
-      const label = M.masterYear(Math.floor(b));
+      const last = i === L.breaks.length - 1;
+      const label = M.masterYear(Math.floor(b) - (last && b === Math.floor(b) ? 1 : 0));
       ax.append("line").attr("class", "m-break").attr("x1", x(b)).attr("x2", x(b)).attr("y1", top - 2).attr("y2", axisY + 3);
-      ax.append("text").attr("x", x(b)).attr("y", axisY + 11).attr("text-anchor", i === 0 ? "start" : i === L.breaks.length - 1 ? "end" : "middle").text(label);
+      ax.append("text").attr("x", x(b)).attr("y", axisY + 11).attr("text-anchor", i === 0 ? "start" : last ? "end" : "middle").text(label);
     });
+    // Say what the empty stretches are, where there's room.
+    const spans = L.periods.map((q) => [q.y0, q.y1]).sort((a, b) => a[0] - b[0]);
+    let reach = spans.length ? spans[0][1] : 0;
+    for (const [a, b] of spans.slice(1)) {
+      if (a > reach && x(a) - x(reach) > 150) svg.append("text").attr("class", "m-gap").attr("x", x(a) - 8).attr("y", top + rowH - 5).attr("text-anchor", "end").text("not yet covered");
+      reach = Math.max(reach, b);
+    }
+    const n = L.breaks.length - 1;
+    if (n > 1) svg.append("text").attr("class", "m-scale").attr("x", x(L.breaks[n - 1]) - 4).attr("y", top - 4).attr("text-anchor", "end")
+      .text("scale stretches toward the present ›").append("title").text("Each stretch between the marked years gets the same width, so short modern periods stay visible.");
     const p = state.ds && L.periods.find((q) => q.id === state.dsId);
-    if (p) svg.append("rect").attr("class", "m-slice").attr("x", x(p.y0)).attr("width", Math.max(2, x(p.y1) - x(p.y0))).attr("y", 0).attr("height", axisY);
     const g = svg.selectAll("g.m-period").data(L.periods).join("g")
       .attr("class", (q) => `m-period${q.id === state.dsId ? " on" : ""}`)
       .attr("data-id", (q) => q.id)
       .on("click", (ev, q) => { if (q.id !== state.dsId) { setPlaying(false); loadDataset(q.id); scheduleHash(); } });
-    g.append("title").text((q) => `${q.title}, ${q.from} – ${q.to}`);
-    g.append("rect").attr("x", (q) => x(q.y0)).attr("y", (q) => top + q.row * rowH).attr("height", rowH - 3)
-      .attr("width", (q) => Math.max(3, x(q.y1) - x(q.y0)));
-    // Names go inside bars wide enough to hold them; the rest have a tooltip.
-    g.append("text").attr("x", (q) => x(q.y0) + 4).attr("y", (q) => top + q.row * rowH + rowH - 6)
-      .text((q) => ((x(q.y1) - x(q.y0)) > q.short.length * 5.6 + 8 ? q.short : ""));
+    g.append("title").text((q) => `${q.full}, ${q.from} – ${q.to}`);
+    g.append("rect").attr("x", (q) => x(q.y0)).attr("y", (q) => top + q.row * rowH).attr("height", rowH - 3).attr("rx", 2)
+      .attr("width", (q) => Math.max(4, x(q.y1) - x(q.y0)));
+    // Every bar is named: inside if it fits, otherwise just outside it, on whichever side has room before the next bar.
+    g.append("text").each(function (q) {
+      const x0 = x(q.y0), x1 = Math.max(x0 + 4, x(q.y1)), w = x1 - x0, need = q.short.length * 5.6 + 8, y = top + q.row * rowH + rowH - 6;
+      const same = L.periods.filter((o) => o !== q && o.row === q.row);
+      const roomR = Math.min(W - pad, ...same.filter((o) => o.y0 >= q.y1).map((o) => x(o.y0))) - x1;
+      const roomL = x0 - Math.max(pad, ...same.filter((o) => o.y1 <= q.y0).map((o) => x(o.y1)));
+      const t = d3.select(this).text(q.short).attr("y", y);
+      if (w > need) t.attr("class", "in").attr("x", x0 + 4);
+      else if (roomR > need || roomR >= roomL) t.attr("x", x1 + 4);
+      else t.attr("x", x0 - 4).attr("text-anchor", "end");
+    });
     if (p) {
       const fx = x(p.y0), tx = x(p.y1), wide = tx - fx > 110;
       // Wide slices carry their years at their ends; narrow ones get one "745 – 865" label over the middle.
@@ -1186,15 +1207,70 @@
         const mid = Math.min(W - pad - half, Math.max(pad + half, (fx + tx) / 2));
         svg.append("text").attr("class", "m-from m-to").attr("x", mid).attr("y", 10).attr("text-anchor", "middle").text(label);
       }
+      master.row = p.row;
     }
-    svg.append("line").attr("class", "m-cursor").attr("y1", top).attr("y2", axisY + 2);
+    svg.append("path").attr("class", "m-zoom");
+    svg.append("path").attr("class", "m-cursor");
     updateMasterCursor();
+    updateMasterZoom();
   }
   function updateMasterCursor() {
     if (!master.x || !state.cursor) return;
     const cx = master.x(M.yearOf(state.cursor));
-    d3.select("#master-svg .m-cursor").attr("x1", cx).attr("x2", cx);
+    d3.select("#master-svg .m-cursor").attr("d", `M${cx},${master.axisY - 1} l-4,-6 h8 z`).attr("data-x", cx);
+    const yr = state.cursor.getUTCFullYear();
+    $("#cursor-date").textContent = state.ds.precision === "year" ? M.masterYear(yr) : fmtCursor(state.cursor);
   }
+  /** The bracket under the open period: what the lower timeline is showing. Also writes "Showing …" on the timeline bar. */
+  function updateMasterZoom() {
+    if (!state.ds || !xs) return;
+    const [a, b] = tlDomain(), ds = state.ds;
+    const whole = +a <= +ds.t0 + M.DAY && +b >= +ds.t1 - M.DAY;
+    const show = $("#tl-showing");
+    if (show) show.textContent = whole ? "Showing the whole period" : `Showing ${fmtCursor(a)} – ${fmtCursor(b)}`;
+    if (!master.x) return;
+    const za = master.x(M.yearOf(a)), zb = Math.max(za + 3, master.x(M.yearOf(b))), zy = master.top + (master.row || 0) * master.rowH + master.rowH - 1;
+    d3.select("#master-svg .m-zoom").attr("d", `M${za},${zy - 4} V${zy + 1} H${zb} V${zy - 4}`).attr("data-a", za).attr("data-b", zb);
+  }
+
+  // ---------------------------------------------------------------- status line
+  // The thin line at the very top: whatever is selected, with its path. Every step is a link (chapters open and zoom
+  // the timeline to themselves); × clears the selection.
+  function deepestChapterAt(t) {
+    const hits = state.ds.chapters.filter((c) => c.t0 <= t && c.t1 >= t);
+    return hits.sort((a, b) => M.ancestors(state.ds, b).length - M.ancestors(state.ds, a).length || (a.t1 - a.t0) - (b.t1 - b.t0))[0] || null;
+  }
+  function renderStatus() {
+    const el = $("#status");
+    if (!el) return;
+    const series = el.querySelector(".series");
+    const it = state.selected && state.ds && state.ds.byId.get(state.selected);
+    let h = "";
+    if (!it) h = `<span class="none">Nothing selected. Click anything on the map or timeline.</span>`;
+    else {
+      const ds = state.ds;
+      const kind = { event: "Event", leader: "Person", book: "Book", chapter: it.kind === "chapter" && it.children.length && !it.depth ? "Part" : "Chapter" }[it.kind] || "";
+      let path = [];
+      if (it.kind === "chapter") path = M.ancestors(ds, it).reverse().map((c) => ({ id: c.id, label: c.title }));
+      else if (it.kind === "event") {
+        const ch = deepestChapterAt(it.t0);
+        if (ch) path = [...M.ancestors(ds, ch).reverse(), ch].map((c) => ({ id: c.id, label: c.title }));
+        else path = [{ label: ds.lanes.find((l) => l.id === it.lane)?.label || "Events" }];
+      } else if (it.kind === "leader") path = [{ label: it.country || "In power" }];
+      else if (it.kind === "book") path = [{ label: it.amits ? "Amit's Fiction" : "Reading" }];
+      h = `<span class="kind">${esc(kind)}</span><span class="path">` +
+        path.map((p) => (p.id ? `<a data-id="${esc(p.id)}" title="Open ${esc(p.label)}">${esc(p.label)}</a>` : `<span>${esc(p.label)}</span>`) + `<span class="gt">›</span>`).join("") +
+        `</span><a class="name" data-id="${esc(it.id)}" title="Go to it">${esc(itemName(it))}</a><span class="dates">${esc(itemWhen(it))}</span>` +
+        `<button class="x" title="Clear selection (Esc)" aria-label="Clear selection">×</button>`;
+    }
+    el.innerHTML = h;
+    if (series) el.append(series);
+  }
+  $("#status").addEventListener("click", (ev) => {
+    const a = ev.target.closest("a[data-id]");
+    if (a) { ev.preventDefault(); select(a.dataset.id); scheduleHash(); return; }
+    if (ev.target.closest(".x")) clearSelection();
+  });
 
   // ---------------------------------------------------------------- datasets
   function loadDataset(id, opts = {}) {
@@ -1204,7 +1280,10 @@
     if (errs.length) console.warn("Dataset problems:", errs);
     state.selected = null; state.pinned = false; state.followed = undefined;
     $("#dataset").value = id;
-    $("#ds-title").textContent = `${state.ds.title} · ${state.ds.subtitle || ""}`;
+    const mp = master.layout.periods.find((q) => q.id === id);
+    $("#ds-title").textContent = state.ds.title;
+    $("#ds-years").textContent = mp ? `${mp.from} – ${mp.to}` : "";
+    $(".picker").title = `${mp ? mp.full : state.ds.title}. Click to choose another period, or click one on the strip below.`;
     document.title = `${state.ds.title} — Amit's World`;
     renderMapLegend();
     drawChapterBox(null);
@@ -1217,9 +1296,9 @@
 
   // ---------------------------------------------------------------- controls
   const dsSel = $("#dataset");
-  for (const [id, d] of Object.entries(window.DATASETS)) {
+  for (const q of master.layout.periods) {
     const o = document.createElement("option");
-    o.value = id; o.textContent = `${d.title} (${d.subtitle})`;
+    o.value = q.id; o.textContent = `${q.title}  (${q.from} – ${q.to})`;
     dsSel.appendChild(o);
   }
   dsSel.addEventListener("change", () => { setPlaying(false); loadDataset(dsSel.value); scheduleHash(); });

@@ -48,7 +48,7 @@ test("e2e: the strip highlights the open period, follows the dropdown, and opens
     on: [...document.querySelectorAll("#master .m-period.on")].map((g) => g.dataset.id),
     years: [...document.querySelectorAll("#master .m-from, #master .m-to")].map((t) => t.textContent),
     dropdown: document.querySelector("#dataset").value,
-    cursor: +document.querySelector("#master .m-cursor").getAttribute("x1")
+    cursor: +document.querySelector("#master .m-cursor").getAttribute("data-x")
   }));
   let s = await on();
   assert.deepEqual(s.on, ["ancient"]);
@@ -65,6 +65,56 @@ test("e2e: the strip highlights the open period, follows the dropdown, and opens
   const before = s.cursor;
   await page.evaluate(() => APP.setCursor(new Date(Date.UTC(1937, 1, 1))));
   assert.ok((await on()).cursor < before, "the cursor tick follows the date");
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test("e2e: header D, with a status line of clickable crumbs, the title as the dropdown, the date, and a zoom bracket", async () => {
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1440, height: 900 });
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto(pathToFileURL(path.join(ROOT, "app", "index.html")).href + "#ancient/-0216-08-02");
+  await page.waitForFunction("window.APP && APP.ready");
+  const read = () => page.evaluate(() => ({
+    status: document.querySelector("#status").textContent,
+    crumbs: [...document.querySelectorAll("#status a[data-id]")].map((a) => a.dataset.id),
+    title: document.querySelector("#ds-title").textContent,
+    years: document.querySelector("#ds-years").textContent,
+    date: document.querySelector("#cursor-date").textContent,
+    showing: document.querySelector("#tl-showing").textContent,
+    zoom: [+document.querySelector("#master .m-zoom").dataset.a, +document.querySelector("#master .m-zoom").dataset.b],
+    picker: !!document.querySelector(".picker select#dataset"),
+    barRows: Math.round(document.querySelector("#bar").getBoundingClientRect().height)
+  }));
+  let s = await read();
+  const barH = s.barRows;
+  assert.ok(barH <= 46, "the bar is one row");
+  assert.match(s.status, /Nothing selected/);
+  assert.match(s.status, /v\d/, "the version sits at the right of the status line");
+  assert.equal(s.picker, true, "the title is the period dropdown");
+  assert.equal(s.years, "1800 BC – AD 700");
+  assert.equal(s.date, "216 BC");
+  assert.equal(s.showing, "Showing the whole period");
+  const wide = s.zoom[1] - s.zoom[0];
+  await page.evaluate(() => APP.select("ch-hannibals-war"));
+  s = await read();
+  assert.deepEqual(s.crumbs, ["ch-rome", "ch-punic-wars", "ch-hannibals-war"], "path then the item itself");
+  assert.match(s.status, /Chapter/);
+  await new Promise((r) => setTimeout(r, 900));
+  s = await read();
+  assert.match(s.showing, /^Showing \d+ BC – \d+ BC$/);
+  assert.ok(s.zoom[1] - s.zoom[0] < wide / 4, "the bracket narrows when the timeline zooms in");
+  await page.click('#status a[data-id="ch-punic-wars"]');
+  assert.equal(await page.evaluate(() => APP.state.selected), "ch-punic-wars", "a crumb opens its chapter");
+  await page.click("#status .x");
+  assert.equal(await page.evaluate(() => APP.state.selected), null, "× clears");
+  await page.select("#dataset", "russia");
+  s = await read();
+  assert.equal(s.title, "Russia: Muscovy to Stalin");
+  assert.equal(s.barRows, barH, "one fixed row, whatever the title");
+  await page.select("#dataset", "maritime");
+  assert.equal((await read()).barRows, barH);
   assert.deepEqual(errors, []);
   await page.close();
 });
