@@ -362,7 +362,84 @@
     return errs;
   }
 
+  // ---- chapter scenes: each chapter can carry a small atlas-grammar map and the names in its text
+
+  /** The scene for a chapter, from window.SCENES[datasetId][chapterId], or null. */
+  function sceneFor(scenes, dsId, ch) {
+    const s = scenes && scenes[dsId];
+    return (ch && s && s[ch.id]) || null;
+  }
+
+  /** Is this layer shown at map zoom k? Layers can set minK / maxK for detail that appears as you zoom in. */
+  function visibleAt(layer, k) {
+    return (layer.minK == null || k >= layer.minK) && (layer.maxK == null || k < layer.maxK);
+  }
+
+  /**
+   * Split text into plain runs and linked terms. Each term links at its first mention only; longer terms win,
+   * so "House of Wisdom" isn't eaten by "Wisdom". Returns [{ text, term? }].
+   */
+  function linkTerms(text, terms) {
+    const src = String(text || "");
+    const hits = [];
+    for (const term of [...(terms || [])].sort((a, b) => b.t.length - a.t.length)) {
+      let from = 0, at;
+      while ((at = src.indexOf(term.t, from)) >= 0) {
+        const end = at + term.t.length;
+        const word = (i) => i >= 0 && i < src.length && /[\p{L}\p{N}]/u.test(src[i]);
+        if (!word(at - 1) && !word(end) && !hits.some((h) => at < h.end && end > h.at)) { hits.push({ at, end, term }); break; }
+        from = at + 1;
+      }
+    }
+    hits.sort((a, b) => a.at - b.at);
+    const out = [];
+    let i = 0;
+    for (const h of hits) {
+      if (h.at > i) out.push({ text: src.slice(i, h.at) });
+      out.push({ text: src.slice(h.at, h.end), term: h.term });
+      i = h.end;
+    }
+    if (i < src.length) out.push({ text: src.slice(i) });
+    return out;
+  }
+
+  /** Where a term goes: your note if there is one, otherwise Wikipedia. */
+  function termUrl(term) {
+    return term.note ? obsidianUrl(term.note, term.heading) : wikiUrl(term.wiki || term.t);
+  }
+
+  const SCENE_TYPES = ["area", "arrow", "route", "boundary", "point", "label"];
+  const SCENE_TIERS = ["core", "conquest", "influence"];
+  const SCENE_SYMBOLS = ["city", "large-city", "capital", "port", "university", "temple", "stupa", "monastery", "battle", "fortress", "treaty", "insurrection", "find"];
+
+  /** Problems with one chapter's scene (layers in the atlas grammar, plus terms). Empty means it can be drawn. */
+  function validateScene(scene, ch) {
+    const errs = [], name = ch ? ch.title : "?";
+    const bad = (m) => errs.push(`scene "${name}": ${m}`);
+    const ll = (p) => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite) && Math.abs(p[0]) <= 180 && Math.abs(p[1]) <= 90;
+    if (!scene || !Array.isArray(scene.layers) || !scene.layers.length) { bad("needs layers"); return errs; }
+    scene.layers.forEach((L, i) => {
+      const w = `layer ${i + 1} (${L.name || L.text || L.type})`;
+      if (!SCENE_TYPES.includes(L.type)) return bad(`${w}: unknown type ${L.type}`);
+      if (L.type === "area" && !(Array.isArray(L.around) && L.around.length >= 3 && L.around.every(ll))) bad(`${w}: area needs around of 3+ [lon,lat]`);
+      if (L.type === "area" && L.tier && !SCENE_TIERS.includes(L.tier)) bad(`${w}: unknown tier ${L.tier}`);
+      if (["arrow", "route", "boundary"].includes(L.type) && !(Array.isArray(L.path) && L.path.length >= 2 && L.path.every(ll))) bad(`${w}: needs a path of 2+ [lon,lat]`);
+      if (L.type === "point" && !ll(L.at)) bad(`${w}: point needs at`);
+      if (L.type === "point" && L.symbol && !SCENE_SYMBOLS.includes(L.symbol)) bad(`${w}: unknown symbol ${L.symbol}`);
+      if (L.type === "point" && !L.name) bad(`${w}: point needs a name`);
+      if (L.type === "label" && !(L.text && ll(L.at))) bad(`${w}: label needs text and at`);
+      if (L.minK != null && !(L.minK >= 1)) bad(`${w}: minK must be 1 or more`);
+    });
+    const text = ch && ch.text ? ch.text : "";
+    for (const term of scene.terms || []) {
+      if (!term.t) { bad("term without t"); continue; }
+      if (text && !linkTerms(text, [term]).some((r) => r.term)) bad(`term "${term.t}" is not in the chapter text`);
+    }
+    return errs;
+  }
+
   return {
+    sceneFor, visibleAt, linkTerms, termUrl, validateScene, SCENE_SYMBOLS,
     DAY, VAULT, VAULT_ID, parseDate, isPartial, isoDate, fmtDate, fmtRange, slug, normalise, nearWindow,
     nearbyEvents, activeLeaders, activeChapters, activeChapter, mapStateAt, booksFor, fictionFor, ficTarget,
     obsidianUrl, wikiUrl, calibreUrl, plateUrl, libraryUrl, linksFor, parseHash, formatHash, search, stepEvent, validate

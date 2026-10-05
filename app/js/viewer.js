@@ -58,6 +58,8 @@
   const countryPaths = mapRoot.append("g").selectAll("path").data(countries).join("path")
     .attr("class", "country").attr("d", geoPath);
   const chapterBox = mapRoot.append("path").attr("class", "chapter-box");
+  const sceneLayer = mapRoot.insert("g", ".chapter-box").attr("class", "scene");
+  const sceneDefs = mapSvg.append("defs");
   const pinLayer = mapRoot.append("g");
 
   const mapZoom = d3.zoom().scaleExtent([1, 40])
@@ -66,6 +68,7 @@
       mapRoot.attr("transform", ev.transform);
       state.mapK = ev.transform.k;
       scalePins();
+      scaleScene();
     });
   mapSvg.call(mapZoom).on("dblclick.zoom", null);
 
@@ -100,9 +103,159 @@
     mapSvg.transition("fly").duration(700).call(mapZoom.transform, t);
   }
 
+  // ---------------------------------------------------------------- chapter scenes (atlas grammar on the viewer map)
+  const SCENES = window.SCENES || {};
+  const viewBox = (ch) => (M.sceneFor(SCENES, state.dsId, ch) || {}).bbox || ch.bbox;
+
   function drawChapterBox(ch) {
-    if (!ch) { chapterBox.attr("d", null); return; }
+    // a chapter with a scene draws its own map, so the dashed box would only add clutter
+    if (!ch || M.sceneFor(SCENES, state.dsId, ch)) { chapterBox.attr("d", null); return; }
     chapterBox.attr("d", geoPath({ type: "LineString", coordinates: bboxRing(ch.bbox) }));
+  }
+
+
+  let sceneKey = null;
+  const SYMBOL_PATHS = {
+    city: "M-2.6,0a2.6,2.6 0 1,0 5.2,0a2.6,2.6 0 1,0 -5.2,0",
+    "large-city": "M-4,0a4,4 0 1,0 8,0a4,4 0 1,0 -8,0",
+    find: "M-2.6,0a2.6,2.6 0 1,0 5.2,0a2.6,2.6 0 1,0 -5.2,0",
+    port: "M0,-4.5L0,3.5M-3.2,1a3.2,3.2 0 0,0 6.4,0M-2,-2.5L2,-2.5",
+    university: "M-4,-3L0,-4.6L4,-3L4,3.6L0,2.2L-4,3.6Z",
+    temple: "M0,-4.8L4.4,3.4L-4.4,3.4Z",
+    stupa: "M-4.4,2.8A4.4,4.4 0 0,1 4.4,2.8Z M0,-5.4L0,-1.6",
+    monastery: "M-3.4,-3.4h6.8v6.8h-6.8Z",
+    fortress: "M-3.6,-3.6h7.2v7.2h-7.2Z",
+    battle: "M-4,-4L4,4M4,-4L-4,4",
+    treaty: "M0,-4.6L4.6,0L0,4.6L-4.6,0Z",
+    insurrection: "M0,-5L1.4,-1.4L5,0L1.4,1.4L0,5L-1.4,1.4L-5,0L-1.4,-1.4Z"
+  };
+  const STROKED = new Set(["port", "battle", "find", "stupa", "monastery"]);
+
+  function stripeFill(colour) {
+    const id = "stripe-" + colour.replace(/[^a-z0-9]/gi, "");
+    if (sceneDefs.select("#" + id).empty()) {
+      const p = sceneDefs.append("pattern").attr("id", id).attr("patternUnits", "userSpaceOnUse")
+        .attr("width", 7).attr("height", 7).attr("patternTransform", "rotate(45)");
+      p.append("rect").attr("width", "100%").attr("height", "100%").attr("fill", colour).attr("opacity", 0.12);
+      p.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 7).attr("stroke", colour).attr("stroke-width", 2.2).attr("opacity", 0.55);
+    }
+    return `url(#${id})`;
+  }
+  function fadeStroke(colour, a, b) {
+    const id = `fade-${sceneDefs.selectAll("linearGradient").size()}`;
+    const g = sceneDefs.append("linearGradient").attr("id", id).attr("gradientUnits", "userSpaceOnUse")
+      .attr("x1", a[0]).attr("y1", a[1]).attr("x2", b[0]).attr("y2", b[1]);
+    g.append("stop").attr("offset", 0).attr("stop-color", colour).attr("stop-opacity", 0.95);
+    g.append("stop").attr("offset", 0.55).attr("stop-color", colour).attr("stop-opacity", 0.6);
+    g.append("stop").attr("offset", 1).attr("stop-color", colour).attr("stop-opacity", 0);
+    return `url(#${id})`;
+  }
+  const smooth = d3.line().curve(d3.curveCatmullRom.alpha(0.5));
+  // a thing drawn at screen size: positioned in map space, scaled by 1/k in scaleScene
+  const screenSized = (g, x, y, rot) => g.append("g").attr("class", "sc").datum({ x, y, rot });
+
+  function sceneText(g, lines, anchor) {
+    const t = g.append("text").attr("text-anchor", anchor);
+    lines.forEach((ln, i) => t.append("tspan").attr("class", ln.cls).attr("x", anchor === "end" ? -7 : anchor === "middle" ? 0 : 7)
+      .attr("dy", i ? (ln.cls === "s-who" ? 11 : 12) : 3.5).text(ln.text));
+    return t;
+  }
+
+  function drawSceneLayers(root, layers, ghost) {
+    const order = ["area", "boundary", "route", "arrow", "label", "point"];
+    for (const L of [...layers].sort((a, b) => order.indexOf(a.type) - order.indexOf(b.type))) {
+      const g = root.append("g").attr("class", `s-L s-${L.type}`).datum(L);
+      const colour = L.colour || "#8a7a5a";
+      if (L.type === "area") {
+        const ring = [...L.around, L.around[0]];
+        let f = { type: "Polygon", coordinates: [ring] };
+        if (d3.geoArea(f) > 2 * Math.PI) f = { type: "Polygon", coordinates: [ring.slice().reverse()] };
+        const tier = L.tier || "core";
+        g.append("path").attr("d", geoPath(f)).attr("class", `s-fill ${tier}`)
+          .style("fill", tier === "conquest" ? stripeFill(colour) : colour).style("stroke", colour);
+        if (L.name && !ghost) {
+          const [x, y] = projection(L.labelAt || d3.geoCentroid(f));
+          sceneText(screenSized(g, x, y), [{ text: L.name, cls: "s-realm" }], "middle").style("fill", L.labelColour || d3.color(colour).darker(1.2));
+        }
+      } else if (L.type === "boundary") {
+        g.append("path").attr("d", geoPath({ type: "LineString", coordinates: L.path })).attr("class", `s-line ${L.style || "dashed"}`).style("stroke", L.colour || null);
+      } else if (L.type === "route" || L.type === "arrow") {
+        const pts = L.path.map((p) => projection(p));
+        const path = g.append("path").attr("d", smooth(pts)).attr("class", L.type === "route" ? `s-route ${L.style || "dotted"}` : "s-arrow");
+        const end = pts[pts.length - 1], prev = pts[pts.length - 2];
+        if (L.type === "arrow") {
+          path.style("stroke", L.fade ? fadeStroke(colour, pts[0], end) : colour);
+          if (!L.fade) {
+            const rot = Math.atan2(end[1] - prev[1], end[0] - prev[0]) * 180 / Math.PI;
+            screenSized(g, end[0], end[1], rot).append("path").attr("d", "M2,0L-8,-5L-6,0L-8,5Z").style("fill", colour);
+          }
+        } else if (L.colour) path.style("stroke", L.colour);
+        if (L.name) {
+          const at = L.labelAt ? projection(L.labelAt) : pts[Math.floor(pts.length / 2)];
+          sceneText(screenSized(g, at[0], at[1]), [{ text: L.name, cls: "s-note" }], L.side === "l" ? "end" : "start").style("fill", L.type === "arrow" ? d3.color(colour).darker(0.8) : null);
+        }
+      } else if (L.type === "label") {
+        const [x, y] = projection(L.at);
+        sceneText(screenSized(g, x, y), [{ text: L.text, cls: `s-${L.style || "note"}` }], "middle");
+      } else if (L.type === "point") {
+        const [x, y] = projection(L.at);
+        const s = screenSized(g, x, y).attr("data-name", L.name);
+        const sym = L.symbol || "city";
+        if (sym === "capital") {
+          s.append("circle").attr("r", 5.2).attr("class", "s-sym-o");
+          s.append("circle").attr("r", 2.2).attr("class", "s-sym-f");
+        } else {
+          s.append("path").attr("d", SYMBOL_PATHS[sym]).attr("class", STROKED.has(sym) ? "s-sym-s" : "s-sym-f").style(STROKED.has(sym) ? "stroke" : "fill", L.colour || null);
+        }
+        const lines = [{ text: L.name + (L.year ? ` ${L.year}` : ""), cls: "s-name" }];
+        for (const w of L.people || []) lines.push({ text: w, cls: "s-who" });
+        if (L.note) lines.push({ text: L.note, cls: "s-who" });
+        const t = sceneText(s, lines, L.side === "l" ? "end" : "start");
+        if (L.dy) t.attr("transform", `translate(0,${L.dy})`);
+      }
+    }
+  }
+
+  /** Draw the focused chapter's scene, plus the areas of other chapters running at the same time, faintly. */
+  function drawScene(t) {
+    const ds = state.ds;
+    const sel = state.selected && ds.byId.get(state.selected);
+    const withScene = (c) => M.sceneFor(SCENES, state.dsId, c);
+    const active = M.activeChapters(ds, t).filter(withScene).sort((a, b) => (a.t1 - a.t0) - (b.t1 - b.t0));
+    const focus = sel && sel.kind === "chapter" && withScene(sel) ? sel : active[0] || null;
+    const ghosts = active.filter((c) => c !== focus);
+    const key = [state.dsId, focus && focus.id, ...ghosts.map((c) => c.id)].join("|");
+    if (key === sceneKey) return;
+    sceneKey = key;
+    sceneLayer.selectAll("*").remove();
+    sceneDefs.selectAll("linearGradient").remove();
+    for (const c of ghosts) drawSceneLayers(sceneLayer.append("g").attr("class", "ghost").attr("data-ch", c.id), withScene(c).layers.filter((L) => L.type === "area"), true);
+    if (focus) drawSceneLayers(sceneLayer.append("g").attr("class", "focus").attr("data-ch", focus.id), withScene(focus).layers, false);
+    state.sceneFocus = focus ? focus.id : null;
+    const cap = focus && withScene(focus).caption;
+    $("#scene-cap").textContent = cap || "";
+    $("#scene-cap").hidden = !cap;
+    scaleScene();
+  }
+
+  function scaleScene() {
+    const k = state.mapK || 1;
+    sceneLayer.selectAll(".s-L").attr("display", (L) => (M.visibleAt(L, k) ? null : "none"));
+    sceneLayer.selectAll(".sc").attr("transform", (d) => `translate(${d.x},${d.y}) scale(${1 / k})${d.rot != null ? ` rotate(${d.rot})` : ""}`);
+    sceneDefs.selectAll("pattern").attr("width", 7 / k).attr("height", 7 / k)
+      .call((p) => p.select("line").attr("y2", 7 / k).attr("stroke-width", 2.2 / k));
+  }
+
+  /** Chapter text with its terms linked one move ahead: your note if it exists, else Wikipedia. ★ marks the ones worth asking about. */
+  function richText(it) {
+    const sc = it.kind === "chapter" && M.sceneFor(SCENES, state.dsId, it);
+    if (!sc || !sc.terms) return esc(it.text);
+    return M.linkTerms(it.text, sc.terms).map((r) => {
+      if (!r.term) return esc(r.text);
+      const ext = !r.term.note;
+      return `<a class="term" data-link="term" href="${esc(M.termUrl(r.term))}"${ext ? ' target="_blank" rel="noopener"' : ""}${r.term.why ? ` title="${esc(r.term.why)}"` : ""}>${esc(r.text)}</a>` +
+        (r.term.star ? `<span class="star" title="Worth asking about">★</span>` : "");
+    }).join("");
   }
 
   function renderMapLegend() {
@@ -204,7 +357,7 @@
       .on("zoom", (ev) => {
         xs = ev.transform.rescaleX(xs0);
         renderTimeline();
-        if (state.cursor) { renderPins(state.cursor); }
+        if (state.cursor) { drawScene(state.cursor); renderPins(state.cursor); }
       });
     tlSvg.call(tlZoom).on("dblclick.zoom", null);
     tlSvg.call(tlZoom.transform, d3.zoomIdentity);
@@ -490,9 +643,10 @@
     const span = w > 300 * M.DAY ? `±${Math.round(w / (365.25 * M.DAY))} yr` : w > 45 * M.DAY ? `±${Math.round(w / (30.4 * M.DAY))} months` : `±${Math.round(w / M.DAY)} days`;
     let h = `<h2 id="cursor-date">${esc(fmtCursor(t))}</h2><div class="when">${state.pinned ? "Pinned. Click the timeline again to let go." : "Hover the timeline, or click to pin."} Showing ${span}.</div>`;
     if (chapters.length) {
-      // the most specific chapter (shortest span) tells the story of this moment
-      const now = chapters.filter((c) => c.text).sort((a, b) => (a.t1 - a.t0) - (b.t1 - b.t0))[0];
-      if (now) h += `<div class="now" id="now"><div class="now-h">Now · <a class="it" href="#" data-id="${esc(now.id)}">${esc(now.title)}</a></div><p>${esc(now.text)}</p></div>`;
+      // the selected chapter, else the most specific one (shortest span), tells the story of this moment
+      const picked = state.selected && chapters.find((c) => c.id === state.selected && c.text);
+      const now = picked || chapters.filter((c) => c.text).sort((a, b) => (a.t1 - a.t0) - (b.t1 - b.t0))[0];
+      if (now) h += `<div class="now" id="now"><div class="now-h">Now · <a class="it" href="#" data-id="${esc(now.id)}">${esc(now.title)}</a></div><p>${richText(now)}</p></div>`;
       const plates = (ds.plates || []).filter((p) => t >= p.t0 && t <= p.t1);
       if (plates.length) h += `<div class="plate-tiles" id="panel-plates">${plates.map(plateTile).join("")}</div>`;
       h += `<h3>Chapter</h3><div>${chapters.map((c) => `<span class="chip${c === now ? " on" : ""}" data-id="${esc(c.id)}">${esc(c.title)}</span>`).join("")}</div>`;
@@ -528,7 +682,7 @@
       h += `<p>${esc(it.author)}${it.amits ? '<span class="tag amits">Amit\'s fiction</span>' : ""}${it.owned ? '<span class="tag own">in Calibre</span>' : ""}${it.canadian ? '<span class="tag">Canadian</span>' : ""}${it.fiction && !it.amits ? '<span class="tag">fiction</span>' : ""}</p>`;
     }
     if (it.kind === "event" && ds.lanes.find((l) => l.id === it.lane)?.fiction) h += `<p><span class="tag amits">from Amit's novel, not history</span></p>`;
-    if (it.text) h += `<p>${esc(it.text)}</p>`;
+    if (it.text) h += `<p>${richText(it)}</p>`;
     const allLinks = M.linksFor(ds, it);
     const plateLinks = allLinks.filter((l) => l.kind === "plate");
     if (plateLinks.length) {
@@ -543,6 +697,16 @@
     }
     if (it.kind === "chapter") h += `<button data-zoom="${esc(it.id)}">Zoom here</button>`;
     h += `<button id="copy-link" title="Copy a link to this moment, for an Obsidian note">Copy link</button><span class="copied" id="copied"></span></div>`;
+    const sc = it.kind === "chapter" && M.sceneFor(SCENES, state.dsId, it);
+    if (sc && sc.terms && sc.terms.length) {
+      const terms = [...sc.terms].sort((a, b) => !!b.star - !!a.star);
+      h += `<h3>One move ahead</h3><ul class="terms" id="card-terms">${terms.map((tm) => {
+        const ext = !tm.note;
+        return `<li${tm.star ? ' class="starred"' : ""}><a data-link="term" href="${esc(M.termUrl(tm))}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(tm.t)}${ext ? " ↗" : ""}</a>` +
+          (tm.why ? ` <span class="d">${esc(tm.why)}</span>` : "") +
+          (tm.star ? `<div class="ask">★ ${esc(tm.star)} <button class="copy-ask" data-ask="${esc(tm.star)}" title="Copy this question to ask Copilot">Copy question</button></div>` : "") + `</li>`;
+      }).join("")}</ul>`;
+    }
     const books = M.booksFor(ds, it);
     if (books.length) {
       h += `<h3>Reading</h3><ul class="books">${books.map((b) => {
@@ -572,6 +736,12 @@
     if (ev.target.closest(".close")) { clearSelection(); return; }
     const z = ev.target.closest("[data-zoom]");
     if (z) { zoomChapter(z.getAttribute("data-zoom")); return; }
+    const ask = ev.target.closest("[data-ask]");
+    if (ask) {
+      const q = ask.getAttribute("data-ask");
+      try { await navigator.clipboard.writeText(q); ask.textContent = "Copied"; } catch (e) { window.prompt("Copy this question:", q); }
+      return;
+    }
     if (ev.target.id === "copy-link") {
       const url = location.href.split("#")[0] + M.formatHash(state.dsId, state.cursor, state.selected);
       let ok = false;
@@ -588,6 +758,7 @@
     state.cursor = t;
     updateCursorVisual();
     colourMap(t);
+    drawScene(t);
     renderPins(t);
     renderPanel();
     if (state.follow && (state.playing || opts.scrub)) followChapter(t);
@@ -600,7 +771,7 @@
     if (id === state.followed) return;
     state.followed = id;
     drawChapterBox(ch);
-    if (ch) flyToBBox(ch.bbox); else flyWorld();
+    if (ch) flyToBBox(viewBox(ch)); else flyWorld();
   }
 
   function zoomChapter(id) {
@@ -609,7 +780,7 @@
     const pad = Math.max((ch.t1 - ch.t0) * 0.08, 20 * M.DAY);
     zoomToDomain(+ch.t0 - pad, +ch.t1 + pad);
     drawChapterBox(ch);
-    flyToBBox(ch.bbox);
+    flyToBBox(viewBox(ch));
     state.followed = ch.id;
     if (!state.cursor || state.cursor < ch.t0 || state.cursor > ch.t1) setCursor(ch.t0);
   }
@@ -636,7 +807,7 @@
     state.pinned = false;
     tlSvg.selectAll("g.item").classed("sel", false);
     renderCard();
-    if (state.cursor) { renderPins(state.cursor); updateCursorVisual(); renderPanel(); }
+    if (state.cursor) { drawScene(state.cursor); renderPins(state.cursor); updateCursorVisual(); renderPanel(); }
     scheduleHash();
   }
 
@@ -778,6 +949,8 @@
   window.APP = {
     state, select, setCursor, zoomChapter, clearSelection, loadDataset, setPlaying,
     domain: () => tlDomain().map((d) => M.isoDate(d)),
+    flyTo: (bb, ms = 0) => flyToBBox(bb, ms),
+    sceneLayers: () => [...document.querySelectorAll("#map .scene .focus .s-L")].filter((n) => n.getAttribute("display") !== "none").map((n) => { const L = d3.select(n).datum(); return L.name || L.text || L.type; }),
     mapTransform: () => { const t = d3.zoomTransform(mapSvg.node()); return { k: t.k, x: t.x, y: t.y }; },
     ready: true
   };
