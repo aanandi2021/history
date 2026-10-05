@@ -649,7 +649,49 @@
     return { period: { title: ds.title, href: link(at, ch ? ch.id : null) }, crumbs, inside, meanwhile, plates };
   }
 
+  /**
+   * The master timeline: every period on one strip. The scale is piecewise: each span between breaks gets an equal
+   * share of the strip, so 1800 BC-500 BC takes the same width as 1900-1950. Otherwise a six-year war would be a
+   * hairline next to two thousand years of antiquity. Years are astronomical (fractional), as from yearOf().
+   */
+  const MASTER_BREAKS = [-499, 500, 1000, 1500, 1800, 1900];
+  /** Years on the master strip: "1800 BC", "AD 500", "1945". */
+  const masterYear = (Y) => (Y <= 0 ? `${1 - Y} BC` : Y < 1000 ? `AD ${Y}` : String(Y));
+  function yearOf(t) {
+    const y = t.getUTCFullYear(), a = utc(y, 0, 1), b = utc(y + 1, 0, 1);
+    return y + (t - a) / (b - a);
+  }
+  function masterLayout(datasets) {
+    const periods = Object.entries(datasets || {}).map(([id, d]) => {
+      const t0 = parseDate(d.range[0]), t1 = parseDate(d.range[1]);
+      const ey = t1.getUTCFullYear(), jan1 = t1.getUTCMonth() === 0 && t1.getUTCDate() === 1;
+      const endYear = jan1 && toHist(ey) % 5 !== 0 ? ey - 1 : ey;
+      return { id, title: d.title, short: d.title.split(":")[0], from: masterYear(t0.getUTCFullYear()), to: masterYear(endYear), y0: yearOf(t0), y1: yearOf(t1) };
+    }).sort((a, b) => a.y0 - b.y0 || b.y1 - a.y1);
+    if (!periods.length) return { periods, breaks: [], y0: 0, y1: 1 };
+    const y0 = Math.min(...periods.map((p) => p.y0)), y1 = Math.max(...periods.map((p) => p.y1));
+    const breaks = [y0, ...MASTER_BREAKS.filter((b) => b > y0 + 50 && b < y1 - 20), y1];
+    const rows = [];
+    for (const p of periods) {
+      let r = rows.findIndex((end) => end <= p.y0);
+      if (r < 0) { r = rows.length; rows.push(0); }
+      rows[r] = p.y1; p.row = r;
+    }
+    return { periods, breaks, y0, y1, rows: rows.length };
+  }
+  /** Where a year falls on the master strip, 0..1. */
+  function masterX(layout, year) {
+    const b = layout.breaks, n = b.length - 1;
+    if (n < 1) return 0;
+    if (year <= b[0]) return 0;
+    if (year >= b[n]) return 1;
+    let i = 0;
+    while (i < n - 1 && year > b[i + 1]) i++;
+    return (i + (year - b[i]) / (b[i + 1] - b[i])) / n;
+  }
+
   return {
+    yearOf, masterLayout, masterX, masterYear,
     plateContext,
     sceneKey,
     sceneFor, visibleAt, liveAt, itineraryAt, stopLabel, sceneLadder, dateStart, dateEnd, linkTerms, termUrl, validateScene, SCENE_SYMBOLS,

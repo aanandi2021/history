@@ -997,6 +997,7 @@
     t = new Date(Math.min(+ds.t1, Math.max(+ds.t0, +t)));
     state.cursor = t;
     updateCursorVisual();
+    updateMasterCursor();
     colourMap(t);
     drawScene(t);
     renderPins(t);
@@ -1142,6 +1143,59 @@
     } else if (ev.key === " ") { ev.preventDefault(); setPlaying(!state.playing); }
   });
 
+  // ---------------------------------------------------------------- master timeline
+  // Every period on one strip (HM.masterLayout). The open period is highlighted with its from/to years, the cursor
+  // is a tick, and clicking a period opens it, the same as choosing it from the Period dropdown.
+  const master = { layout: M.masterLayout(window.DATASETS) };
+  function renderMaster() {
+    const svg = d3.select("#master-svg");
+    if (svg.empty()) return;
+    const W = svg.node().clientWidth || 1000, L = master.layout, pad = 6;
+    const x = (y) => pad + M.masterX(L, y) * (W - 2 * pad);
+    const rowH = 14, top = 14, axisY = top + L.rows * rowH + 3;
+    master.x = x;
+    svg.attr("height", axisY + 14);
+    svg.selectAll("*").remove();
+    const ax = svg.append("g").attr("class", "m-axis");
+    ax.append("line").attr("x1", x(L.y0)).attr("x2", x(L.y1)).attr("y1", axisY).attr("y2", axisY);
+    L.breaks.forEach((b, i) => {
+      const label = M.masterYear(Math.floor(b));
+      ax.append("line").attr("class", "m-break").attr("x1", x(b)).attr("x2", x(b)).attr("y1", top - 2).attr("y2", axisY + 3);
+      ax.append("text").attr("x", x(b)).attr("y", axisY + 11).attr("text-anchor", i === 0 ? "start" : i === L.breaks.length - 1 ? "end" : "middle").text(label);
+    });
+    const p = state.ds && L.periods.find((q) => q.id === state.dsId);
+    if (p) svg.append("rect").attr("class", "m-slice").attr("x", x(p.y0)).attr("width", Math.max(2, x(p.y1) - x(p.y0))).attr("y", 0).attr("height", axisY);
+    const g = svg.selectAll("g.m-period").data(L.periods).join("g")
+      .attr("class", (q) => `m-period${q.id === state.dsId ? " on" : ""}`)
+      .attr("data-id", (q) => q.id)
+      .on("click", (ev, q) => { if (q.id !== state.dsId) { setPlaying(false); loadDataset(q.id); scheduleHash(); } });
+    g.append("title").text((q) => `${q.title}, ${q.from} – ${q.to}`);
+    g.append("rect").attr("x", (q) => x(q.y0)).attr("y", (q) => top + q.row * rowH).attr("height", rowH - 3)
+      .attr("width", (q) => Math.max(3, x(q.y1) - x(q.y0)));
+    // Names go inside bars wide enough to hold them; the rest have a tooltip.
+    g.append("text").attr("x", (q) => x(q.y0) + 4).attr("y", (q) => top + q.row * rowH + rowH - 6)
+      .text((q) => ((x(q.y1) - x(q.y0)) > q.short.length * 5.6 + 8 ? q.short : ""));
+    if (p) {
+      const fx = x(p.y0), tx = x(p.y1), wide = tx - fx > 110;
+      // Wide slices carry their years at their ends; narrow ones get one "745 – 865" label over the middle.
+      if (wide) {
+        svg.append("text").attr("class", "m-from").attr("x", fx).attr("y", 10).text(p.from);
+        svg.append("text").attr("class", "m-to").attr("x", tx).attr("y", 10).attr("text-anchor", "end").text(p.to);
+      } else {
+        const label = `${p.from} – ${p.to}`, half = label.length * 3.2;
+        const mid = Math.min(W - pad - half, Math.max(pad + half, (fx + tx) / 2));
+        svg.append("text").attr("class", "m-from m-to").attr("x", mid).attr("y", 10).attr("text-anchor", "middle").text(label);
+      }
+    }
+    svg.append("line").attr("class", "m-cursor").attr("y1", top).attr("y2", axisY + 2);
+    updateMasterCursor();
+  }
+  function updateMasterCursor() {
+    if (!master.x || !state.cursor) return;
+    const cx = master.x(M.yearOf(state.cursor));
+    d3.select("#master-svg .m-cursor").attr("x1", cx).attr("x2", cx);
+  }
+
   // ---------------------------------------------------------------- datasets
   function loadDataset(id, opts = {}) {
     state.dsId = id;
@@ -1157,6 +1211,7 @@
     flyWorld(0);
     renderCard();
     setupTimeline();
+    renderMaster();
     setCursor(opts.cursor || M.parseDate(state.ds.startAt) || state.ds.t0, { hover: !!opts.quiet });
   }
 
@@ -1177,7 +1232,7 @@
   let resizeTimer = null;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { const d = tlDomain(); setupTimeline(d); }, 150);
+    resizeTimer = setTimeout(() => { const d = tlDomain(); setupTimeline(d); renderMaster(); }, 150);
   });
 
   // ---------------------------------------------------------------- start

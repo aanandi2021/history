@@ -9,6 +9,10 @@ The notes are the source of truth. This repo turns their frontmatter into timeli
 
 Open `app/index.html` in a browser (double-click is fine). It works from `file://`, offline, with no server or build.
 
+- **Very top:** the master timeline, every period on one strip from 1800 BC to 1945. The open period is highlighted with
+  its from/to years and a tick for the date you're on. Click a period to open it (the same as the Period dropdown).
+  The scale stretches toward the present: each stretch between the marked years gets the same width, so a six-year
+  war isn't a hairline next to two thousand years of antiquity.
 - **Top:** a world map. Countries are coloured at a few snapshot dates (WW2 only); pins mark events near the date you're looking at.
 - **Bottom:** the timeline. Chapters across the top, then lanes (Canada always first), who was in power, books, and your family.
 - **Right:** what was happening everywhere around that date, and a card for whatever you click.
