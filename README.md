@@ -56,8 +56,11 @@ local legend on the left page, and date-led text on the right. Hovering a text e
 and the other way round.
 
 - `docs/atlas-design-language.md` is the grammar, reverse-engineered from the first twenty spreads of Vol. 1 (two rounds of ten).
-- `atlas/plates/*.js` are the plates (`maritime-monsoon` is mapified from the Maritime Asia note; `hammurabi` is a
-  fidelity test on the book's own ground). `atlas/index.html#key` shows every symbol.
+- `atlas/plates/*.js` are the plates (`maritime-monsoon` is mapified from the Maritime Asia note; `hammurabi` and
+  `han-china` are fidelity tests on the book's own ground, one per round). `atlas/index.html#key` shows every symbol.
+- Plates and the timeline viewer link both ways. A dataset's `plates: [{ id, title, start, end }]` adds an
+  "Atlas plate" link to every card inside that span, and a plate's `viewer: "period/date"` turns its header link
+  into "On the timeline".
 - `.github/skills/mapify/SKILL.md` is the Copilot CLI skill that turns a vault note into a plate. It's linked into
   `~/.copilot/skills/mapify` with a directory junction, so it loads from any folder.
 - `node scripts/plate_check.mjs <id> [--out <dir>]` validates a plate, runs the renderer's self-review (label
