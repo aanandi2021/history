@@ -5,10 +5,183 @@
 window.SCENES = window.SCENES || {};
 (function () {
   const RUS = "#6f8655", RUS2 = "#8a9a5b", STEPPE = "#b88444", POL = "#8c6aa0", SWE = "#5b79a6", OTT = "#b05b4c",
-    FRA = "#4f6fa0", BRIT = "#7a5a8c", CAN = "#c23b3b", WHITE = "#b89a64", RED = "#a33d3d", GER = "#505050",
-    SEA = "#2e5f8a", RAIL = "#6d5a45", CHINA = "#b98b55", JAPAN = "#6b7f9f", UKR = "#caa44d", FIN = "#6c91b8";
+    FRA = "#4f6fa0", BRIT = "#7a5a8c", CAN = "#b22d2d", WHITE = "#b89a64", RED = "#a33d3d", GER = "#505050",
+    SEA = "#2e5f8a", RAIL = "#6d5a45", CHINA = "#b98b55", JAPAN = "#6b4f8c", UKR = "#caa44d", FIN = "#6c91b8", GULAG = "#46465a";
+
+  // Who each colour stands for, for the map's colour key. One colour per actor across every chapter of the period.
+  (window.SCENE_ACTORS = window.SCENE_ACTORS || {}).russia = {
+    [RUS]: "Russia", [RUS2]: "Russian advances", [STEPPE]: "Tatars, steppe peoples and rebels", [POL]: "Poland–Lithuania", [SWE]: "Sweden",
+    [OTT]: "Ottoman empire", [FRA]: "France", [BRIT]: "Britain and British India", [CAN]: "Canada", [WHITE]: "Whites", [RED]: "Reds and the Soviet state",
+    [GER]: "Germany", [SEA]: "Sea routes", [RAIL]: "Railways", [CHINA]: "China", [JAPAN]: "Japan", [UKR]: "Ukraine", [FIN]: "Finland", [GULAG]: "Gulag"
+  };
 
   window.SCENES.russia = {
+    "ch-muscovy": {
+      caption: "Muscovy gathers the Russian lands from Moscow's core to the Volga and western Siberia, 1462–1613. Borders are approximate.",
+      bbox: [[18, 40], [75, 66]],
+      layers: [
+        { type: "area", name: "Moscow principality 1462", tier: "core", colour: RUS, labelAt: [36.0, 54.8],
+          around: [[35.0, 54.4], [36.4, 55.2], [37.2, 56.1], [38.6, 56.7], [40.2, 56.3], [41.1, 55.2], [40.2, 54.2], [38.2, 53.8], [36.4, 53.9]] },
+        { type: "area", name: "Muscovy by 1613", tier: "conquest", colour: RUS, labelAt: [49.5, 58.4],
+          around: [[27.0, 56.5], [30.0, 59.5], [36.5, 61.5], [45.0, 60.2], [54.5, 57.5], [65.5, 58.6], [71.0, 56.5], [67.0, 53.5], [55.0, 52.0], [49.0, 47.0], [43.5, 45.5], [37.0, 48.0], [30.5, 52.0]] },
+        { type: "area", name: "Tatar khanates and steppe", tier: "influence", colour: STEPPE, labelAt: [49.5, 49.5],
+          around: [[36.0, 45.0], [42.0, 48.0], [49.0, 50.0], [58.0, 50.5], [65.0, 48.5], [64.0, 45.5], [55.0, 43.8], [45.0, 43.6], [38.0, 44.0]] },
+        { type: "area", name: "Polish and Swedish pressure", tier: "influence", colour: POL, labelAt: [25.0, 55.0],
+          around: [[18.5, 49.0], [22.0, 53.0], [23.5, 58.0], [29.0, 59.0], [32.0, 56.0], [30.0, 51.0], [25.0, 48.5]] },
+        { type: "arrow", colour: RUS2, name: "down the Volga", labelAt: [45.5, 52.0], path: [[37.62, 55.75], [44.0, 56.3], [49.1, 55.8], [47.8, 52.0], [48.0, 46.4]] },
+        { type: "arrow", colour: RUS2, name: "over the Urals", labelAt: [59.5, 57.6], fade: true, path: [[49.1, 55.8], [56.0, 56.7], [62.0, 57.8], [68.25, 58.2]] },
+        { type: "arrow", colour: POL, name: "foreign armies", labelAt: [31.0, 55.0], side: "l", path: [[21.0, 52.2], [27.0, 53.5], [33.0, 54.7], [37.62, 55.75]] },
+        { type: "point", symbol: "capital", name: "Moscow", year: "1462", at: [37.62, 55.75], side: "l", dy: 18 },
+        { type: "point", symbol: "large-city", name: "Novgorod", year: "1478", at: [31.27, 58.52], side: "l" },
+        { type: "point", symbol: "fortress", name: "Kazan", year: "1552", at: [49.1, 55.79], dy: -16 },
+        { type: "point", symbol: "fortress", name: "Astrakhan", year: "1556", at: [48.03, 46.35], side: "l" },
+        { type: "point", symbol: "battle", name: "Time of Troubles", year: "1598–1613", at: [37.62, 55.75], dy: 30, side: "l", minK: 7 },
+        { type: "label", style: "medallion", text: "R", at: [57.0, 61.5], colour: RUS },
+        { type: "label", style: "medallion", text: "P", at: [22.0, 47.2], colour: POL },
+        { type: "label", style: "water", text: "Volga", at: [47.0, 52.2] },
+        { type: "label", style: "water", text: "Caspian Sea", at: [51.0, 42.2] },
+        { type: "label", style: "region", text: "western Siberia", at: [66.0, 59.5], minK: 4 }
+      ],
+      terms: [
+        { t: "Moscow", wiki: "Moscow" },
+        { t: "Tatar", wiki: "Tatars", why: "The Tatar khanates were the steppe powers Muscovy first paid, then conquered." },
+        { t: "tsar", wiki: "Tsar" },
+        { t: "Volga", wiki: "Volga", why: "Control of the river opened the route to the Caspian and the east.", star: "Why did control of the Volga change Muscovy's whole scale?" },
+        { t: "Time of Troubles", wiki: "Time of Troubles" },
+        { t: "Romanov", wiki: "House of Romanov" },
+        { t: "Champlain", wiki: "Samuel de Champlain" }
+      ]
+    },
+
+    "ch-romanov-empire": {
+      caption: "The Romanovs turn Muscovy into a Baltic, Black Sea and Siberian empire, 1582–1796. Borders are approximate.",
+      bbox: [[18, 39], [150, 72]],
+      layers: [
+        { type: "area", name: "Romanov core", tier: "core", colour: RUS, labelAt: [42.0, 56.5],
+          around: [[27.0, 52.0], [31.0, 58.5], [39.0, 61.5], [50.0, 60.5], [57.0, 56.0], [55.0, 50.5], [47.0, 48.5], [37.0, 49.0], [30.0, 50.5]] },
+        { type: "area", name: "Siberian and Pacific frontier", tier: "conquest", colour: RUS, labelAt: [96.0, 60.0],
+          around: [[58.0, 54.0], [72.0, 58.0], [92.0, 61.0], [114.0, 61.5], [136.0, 59.0], [146.0, 56.5], [143.0, 53.0], [122.0, 53.5], [99.0, 55.0], [76.0, 54.0]] },
+        { type: "area", name: "Baltic and Polish gains", tier: "conquest", colour: RUS, labelAt: [27.0, 56.8],
+          around: [[20.0, 49.0], [23.0, 53.0], [24.0, 59.5], [30.5, 60.5], [34.0, 56.0], [31.0, 50.0], [25.0, 48.5]] },
+        { type: "area", name: "Crimea and Black Sea coast", tier: "conquest", colour: RUS, labelAt: [34.5, 45.2],
+          around: [[28.5, 44.7], [32.5, 46.6], [37.0, 46.2], [40.5, 44.8], [39.0, 43.2], [34.2, 44.0], [30.0, 43.8]] },
+        { type: "area", name: "Ottoman Empire", tier: "influence", colour: OTT, labelAt: [32.5, 41.5],
+          around: [[25.0, 39.5], [30.0, 42.6], [37.0, 42.2], [43.0, 40.2], [39.0, 37.6], [31.0, 37.7], [26.0, 38.7]] },
+        { type: "area", name: "Qing China", tier: "influence", colour: CHINA, labelAt: [122.0, 48.0],
+          around: [[104.0, 43.0], [116.0, 47.0], [129.0, 51.0], [137.0, 50.5], [138.0, 46.0], [128.0, 42.5], [114.0, 41.0], [105.0, 42.0]] },
+        { type: "arrow", colour: RUS2, name: "Cossacks east", labelAt: [83.0, 60.0], fade: true, path: [[68.25, 58.2], [86.0, 60.2], [108.0, 61.2], [128.0, 59.5], [143.2, 59.4]] },
+        { type: "arrow", colour: RUS2, name: "Baltic window", labelAt: [32.0, 58.2], path: [[37.62, 55.75], [33.0, 57.6], [30.31, 59.94]] },
+        { type: "arrow", colour: RUS2, name: "Black Sea drive", labelAt: [35.8, 49.0], path: [[37.62, 55.75], [36.0, 51.0], [34.1, 44.95]] },
+        { type: "point", symbol: "capital", name: "Moscow", at: [37.62, 55.75], side: "l" },
+        { type: "point", symbol: "capital", name: "St. Petersburg", year: "1703", at: [30.31, 59.94] },
+        { type: "point", symbol: "treaty", name: "Nerchinsk", year: "1689", at: [116.6, 51.98], side: "l", minK: 4 },
+        { type: "point", symbol: "port", name: "Okhotsk", year: "1639", at: [143.2, 59.4], colour: SEA, minK: 4 },
+        { type: "point", symbol: "battle", name: "Poltava", year: "1709", at: [34.55, 49.59], side: "l", minK: 4 },
+        { type: "point", symbol: "fortress", name: "Crimea", year: "1783", at: [34.1, 44.95], side: "l" },
+        { type: "point", symbol: "treaty", name: "Poland", year: "1772–95", at: [21.0, 52.23], side: "l" },
+        { type: "label", style: "medallion", text: "R", at: [75.0, 66.0], colour: RUS },
+        { type: "label", style: "medallion", text: "O", at: [44.0, 39.8], colour: OTT },
+        { type: "label", style: "water", text: "Baltic Sea", at: [22.0, 58.0] },
+        { type: "label", style: "water", text: "Black Sea", at: [35.0, 42.8] },
+        { type: "label", style: "region", text: "Siberia", at: [102.0, 63.2] }
+      ],
+      terms: [
+        { t: "Cossacks", wiki: "Cossacks" },
+        { t: "Siberia", wiki: "Siberia", why: "The fur frontier carried Russia across the continent." },
+        { t: "Peter the Great", wiki: "Peter the Great" },
+        { t: "Baltic", wiki: "Baltic Sea" },
+        { t: "St. Petersburg", wiki: "Saint Petersburg", star: "Why did Peter build a new capital on the Baltic instead of ruling from Moscow?" },
+        { t: "Catherine the Great", wiki: "Catherine the Great" },
+        { t: "Serfdom", wiki: "Serfdom in Russia" }
+      ]
+    },
+
+    "ch-great-power": {
+      caption: "Russia acts as a European great power while its frontiers stretch to Alaska, Central Asia and the Pacific, 1741–1907. Borders are approximate.",
+      bbox: [[-172, 22], [150, 72]],
+      layers: [
+        { type: "area", name: "European Russia", tier: "core", colour: RUS, labelAt: [42.0, 56.0],
+          around: [[21.0, 49.0], [27.0, 57.5], [39.0, 61.5], [55.0, 59.0], [63.0, 54.0], [58.0, 48.0], [43.0, 46.5], [29.0, 47.5]] },
+        { type: "area", name: "Alaska reach", tier: "influence", colour: RUS, labelAt: [-149.0, 59.0],
+          around: [[-167.0, 53.0], [-160.0, 58.0], [-150.0, 61.0], [-141.0, 60.2], [-135.0, 57.0], [-139.0, 55.0], [-151.0, 56.0], [-162.0, 54.5]] },
+        { type: "area", name: "Central Asia taken", tier: "conquest", colour: RUS, labelAt: [65.0, 42.0],
+          around: [[53.0, 40.5], [58.0, 45.0], [66.0, 45.6], [74.0, 43.0], [76.0, 39.5], [70.0, 37.0], [60.0, 38.0], [53.0, 39.0]] },
+        { type: "area", name: "Amur and Pacific coast", tier: "conquest", colour: RUS, labelAt: [129.0, 49.0],
+          around: [[119.0, 48.5], [126.0, 52.0], [136.0, 52.0], [141.0, 49.0], [140.0, 44.0], [132.0, 42.0], [126.0, 45.0]] },
+        { type: "area", name: "British India", tier: "core", colour: BRIT, labelAt: [77.0, 27.0],
+          around: [[67.0, 24.0], [72.0, 30.0], [78.0, 33.0], [85.0, 29.0], [86.0, 22.0], [78.0, 19.0], [70.0, 21.0]] },
+        { type: "area", name: "Japan", tier: "core", colour: JAPAN, labelAt: [138.0, 37.0],
+          around: [[130.0, 32.0], [134.0, 35.0], [139.0, 40.0], [145.0, 43.0], [143.0, 36.0], [137.0, 33.0]] },
+        { type: "arrow", colour: FRA, name: "Napoleon beaten", labelAt: [27.0, 55.0], path: [[23.9, 54.9], [32.0, 55.2], [37.62, 55.75]] },
+        { type: "arrow", colour: RUS2, name: "Central Asian advance", labelAt: [62.0, 45.0], path: [[55.1, 51.77], [60.0, 45.0], [69.2, 41.3]] },
+        { type: "arrow", colour: RUS2, name: "to the Pacific", labelAt: [120.0, 52.0], path: [[104.0, 52.0], [119.0, 50.0], [131.9, 43.12]] },
+        { type: "arrow", colour: JAPAN, name: "Japan stops expansion", labelAt: [129.0, 38.0], side: "l", path: [[139.7, 35.7], [134.5, 37.0], [129.5, 34.5]] },
+        { type: "point", symbol: "port", name: "Alaska", year: "1741–1867", at: [-149.0, 61.2], side: "l" },
+        { type: "point", symbol: "battle", name: "Borodino", year: "1812", at: [35.82, 55.52] },
+        { type: "point", symbol: "battle", name: "Sevastopol", year: "1854–56", at: [33.52, 44.6], side: "l" },
+        { type: "point", symbol: "treaty", name: "Alaska sale", year: "1867", at: [-135.33, 57.05], dy: 26, minK: 3 },
+        { type: "point", symbol: "city", name: "Tashkent", year: "1865", at: [69.24, 41.31] },
+        { type: "point", symbol: "port", name: "Vladivostok", year: "1860", at: [131.9, 43.12], colour: SEA },
+        { type: "point", symbol: "battle", name: "Tsushima", year: "1905", at: [129.5, 34.5] },
+        { type: "label", style: "medallion", text: "R", at: [92.0, 64.0], colour: RUS },
+        { type: "label", style: "medallion", text: "B", at: [82.0, 23.5], colour: BRIT },
+        { type: "label", style: "medallion", text: "J", at: [147.0, 36.0], colour: JAPAN },
+        { type: "label", style: "region", text: "Central Asia", at: [66.0, 36.0] },
+        { type: "label", style: "water", text: "Bering Sea", at: [-168.0, 58.0] },
+        { type: "label", style: "water", text: "Pacific", at: [145.0, 47.0] }
+      ],
+      terms: [
+        { t: "Europe", wiki: "Europe" },
+        { t: "Alaska", wiki: "Russian America" },
+        { t: "Central Asia", wiki: "Central Asia", why: "The Central Asian frontier brought Russia up against British India." },
+        { t: "Amur", wiki: "Amur" },
+        { t: "Napoleon", wiki: "Napoleon" },
+        { t: "Crimean War", wiki: "Crimean War", star: "Why did the Crimean War expose Russia as both huge and backward?" },
+        { t: "Japan", wiki: "Empire of Japan" }
+      ]
+    },
+
+    "ch-revolution": {
+      caption: "War, revolution, civil war and Stalin's Soviet state, 1914–1941. Borders are approximate.",
+      bbox: [[10, 36], [142, 68]],
+      layers: [
+        { type: "area", name: "Russian Empire / Soviet core", tier: "core", colour: RED, labelAt: [43.0, 56.5],
+          around: [[20.0, 49.0], [27.0, 58.0], [40.0, 62.5], [62.0, 62.0], [86.0, 58.0], [93.0, 52.0], [78.0, 46.0], [55.0, 45.0], [35.0, 46.0]] },
+        { type: "area", name: "Brest-Litovsk and 1939–40 borderlands", tier: "conquest", colour: GER, labelAt: [25.5, 56.0],
+          around: [[18.0, 48.8], [22.0, 54.0], [24.0, 59.0], [31.0, 59.0], [34.0, 55.0], [32.0, 50.0], [25.0, 48.0]] },
+        { type: "area", name: "Civil war fronts", tier: "influence", colour: WHITE, labelAt: [66.0, 49.0],
+          around: [[20.0, 42.0], [38.0, 45.0], [58.0, 47.0], [82.0, 53.0], [108.0, 55.0], [118.0, 50.0], [105.0, 44.0], [74.0, 40.5], [42.0, 40.0]] },
+        { type: "area", name: "Collectivization and famine belt", tier: "conquest", colour: UKR, labelAt: [38.0, 49.5],
+          around: [[25.0, 45.5], [32.0, 50.0], [41.0, 52.0], [51.0, 51.0], [53.0, 48.5], [45.0, 45.5], [34.0, 44.2]] },
+        { type: "area", name: "Gulag regions", tier: "influence", colour: GULAG, labelAt: [73.0, 61.0],
+          around: [[43.0, 56.0], [57.0, 62.0], [78.0, 64.0], [98.0, 61.5], [98.0, 56.0], [76.0, 54.0], [55.0, 54.0]] },
+        { type: "arrow", colour: GER, name: "Germany drives east", labelAt: [26.0, 54.2], path: [[13.4, 52.5], [20.0, 53.0], [30.0, 54.0], [37.62, 55.75]] },
+        { type: "arrow", colour: RED, name: "Bolshevik centre holds", labelAt: [51.0, 55.8], path: [[73.37, 54.99], [58.0, 55.2], [44.0, 55.8], [37.62, 55.75]] },
+        { type: "arrow", colour: CAN, name: "Canadians to Siberia", labelAt: [136.0, 45.2], fade: true, path: [[142.0, 45.5], [137.0, 44.2], [131.9, 43.12]] },
+        { type: "point", symbol: "capital", name: "Petrograd", year: "1917", at: [30.31, 59.94], dy: -18 },
+        { type: "point", symbol: "treaty", name: "Brest-Litovsk", year: "1918", at: [23.7, 52.1], side: "l", dy: 18 },
+        { type: "point", symbol: "capital", name: "Moscow", year: "1941", at: [37.62, 55.75], dy: 26 },
+        { type: "point", symbol: "port", name: "Vladivostok", year: "Canadians 1918–19", at: [131.9, 43.12], colour: CAN, side: "l" },
+        { type: "point", symbol: "find", name: "Holodomor", year: "1932–33", at: [31.0, 49.0], colour: UKR, side: "l", minK: 4 },
+        { type: "point", symbol: "insurrection", name: "Great Terror", year: "1936–38", at: [37.62, 55.75], side: "l", dy: -24, minK: 4 },
+        { type: "point", symbol: "battle", name: "Poland", year: "1939", at: [21.0, 52.23], side: "l" },
+        { type: "label", style: "medallion", text: "S", at: [78.0, 65.0], colour: RED },
+        { type: "label", style: "medallion", text: "G", at: [14.0, 48.0], colour: GER },
+        { type: "label", style: "region", text: "Eastern Europe", at: [26.0, 49.0] },
+        { type: "label", style: "region", text: "Siberia", at: [94.0, 58.5] },
+        { type: "label", style: "water", text: "Black Sea", at: [34.0, 43.0] }
+      ],
+      terms: [
+        { t: "First World War", wiki: "World War I" },
+        { t: "tsar", wiki: "Tsar" },
+        { t: "Bolsheviks", wiki: "Bolsheviks", why: "They seized the centre, made peace and then survived the civil war." },
+        { t: "civil war", wiki: "Russian Civil War" },
+        { t: "Canadians", wiki: "Canadian Siberian Expeditionary Force", star: "Why were Canadians on Russian soil after the armistice?" },
+        { t: "Stalin", wiki: "Joseph Stalin" },
+        { t: "Hitler", wiki: "Adolf Hitler" }
+      ]
+    },
+
     "ch-moscow-rises": {
       caption: "Muscovy at Ivan III's death in 1505. Borders are approximate.",
       layers: [
@@ -458,7 +631,7 @@ window.SCENES = window.SCENES || {};
           around: [[21, 49], [28, 58], [42, 64], [62, 64], [84, 59], [90, 53], [79, 47], [58, 45], [38, 46]] },
         { type: "area", name: "collectivization belt", tier: "conquest", colour: UKR, labelAt: [38.0, 50.4],
           around: [[25, 46], [32, 50], [40, 52], [49, 52], [53, 49], [48, 46], [38, 44], [29, 44]] },
-        { type: "area", name: "Gulag regions", tier: "influence", colour: GER, labelAt: [68.0, 61.0],
+        { type: "area", name: "Gulag regions", tier: "influence", colour: GULAG, labelAt: [68.0, 61.0],
           around: [[44, 57], [56, 62], [75, 64], [88, 61], [86, 56], [68, 55], [51, 55]] },
         { type: "route", style: "road", colour: RAIL, name: "industrial rail spine", labelAt: [55.0, 56.5], path: [[37.62, 55.75], [49.1, 55.79], [59.0, 53.4], [60.6, 56.84], [73.37, 54.99]] },
         { type: "arrow", colour: RED, name: "grain requisition", labelAt: [34.0, 51.2], side: "l", path: [[31.0, 49.0], [35.0, 51.0], [37.62, 55.75]] },

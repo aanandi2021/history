@@ -194,6 +194,12 @@
           const at = L.labelAt ? projection(L.labelAt) : pts[Math.floor(pts.length / 2)];
           sceneText(screenSized(g, at[0], at[1]), [{ text: L.name, cls: "s-note" }], L.side === "l" ? "end" : "start").style("fill", L.type === "arrow" ? d3.color(colour).darker(0.8) : null);
         }
+      } else if (L.type === "label" && L.style === "medallion") {
+        // the atlas's great-power initial in a ring (C, E, P on the Athens plate): an actor at overview scale
+        const [x, y] = projection(L.at);
+        const s = screenSized(g, x, y).attr("class", "sc s-medal");
+        s.append("circle").attr("r", 11).style("stroke", colour);
+        s.append("text").attr("dy", 4.5).attr("text-anchor", "middle").style("fill", colour).text(L.text);
       } else if (L.type === "label") {
         const [x, y] = projection(L.at);
         sceneText(screenSized(g, x, y), [{ text: L.text, cls: `s-${L.style || "note"}` }], "middle");
@@ -216,14 +222,25 @@
     }
   }
 
+  /** The chapter whose map fits this moment, the timeline zoom and the folds: a big part when zoomed out or folded. */
+  function focusAt(t) {
+    const span = xs ? tlDomain()[1] - tlDomain()[0] : null;
+    const open = new Set(M.openChapters(state.ds, isFolded));
+    return M.focusChapter(state.ds, t, span, (c) => open.has(c) && !!M.sceneFor(SCENES, state.dsId, c));
+  }
+
   /** Draw the focused chapter's scene, plus the areas of other chapters running at the same time, faintly. */
   function drawScene(t) {
     const ds = state.ds;
     const sel = state.selected && ds.byId.get(state.selected);
     const withScene = (c) => M.sceneFor(SCENES, state.dsId, c);
-    const active = M.activeChapters(ds, t).filter(withScene).sort((a, b) => (a.t1 - a.t0) - (b.t1 - b.t0));
-    const focus = sel && sel.kind === "chapter" && withScene(sel) ? sel : active[0] || null;
-    const ghosts = active.filter((c) => c !== focus);
+    const focus = sel && sel.kind === "chapter" && withScene(sel) ? sel : focusAt(t);
+    // "Meanwhile" stories only: a part's own chapters, or the part above a chapter, are the same story at another scale
+    const open = new Set(M.openChapters(ds, isFolded));
+    const live = M.activeChapters(ds, t).filter((c) => withScene(c) && open.has(c));
+    const ghosts = live
+      .filter((c) => !focus || !(M.within(ds, focus, c) || M.within(ds, c, focus)))
+      .filter((c) => !live.some((k) => k.parentId === c.id));
     const key = [state.dsId, focus && focus.id, ...ghosts.map((c) => c.id)].join("|");
     if (key === sceneKey) return;
     sceneKey = key;
@@ -235,8 +252,46 @@
     const cap = focus && withScene(focus).caption;
     $("#scene-cap").textContent = cap || "";
     $("#scene-cap").hidden = !cap;
+    renderSceneKey(focus && withScene(focus));
     scaleScene();
   }
+
+  // ---------------------------------------------------------------- colour key for the scene on the map
+  const KEY_OPEN = "history.sceneKey.open";
+  function keySwatch(colour, marks) {
+    const area = marks.find((m) => m === "core" || m === "conquest" || m === "influence");
+    let s = "";
+    if (area === "core") s += `<rect x="1" y="2" width="12" height="9" rx="1.5" fill="${colour}" fill-opacity=".35" stroke="${colour}"/>`;
+    if (area === "conquest") s += `<rect x="1" y="2" width="12" height="9" rx="1.5" fill="url(#k-${colour.slice(1)})" stroke="${colour}" stroke-dasharray="3 2"/>` +
+      `<defs><pattern id="k-${colour.slice(1)}" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line y2="4" stroke="${colour}" stroke-width="1.6"/></pattern></defs>`;
+    if (area === "influence") s += `<rect x="1" y="2" width="12" height="9" rx="1.5" fill="${colour}" fill-opacity=".12" stroke="${colour}" stroke-dasharray="1.5 2"/>`;
+    const x0 = area ? 16 : 1;
+    if (marks.includes("arrow")) s += `<path d="M${x0},6.5H${x0 + 9}" stroke="${colour}" stroke-width="2.4"/><path d="M${x0 + 13},6.5l-5,-3.4v6.8z" fill="${colour}"/>`;
+    else if (marks.includes("route")) s += `<path d="M${x0},6.5H${x0 + 13}" stroke="${colour}" stroke-width="2" stroke-dasharray="1.4 3" stroke-linecap="round"/>`;
+    return `<svg width="32" height="13" aria-hidden="true">${s}</svg>`;
+  }
+  function renderSceneKey(scene) {
+    const box = $("#scene-key");
+    const rows = M.sceneKey(scene, (window.SCENE_ACTORS || {})[state.dsId]);
+    if (!rows.length) { box.hidden = true; box.innerHTML = ""; return; }
+    const open = localStorage.getItem(KEY_OPEN) !== "0";
+    const tiers = new Set(rows.flatMap((r) => r.marks).filter((m) => m === "conquest" || m === "influence"));
+    const group = (g, title) => {
+      const rs = rows.filter((r) => r.group === g);
+      return rs.length ? `<div class="sk-h">${title}</div>` + rs.map((r) => `<div class="sk-row">${keySwatch(r.colour, r.marks)}<span>${esc(r.label)}</span></div>`).join("") : "";
+    };
+    box.innerHTML = `<button class="sk-toggle" aria-expanded="${open}">Key ${open ? "▾" : "▸"}</button>` +
+      (open ? `<div class="sk-body">${group("who", "Who")}${group("movement", "Routes and lines")}` +
+        (tiers.size ? `<div class="sk-foot">solid: held${tiers.has("conquest") ? " · stripes: newly won" : ""}${tiers.has("influence") ? " · pale: influence" : ""}</div>` : "") +
+        `<div class="sk-foot">An arrow takes the colour of whoever is moving.</div></div>` : "");
+    box.hidden = false;
+  }
+  $("#scene-key").addEventListener("click", (ev) => {
+    if (!ev.target.closest(".sk-toggle")) return;
+    localStorage.setItem(KEY_OPEN, localStorage.getItem(KEY_OPEN) === "0" ? "1" : "0");
+    const sc = state.sceneFocus && M.sceneFor(SCENES, state.dsId, state.ds.byId.get(state.sceneFocus));
+    renderSceneKey(sc);
+  });
 
   function scaleScene() {
     const k = state.mapK || 1;
@@ -455,10 +510,53 @@
         gi.append("circle").attr("cx", d.x0).attr("cy", cy).attr("r", 4).attr("fill", fill);
       }
       if (d.showLabel) {
-        gi.append("text").attr("x", d.lx).attr("y", cy + 4).attr("text-anchor", d.anchor)
-          .attr("class", d.inside && !opts.darkText && !it.approx ? "in" : null).text(d.en.label);
+        const tx = gi.append("text").attr("x", d.lx).attr("y", cy + 4).attr("text-anchor", d.anchor)
+          .attr("class", d.inside && !opts.darkText && !it.approx ? "in" : null);
+        if (d.en.twisty) {
+          twisty(tx.append("tspan"), it, d.en.twisty);
+          tx.append("tspan").text(" " + d.en.text);
+        } else tx.text(d.en.label);
+      } else if (d.en.twisty && d.vx1 - d.vx0 >= 12) {
+        twisty(gi.append("text").attr("x", d.vx0 + 3).attr("y", cy + 4), it, d.en.twisty);
       }
     }
+  }
+
+  // ---------------------------------------------------------------- folding chapters (▾ open, ▸ folded)
+  const FOLD_KEY = "history.folds.v1", AUTO_FOLD_PX = 70;
+  function loadFolds() {
+    try { return JSON.parse(localStorage.getItem(FOLD_KEY)) || {}; } catch (e) { return {}; }
+  }
+  /** Folded if you said so; otherwise folded automatically while the part is too narrow on screen to hold its children. */
+  function isFolded(c) {
+    if (!c.children || !c.children.length) return false;
+    const pref = (loadFolds()[state.dsId] || {})[c.id];
+    if (pref != null) return pref;
+    return !!xs && xs(c.t1) - xs(c.t0) < AUTO_FOLD_PX;
+  }
+  function setFold(id, folded) {
+    const all = loadFolds();
+    all[state.dsId] = Object.assign(all[state.dsId] || {}, { [id]: folded });
+    localStorage.setItem(FOLD_KEY, JSON.stringify(all));
+  }
+  function setAllFolds(folded) {
+    const all = loadFolds();
+    all[state.dsId] = {};
+    for (const c of state.ds.chapters) if (c.children.length) all[state.dsId][c.id] = folded;
+    localStorage.setItem(FOLD_KEY, JSON.stringify(all));
+    refold();
+  }
+  function refold() {
+    renderTimeline();
+    if (state.cursor) { drawScene(state.cursor); renderPanel(); }
+  }
+  /** Open every part above a chapter, so selecting it never leaves it hidden. */
+  function unfoldTo(c) {
+    for (const p of M.ancestors(state.ds, c)) if (isFolded(p)) setFold(p.id, false);
+  }
+  function twisty(el, c, glyph) {
+    return el.attr("class", "twisty").attr("data-twisty", c.id).text(glyph)
+      .on("click", (ev) => { ev.stopPropagation(); setFold(c.id, !isFolded(c)); refold(); hideTip(); });
   }
 
   function renderTimeline() {
@@ -491,11 +589,26 @@
       y += hgt;
     };
 
-    // Chapters
+    // Chapters: one lane per level of the chapter tree. Parts with children carry a ▾/▸ to fold them.
     section("Chapters");
-    const chEntries = ds.chapters.slice().sort((a, b) => a.t0 - b.t0).map((c) => ({ ref: c, t0: c.t0, t1: c.t1, label: c.title }));
-    const chLaid = layoutRows(chEntries, 4);
-    lane("click to zoom", null, chLaid, (y0) => drawEntries(body, chLaid, y0, { cls: "chapter", h: 14, alwaysBar: true, darkText: true, fill: () => null }), 0);
+    if (ds.chapters.some((c) => c.children.length)) {
+      labels.append("text").attr("class", "fold-all").attr("data-fold-all", "open").attr("x", 76).attr("y", y - 4).text("▾ open all")
+        .on("click", (ev) => { ev.stopPropagation(); setAllFolds(false); });
+      labels.append("text").attr("class", "fold-all").attr("data-fold-all", "fold").attr("x", 126).attr("y", y - 4).text("▸ fold")
+        .on("click", (ev) => { ev.stopPropagation(); setAllFolds(true); });
+    }
+    const open = M.openChapters(ds, isFolded);
+    const maxDepth = Math.max(0, ...open.map((c) => c.depth));
+    const depthName = (d) => (maxDepth === 0 ? "click to zoom" : ["Parts", "Chapters", "Details"][d] || `Level ${d + 1}`);
+    for (let d = 0; d <= maxDepth; d++) {
+      const chEntries = open.filter((c) => c.depth === d).sort((a, b) => a.t0 - b.t0).map((c) => {
+        const twisty = c.children.length ? (isFolded(c) ? "▸" : "▾") : null;
+        const label = c.title + (twisty === "▸" ? ` · ${c.children.length}` : "");
+        return { ref: c, t0: c.t0, t1: c.t1, label: twisty ? `${twisty} ${label}` : label, twisty, text: label };
+      });
+      const chLaid = layoutRows(chEntries, 4);
+      lane(depthName(d), null, chLaid, (y0) => drawEntries(body, chLaid, y0, { cls: `chapter depth-${d}`, h: 14, alwaysBar: true, darkText: true, fill: () => null }), d);
+    }
 
     // Event lanes
     section("Events");
@@ -659,9 +772,10 @@
     const span = w > 300 * M.DAY ? `±${Math.round(w / (365.25 * M.DAY))} yr` : w > 45 * M.DAY ? `±${Math.round(w / (30.4 * M.DAY))} months` : `±${Math.round(w / M.DAY)} days`;
     let h = `<h2 id="cursor-date">${esc(fmtCursor(t))}</h2><div class="when">${state.pinned ? "Pinned. Click the timeline again to let go." : "Hover the timeline, or click to pin."} Showing ${span}.</div>`;
     if (chapters.length) {
-      // the selected chapter, else the most specific one (shortest span), tells the story of this moment
+      // the selected chapter, else the one whose map is showing, tells the story of this moment
       const picked = state.selected && chapters.find((c) => c.id === state.selected && c.text);
-      const now = picked || chapters.filter((c) => c.text).sort((a, b) => (a.t1 - a.t0) - (b.t1 - b.t0))[0];
+      const shown = focusAt(t);
+      const now = picked || (shown && shown.text ? shown : null) || chapters.filter((c) => c.text).sort((a, b) => (a.t1 - a.t0) - (b.t1 - b.t0))[0];
       if (now) h += `<div class="now" id="now"><div class="now-h">Now · <a class="it" href="#" data-id="${esc(now.id)}">${esc(now.title)}</a></div><p>${richText(now)}</p></div>`;
       const plates = (ds.plates || []).filter((p) => t >= p.t0 && t <= p.t1);
       if (plates.length) h += `<div class="plate-tiles" id="panel-plates">${plates.map(plateTile).join("")}</div>`;
@@ -688,9 +802,13 @@
     const it = state.selected && state.ds.byId.get(state.selected);
     if (!it) { card.hidden = true; card.innerHTML = ""; return; }
     const ds = state.ds;
-    const kindLabel = { event: ds.lanes.find((l) => l.id === it.lane)?.label || "Event", leader: `In power · ${it.country}`, chapter: "Chapter", book: it.amits ? "Amit's Fiction" : it.fiction ? "Book · fiction" : "Book" }[it.kind];
+    const kindLabel = { event: ds.lanes.find((l) => l.id === it.lane)?.label || "Event", leader: `In power · ${it.country}`, chapter: it.kind === "chapter" && it.children.length && !it.depth ? "Part" : "Chapter", book: it.amits ? "Amit's Fiction" : it.fiction ? "Book · fiction" : "Book" }[it.kind];
     let h = `<button class="close" title="Close (Esc)" aria-label="Close">×</button><div class="kind">${esc(kindLabel)}</div><h2>${esc(itemName(it))}</h2>`;
     h += `<div class="when" id="card-when">${esc(itemWhen(it))}</div>`;
+    if (it.kind === "chapter") {
+      const up = M.ancestors(ds, it).reverse();
+      if (up.length) h = h.replace(`<div class="kind">`, `<div class="crumbs" id="card-crumbs">${up.map((p) => itemLink(p)).join(" › ")} ›</div><div class="kind">`);
+    }
     if (it.approx) h += `<div class="when">Dates are approximate.</div>`;
     if (it.kind === "leader" && it.born && it.died) h += `<div class="when">Lived ${esc(M.fmtRange(it.born, it.died))}</div>`;
     if (it.kind === "leader" && it.lifeUnknown) h += `<div class="when">Birth and death dates are not known.</div>`;
@@ -699,6 +817,10 @@
     }
     if (it.kind === "event" && ds.lanes.find((l) => l.id === it.lane)?.fiction) h += `<p><span class="tag amits">from Amit's novel, not history</span></p>`;
     if (it.text) h += `<p>${richText(it)}</p>`;
+    if (it.kind === "chapter" && it.children.length) {
+      h += `<h3>Inside this part</h3><ul class="kids" id="card-kids">${it.children.map((k) => ds.byId.get(k)).map((k) =>
+        `<li>${itemLink(k)} <span class="d">${esc(itemWhen(k))}${k.children.length ? ` · ${k.children.length} more inside` : ""}</span></li>`).join("")}</ul>`;
+    }
     const allLinks = M.linksFor(ds, it);
     const plateLinks = allLinks.filter((l) => l.kind === "plate");
     if (plateLinks.length) {
@@ -782,7 +904,7 @@
   }
 
   function followChapter(t) {
-    const ch = M.activeChapter(state.ds, t);
+    const ch = focusAt(t) || M.activeChapter(state.ds, t);
     const id = ch ? ch.id : null;
     if (id === state.followed) return;
     state.followed = id;
@@ -809,7 +931,7 @@
     let t = it.t0;
     if (it.kind === "leader" && state.cursor && it.terms.some((r) => r.t0 <= state.cursor && r.t1 >= state.cursor)) t = state.cursor;
     if (opts.keepCursor && state.cursor) t = state.cursor;
-    if (it.kind === "chapter") zoomChapter(id);
+    if (it.kind === "chapter") { unfoldTo(it); zoomChapter(id); }
     else keepInView(t);
     tlSvg.selectAll("g.item").classed("sel", (d) => d && d.id === id);
     setCursor(t);
@@ -968,6 +1090,9 @@
     flyTo: (bb, ms = 0) => flyToBBox(bb, ms),
     sceneLayers: () => [...document.querySelectorAll("#map .scene .focus .s-L")].filter((n) => n.getAttribute("display") !== "none").map((n) => { const L = d3.select(n).datum(); return L.name || L.text || L.type; }),
     mapTransform: () => { const t = d3.zoomTransform(mapSvg.node()); return { k: t.k, x: t.x, y: t.y }; },
+    isFolded: (id) => isFolded(state.ds.byId.get(id)), setFold: (id, f) => { setFold(id, f); refold(); }, setAllFolds,
+    zoomTimeline: (a, b) => zoomToDomain(M.parseDate(a), M.parseDate(b), 0),
+    focus: () => state.sceneFocus,
     ready: true
   };
 })();

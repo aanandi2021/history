@@ -4,7 +4,177 @@ window.SCENES = window.SCENES || {};
 (function () {
   const AXIS = "#8c3b3b", ALLIED = "#3f6e8c", SOVIET = "#b36b2e", CANADA = "#b22d2d", JAPAN = "#6b4f8c", SEA = "#2e5f8a", FRONT = "#4d463b", NEUTRAL = "#8a7a5a";
 
+  // Who each colour stands for, for the map's colour key. Same colours as the country shading and the timeline lanes.
+  (window.SCENE_ACTORS = window.SCENE_ACTORS || {}).ww2 = {
+    [AXIS]: "Germany and its allies", [ALLIED]: "Western Allies", [SOVIET]: "Soviet Union", [CANADA]: "Canada", [JAPAN]: "Japan",
+    [SEA]: "Sea lanes and convoys", [FRONT]: "Front lines", [NEUTRAL]: "Neutral or other"
+  };
+
   window.SCENES.ww2 = {
+    "ch-war-in-the-west": {
+      caption: "War in the West, from Hitler's first annexations to the Allied return to Germany. Lines are approximate.",
+      bbox: [[-75, 30], [30, 64]],
+      key: [
+        { colour: AXIS, label: "Axis high-water mark and attacks", marks: ["conquest", "arrow"], group: "who" },
+        { colour: ALLIED, label: "Western Allied return", marks: ["arrow"], group: "who" },
+        { colour: CANADA, label: "Canada", marks: ["arrow"], group: "who" },
+        { colour: SEA, label: "Atlantic lifeline", marks: ["route"], group: "movement" }
+      ],
+      layers: [
+        { type: "area", name: "Axis high-water mark in western Europe", tier: "conquest", colour: AXIS, labelAt: [7.5, 47.8],
+          around: [[-1.8, 43.5], [1.5, 43.1], [5.5, 43.2], [7.8, 44.5], [8.5, 47.8], [7.8, 50.0], [6.0, 52.0], [4.5, 53.3], [7.5, 56.5], [10.8, 60.0], [13.5, 60.2], [12.0, 55.0], [10.0, 52.5], [13.6, 52.4], [21.0, 52.2], [22.8, 51.0], [17.0, 48.6], [14.1, 47.7], [9.5, 46.4]] },
+        { type: "arrow", colour: AXIS, name: "1940 into France", labelAt: [3.5, 50.4],
+          path: [[7.1, 50.8], [5.4, 50.0], [3.2, 50.1], [1.8, 50.6]] },
+        { type: "route", style: "dotted", colour: SEA, name: "Atlantic lifeline", labelAt: [-38, 48], minK: 2,
+          path: [[-63.57, 44.65], [-50, 46], [-35, 50], [-18, 52], [-3, 53.4]] },
+        { type: "arrow", colour: ALLIED, name: "D-Day to Germany", labelAt: [1.8, 49.6],
+          path: [[-0.45, 49.34], [2.35, 48.86], [4.4, 50.85], [6.6, 50.9]] },
+        { type: "arrow", colour: CANADA, name: "Canadians: Juno, Scheldt, Netherlands", labelAt: [2.5, 51.6], minK: 2,
+          path: [[-0.45, 49.34], [3.8, 51.4], [5.66, 51.97]] },
+        { type: "point", symbol: "battle", name: "Dunkirk", year: "1940", at: [2.38, 51.03] },
+        { type: "point", symbol: "capital", name: "London", year: "Blitz 1940–41", at: [-0.13, 51.5], side: "l" },
+        { type: "point", symbol: "port", name: "Halifax", year: "convoys", at: [-63.57, 44.65], colour: CANADA, minK: 2 },
+        { type: "point", symbol: "battle", name: "Juno Beach", year: "1944", at: [-0.45, 49.34], colour: CANADA },
+        { type: "point", symbol: "battle", name: "Scheldt", year: "1944", at: [3.8, 51.4], colour: CANADA, minK: 2 },
+        { type: "label", style: "medallion", text: "G", at: [14.0, 54.7], colour: AXIS },
+        { type: "label", style: "medallion", text: "B", at: [-8.0, 55.0], colour: ALLIED },
+        { type: "label", style: "medallion", text: "C", at: [-57.0, 49.5], colour: CANADA },
+        { type: "label", style: "water", text: "North Atlantic", at: [-36, 41], minK: 2 }
+      ],
+      terms: [
+        { t: "Hitler", wiki: "Adolf Hitler", why: "The western war begins with Hitler's annexations and invasions." },
+        { t: "Poland", wiki: "Invasion of Poland", why: "The invasion brought Britain and France into the war." },
+        { t: "Blitz", wiki: "The Blitz", why: "Britain held out through the air battle and bombing campaign." },
+        { t: "Atlantic", wiki: "Battle of the Atlantic", why: "The convoy war kept Britain supplied." },
+        { t: "Juno Beach", wiki: "Juno Beach", why: "The Canadian landing beach marks Canada's role in the Allied return." },
+        { t: "Canada", wiki: "Military history of Canada during World War II", why: "Canada entered by its own decision and fought at sea and in northwest Europe.",
+          star: "How did Canada move from a supporting Dominion role to a major combatant in the Atlantic and northwest Europe?" }
+      ]
+    },
+
+    "ch-mediterranean": {
+      caption: "The Mediterranean war from Egypt and North Africa to Sicily and Italy. Lines are approximate.",
+      bbox: [[-10, 28], [36, 47]],
+      key: [
+        { colour: AXIS, label: "Axis advance and defensive lines", marks: ["conquest", "arrow"], group: "who" },
+        { colour: ALLIED, label: "Allied return", marks: ["arrow"], group: "who" },
+        { colour: CANADA, label: "Canadians in Italy", marks: ["arrow"], group: "who" },
+        { colour: FRONT, label: "German defensive lines", marks: ["route"], group: "movement" }
+      ],
+      layers: [
+        { type: "area", name: "Axis high-water mark in North Africa", tier: "conquest", colour: AXIS, labelAt: [19.5, 31.2],
+          around: [[10.2, 36.8], [13.2, 32.9], [17.0, 31.5], [21.8, 31.4], [25.9, 31.0], [28.95, 30.83], [30.2, 31.2], [28.0, 32.0], [23.0, 32.2], [17.0, 32.5], [12.0, 34.0]] },
+        { type: "area", name: "Italy campaign", tier: "influence", colour: ALLIED, labelAt: [13.2, 41.8],
+          around: [[12.4, 37.0], [15.2, 37.4], [16.2, 40.0], [14.4, 42.35], [13.4, 44.2], [11.9, 44.4], [10.4, 43.4], [12.2, 41.0]] },
+        { type: "arrow", colour: AXIS, name: "toward Egypt", labelAt: [24.0, 31.7],
+          path: [[13.2, 32.9], [18.0, 31.9], [24.1, 31.7], [28.95, 30.83]] },
+        { type: "arrow", colour: ALLIED, name: "El Alamein to Tunisia", labelAt: [21.0, 33.1],
+          path: [[28.95, 30.83], [23.0, 31.0], [17.0, 31.6], [13.2, 32.9], [10.2, 36.8]] },
+        { type: "arrow", colour: ALLIED, name: "Torch landings", labelAt: [-1.5, 35.6],
+          path: [[-7.6, 33.57], [-2.9, 35.4], [3.0, 36.7], [10.2, 36.8]] },
+        { type: "arrow", colour: CANADA, name: "Canadians up Italy", labelAt: [14.7, 40.5],
+          path: [[14.5, 37.5], [15.8, 40.6], [14.4, 42.35], [11.9, 44.4]] },
+        { type: "boundary", style: "wall", colour: FRONT, path: [[13.8, 41.3], [14.1, 41.8], [14.0, 42.3], [14.4, 42.6]], minK: 2 },
+        { type: "point", symbol: "battle", name: "El Alamein", year: "1942", at: [28.95, 30.83] },
+        { type: "point", symbol: "battle", name: "Tunis", year: "1943", at: [10.18, 36.8] },
+        { type: "point", symbol: "battle", name: "Sicily", year: "1943", at: [14.5, 37.5], colour: CANADA },
+        { type: "point", symbol: "battle", name: "Ortona", year: "1943", at: [14.4, 42.35], colour: CANADA },
+        { type: "point", symbol: "capital", name: "Rome", year: "1944", at: [12.6, 41.95], minK: 2 },
+        { type: "label", style: "medallion", text: "I", at: [17.0, 45.4], colour: AXIS },
+        { type: "label", style: "medallion", text: "B", at: [32.0, 34.8], colour: ALLIED }
+      ],
+      terms: [
+        { t: "Mussolini", wiki: "Benito Mussolini", why: "Italy's invasion of Egypt widened the war in the Mediterranean." },
+        { t: "Egypt", wiki: "Western Desert campaign", why: "The Axis advance threatened Egypt and the Suez route." },
+        { t: "El Alamein", wiki: "Second Battle of El Alamein", why: "El Alamein stopped the Axis drive and began the Allied pursuit." },
+        { t: "Torch", wiki: "Operation Torch", why: "The Allied landings in North Africa trapped Axis forces in Tunisia." },
+        { t: "Ortona", wiki: "Battle of Ortona", why: "Ortona anchors the Canadian experience in the Italian campaign." },
+        { t: "peninsula", wiki: "Italian campaign (World War II)", why: "Italy became a long campaign up difficult terrain.",
+          star: "Why did the Mediterranean remain strategically important after the Axis had already lost North Africa?" }
+      ]
+    },
+
+    "ch-eastern-front": {
+      caption: "The Eastern Front from Barbarossa's high-water line to the Red Army's return to Berlin. Lines are approximate.",
+      bbox: [[10, 40], [60, 64]],
+      key: [
+        { colour: AXIS, label: "German advance and high-water mark", marks: ["conquest", "arrow"], group: "who" },
+        { colour: SOVIET, label: "Red Army counteroffensive", marks: ["arrow"], group: "who" },
+        { colour: FRONT, label: "Front line", marks: ["route"], group: "movement" }
+      ],
+      layers: [
+        { type: "area", name: "Axis high-water mark", tier: "conquest", colour: AXIS, labelAt: [34.0, 51.8],
+          around: [[22, 56], [27, 58.5], [31, 59.8], [36.2, 56.8], [37.6, 55.8], [39.2, 53.0], [42.6, 50.5], [44.5, 48.7], [43.0, 46.0], [38.5, 47.0], [34.0, 48.2], [30.2, 49.4], [26.0, 50.2], [22.8, 51.0]] },
+        { type: "arrow", colour: AXIS, name: "Barbarossa, 1941", labelAt: [31.5, 54.4],
+          path: [[23.7, 52.1], [28.7, 53.9], [33.0, 54.8], [37.62, 55.75]] },
+        { type: "arrow", colour: AXIS, name: "toward Stalingrad", labelAt: [37.0, 49.8],
+          path: [[23.7, 52.1], [30.5, 50.4], [36.2, 49.9], [44.5, 48.7]] },
+        { type: "arrow", colour: SOVIET, name: "Red Army west, 1943–45", labelAt: [27.0, 53.0],
+          path: [[36.2, 51.7], [30.5, 50.45], [27.6, 53.9], [21.0, 52.2], [13.4, 52.52]] },
+        { type: "arrow", colour: SOVIET, name: "Uranus encirclement", labelAt: [43.0, 49.5], minK: 4,
+          path: [[42.1, 50.4], [43.4, 49.4], [44.5, 48.7], [45.4, 47.8], [43.6, 48.4]] },
+        { type: "boundary", style: "dashed", colour: FRONT, path: [[30.3, 59.94], [36.5, 56], [37.62, 55.75], [39.5, 53.5], [42, 51], [44.5, 48.7]], minK: 4 },
+        { type: "point", symbol: "capital", name: "Moscow", year: "1941", at: [37.62, 55.75], side: "l" },
+        { type: "point", symbol: "battle", name: "Stalingrad", year: "1942–43", at: [44.5, 48.7] },
+        { type: "point", symbol: "battle", name: "Kursk", year: "1943", at: [36.2, 51.7] },
+        { type: "point", symbol: "capital", name: "Warsaw", year: "1945", at: [21.01, 52.23], minK: 2 },
+        { type: "point", symbol: "capital", name: "Berlin", year: "1945", at: [13.4, 52.52], side: "l" },
+        { type: "label", style: "medallion", text: "G", at: [19.0, 57.8], colour: AXIS },
+        { type: "label", style: "medallion", text: "S", at: [52.0, 56.0], colour: SOVIET }
+      ],
+      terms: [
+        { t: "Germany", wiki: "Nazi Germany", why: "Germany launched the invasion and carried most of its losses on this front." },
+        { t: "Soviet Union", wiki: "Soviet Union in World War II", why: "The Soviet Union absorbed the invasion and then pushed back to Berlin." },
+        { t: "Moscow", wiki: "Battle of Moscow", why: "The German advance reached the edge of Moscow before being stopped." },
+        { t: "Stalingrad", wiki: "Battle of Stalingrad", why: "Stalingrad destroyed the German offensive in the south." },
+        { t: "Kursk", wiki: "Battle of Kursk", why: "Kursk marked the failure of Germany's last major eastern offensive." },
+        { t: "Berlin", wiki: "Battle of Berlin", why: "The Red Army's capture of Berlin ended the European war.",
+          star: "Why did the Eastern Front consume so much more of the German army than the western campaigns?" }
+      ]
+    },
+
+    "ch-asia-pacific": {
+      caption: "Asia and the Pacific, from Japan's war in China to the Allied island-by-island return. Lines are approximate.",
+      bbox: [[90, -15], [180, 50]],
+      key: [
+        { colour: JAPAN, label: "Japanese expansion and perimeter", marks: ["conquest", "arrow"], group: "who" },
+        { colour: ALLIED, label: "United States and Allied return", marks: ["arrow"], group: "who" },
+        { colour: CANADA, label: "Canada at Hong Kong", marks: ["core"], group: "who" }
+      ],
+      layers: [
+        { type: "area", name: "Japanese perimeter, 1942", tier: "conquest", colour: JAPAN, labelAt: [133, 12],
+          around: [[100, 20], [104, 15], [103.8, 1.35], [110, -2], [124, -5], [141, -3], [160, -9.6], [166, -2], [160, 12], [142, 24], [132, 34], [126, 38], [121, 40.5], [116, 39], [112, 30], [114, 22]] },
+        { type: "area", name: "War in China", tier: "influence", colour: JAPAN, labelAt: [116.5, 32.0],
+          around: [[113.5, 40], [116.2, 39.8], [119.5, 39.5], [121.5, 36], [121, 31], [119, 28], [116, 24], [113.2, 23.1], [112.0, 27.5], [112.5, 34.5]] },
+        { type: "arrow", colour: JAPAN, name: "1941–42 southward attacks", labelAt: [113, 9],
+          path: [[139.75, 35.7], [126, 26], [114.17, 22.3], [103.82, 1.35]] },
+        { type: "arrow", colour: JAPAN, name: "Pearl Harbor strike", labelAt: [164, 31], fade: true,
+          path: [[139.75, 35.7], [155, 33], [170, 27], [179, 23]] },
+        { type: "arrow", colour: ALLIED, name: "island by island", labelAt: [150, 8],
+          path: [[160, -9.6], [152, 7], [145.7, 15.2], [141.32, 24.78], [127.8, 26.3], [139.75, 35.4]] },
+        { type: "arrow", colour: ALLIED, name: "MacArthur returns", labelAt: [126, 10.7], minK: 2,
+          path: [[147, -9.4], [137, -4], [130, 4], [125, 10.8]] },
+        { type: "point", symbol: "battle", name: "Hong Kong", year: "1941", at: [114.17, 22.3], colour: CANADA, side: "l" },
+        { type: "point", symbol: "battle", name: "Midway", year: "1942", at: [176, 28.2], side: "l" },
+        { type: "point", symbol: "battle", name: "Guadalcanal", year: "1942–43", at: [160, -9.6] },
+        { type: "point", symbol: "battle", name: "Okinawa", year: "1945", at: [127.8, 26.3], minK: 2 },
+        { type: "point", symbol: "city", name: "Hiroshima", year: "1945", at: [132.46, 34.39] },
+        { type: "point", symbol: "treaty", name: "Tokyo Bay", year: "surrender", at: [139.75, 35.4], minK: 2 },
+        { type: "label", style: "medallion", text: "J", at: [146.0, 41.5], colour: JAPAN },
+        { type: "label", style: "medallion", text: "U", at: [173.0, -6.0], colour: ALLIED },
+        { type: "label", style: "medallion", text: "C", at: [107.0, 17.5], colour: CANADA }
+      ],
+      terms: [
+        { t: "China", wiki: "Second Sino-Japanese War", why: "China's war began in 1937, before the European war." },
+        { t: "Japan", wiki: "Empire of Japan", why: "Japan expanded from China across Southeast Asia and the Pacific." },
+        { t: "Pearl Harbor", wiki: "Attack on Pearl Harbor", why: "The attack brought the United States into the war." },
+        { t: "Hong Kong", wiki: "Battle of Hong Kong", why: "Canadian troops were killed or captured there in December 1941." },
+        { t: "Midway", wiki: "Battle of Midway", why: "Midway checked Japanese carrier power in 1942." },
+        { t: "atomic bombs", wiki: "Atomic bombings of Hiroshima and Nagasaki", why: "The atomic bombings preceded Japan's surrender.",
+          star: "How did a war that began in China become a Pacific carrier and island campaign?" }
+      ]
+    },
+
     "ch-road-to-war": {
       caption: "German expansion and the 1939 partition of Poland. Lines are approximate.",
       bbox: [[5, 44], [33, 57]],

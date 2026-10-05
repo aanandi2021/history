@@ -226,3 +226,47 @@ drawn by `viewer.js` on the zoomable world map instead of on a framed plate. Thr
 
 The base map under a scene is still today's coastlines at 1:110m, so city-scale views (Baghdad's round city)
 need their own plate. That's left for later.
+
+## 14. Round 3: overview and detail (PDF pp. 54–73)
+
+Ten more spreads: Sparta and the Peloponnese, Solon and Cleisthenes, the Persian Wars and the Delian League, a
+text-only culture page, Athens' empire, Thebes and Philip, Alexander, the Diadochi, Hellenistic cities, and the
+Hellenistic economy. Analyses are in `study/analysis/spread-p054…p072.json` and `round3-{a,b}-findings.md`.
+
+**How the atlas pairs overview and detail.** There are no zoom insets in this batch. Instead:
+
+- **Paired maps on one page.** The upper Athens map shows the theatre (Athens among Carthage, Etruria and
+  Persia, a few bases and treaty lines). The lower one, on the same colours, adds Sparta, neutrals, battles,
+  routes and dates. The reader carries colour and symbol from the overview into the detail.
+- **Small multiples on a fixed extent.** The Diadochi are three panels of the same ground in 303, after 301 and
+  around 180 BC. The comparison is the point, so nothing moves.
+- **Overview and detail fused.** Alexander is one empire wash with a dated route drawn over it: the route is the
+  detail.
+
+**Colour.** It usually means *who* on political plates (Athens orange, Sparta blue, Persia green), but it also
+means phase or degree (Philip's core, gains, allies, friends) and, on economic plates, kind (resource classes).
+Arrows are the least reliable: black can mean one campaign's chronology rather than a black actor. A key appears
+whenever colour is overloaded; plates that a few big labels can explain go without one.
+
+**New techniques.** Great-power initials in a ring (C, E, P; M and P) to mark actors at overview scale;
+coalition envelopes (dotted loops for the Corinthian League) that claim a sphere without a border; treaty arcs
+and sea-limit lines (“off limits for Persian ships”) as lines rather than areas; fiscal districts drawn on the
+sea; constitutional diagrams in the same frames as maps; city dots classed by founder; mint and harbour symbols.
+
+**What we built from it.**
+
+- **A chapter tree.** Chapters take a `parent`. A *part* is a top-level chapter with children; its scene is
+  the overview: realm washes for the whole span, two to four big arrows, three to six anchor places, and
+  medallions (`{ type: "label", style: "medallion", text: "R" }`) for the main powers. Its chapters reuse its
+  colours exactly.
+- **The map follows the timeline's zoom.** Zoomed out, the shortest chapter that still fills a fifth of the
+  visible time tells the story, which is usually a part. Zoomed in, its chapters take over. Folding a part
+  (▸ on the timeline) also makes its overview the map. This is the scene version of paired maps.
+- **A colour key on the map**, grouped as the atlas does: *Who* (areas, and arrows in an actor's colour) and
+  *Routes and lines*. Each scene file names its colours in `window.SCENE_ACTORS[dataset]`, one colour per actor
+  for the whole period, and a test fails if a scene uses an unnamed colour. Canada and Japan share colours
+  between the Russia and WW2 periods. The key shows pattern beside colour (solid held, stripes newly won, pale
+  influence) and folds away.
+
+Not yet: small multiples (the Diadochi triptych), coalition envelopes as their own layer type, and diagram
+plates for institutions.

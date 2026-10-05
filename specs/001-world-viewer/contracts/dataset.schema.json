@@ -45,7 +45,9 @@
       "properties": {
         "title": { "type": "string" }, "start": { "$ref": "#/$defs/date" }, "end": { "$ref": "#/$defs/date" },
         "bbox": { "type": "array", "items": { "$ref": "#/$defs/lonlat" }, "minItems": 2, "maxItems": 2 },
-        "text": { "type": "string" }, "section": { "type": "string" }, "wiki": { "type": "string" }, "fic": { "$ref": "#/$defs/fic" } } } },
+        "text": { "type": "string" }, "section": { "type": "string" }, "wiki": { "type": "string" }, "fic": { "$ref": "#/$defs/fic" },
+        "id": { "type": "string" },
+        "parent": { "type": "string", "description": "id of the chapter this one sits inside (e.g. ch-muscovy). Its dates must fall within the parent's." } } } },
     "mapStates": { "type": "array", "items": {
       "type": "object", "required": ["date", "label", "status"],
       "properties": { "date": { "$ref": "#/$defs/date" }, "label": { "type": "string" },

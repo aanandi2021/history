@@ -73,21 +73,34 @@ The book scans used for the study stay in `study\`, which is git-ignored, and mu
 
 ## Chapter scenes
 
-The chapter bars nest: shorter chapters sit inside longer ones. Each chapter can also carry a **scene**: a small map
-in the atlas grammar, drawn on the viewer map while that chapter is selected or is the most specific one running.
-Other chapters running at the same time show their areas faintly behind it. Scenes live in `app/scenes/<period>.js`
-and are keyed by chapter id. `ch-abbasid-baghdad` in `scenes/maritime.js` is the worked example.
+Chapters form a tree. A chapter can name a `parent` (by id, e.g. `parent: "ch-muscovy"`), and its dates must fall
+inside the parent's. A top-level chapter with children is a **part**. The timeline gives each level its own lane
+(Parts, Chapters, Details). A ▾ on a part folds it to ▸ and hides its children, and **open all / fold** sit beside
+the Chapters heading. Folds are remembered per period in the browser. A part folds itself while it's too narrow on
+screen to hold its children. Selecting a chapter opens any folded parts above it. The card shows the parts above
+a chapter as breadcrumbs, and a part's card lists the chapters inside it.
+
+Each chapter can also carry a **scene**: a small map in the atlas grammar. The map follows the timeline's zoom.
+Zoomed out (or with a part folded), the part's overview scene shows; zoomed in, the scenes of its chapters take
+over. More precisely, the map shows the shortest chapter with a scene that still fills a fifth of the visible time,
+or a selected chapter. Chapters running at the same time in other stories show their areas faintly behind it.
+Scenes live in `app/scenes/<period>.js` and are keyed by chapter id. `ch-abbasid-baghdad` in `scenes/maritime.js`
+is the worked example of a detail scene, and `ch-muscovy` in `scenes/russia.js` of an overview.
 
 - Layers use the plate types (`area` with `tier`, `boundary`, `route`, `arrow`, `point`, `label`). There are
   extras for the viewer: `minK`/`maxK` (detail that appears or goes with map zoom), `fade` (an arrow that fades out
-  when its destination is general), `people` and `year` on points. `bbox` sets the camera, and `caption` describes
-  the map.
+  when its destination is general), `people` and `year` on points, and `style: "medallion"` labels (a great
+  power's initial in a ring, for overviews). `bbox` sets the camera, and `caption` describes the map.
+- **Colour key.** The box at the top right of the map names who each colour is. Each scene file declares
+  `window.SCENE_ACTORS[period]`, a map from colour to actor, and uses one colour per actor in every chapter. A layer's
+  `who` or a scene's `key` overrides it. An arrow is always in the colour of whoever is moving.
 - `terms` link the names in the chapter text "one move ahead": to a vault note if `note` is set, otherwise to
   Wikipedia. Each name links at its first mention, in the card and in the Now paragraph. Terms with a `star` carry
   a question worth asking, and the card has a **Copy question** button for each.
 - `tests/scenes.test.mjs` checks that every scene matches a chapter and passes `validateScene`, that every term
   appears in its chapter's text, and that points sit inside the view. It also checks in the browser that scenes
-  draw, link and respond to zoom.
+  draw, link and respond to zoom. `tests/chapters.test.mjs` covers the tree, folding, the zoom-aware focus, the
+  colour key, and that every part has an overview scene and every scene colour has an actor name.
 
 ## Cause-and-effect boards
 

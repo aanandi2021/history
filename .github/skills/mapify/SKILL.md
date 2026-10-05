@@ -170,6 +170,19 @@ The tests validate every plate, check coverage, render each one headless with th
 zero self-review warnings. Then commit the plate file and the `index.html` line (with the Copilot trailers), and
 push. Never commit anything from `study\` (git-ignored): those are scans of a copyrighted book.
 
+## Scenes on the viewer map: overview and detail
+
+When the text is a period with sub-chapters, mapify it for the viewer as well as (or instead of) a plate:
+
+- Give the period a **part** chapter, and set `parent` on each sub-chapter in `app/data/<period>.js`.
+- Write the part's **overview scene** first (`app/scenes/<period>.js`). Use realm washes for the whole span, two to
+  four big arrows, three to six anchor places with years, and one to three `medallion` labels for the main powers.
+  Then write each chapter's **detail scene** in the same colours. That's the atlas's paired-maps move
+  (`docs/atlas-design-language.md` §14).
+- Name every colour in `window.SCENE_ACTORS[period]` (one colour per actor). The on-map key reads from it.
+- Check with `node --test tests/scenes.test.mjs tests/chapters.test.mjs`, then screenshot both the zoomed-out
+  part and a zoomed-in chapter.
+
 ## Known limits (say so rather than fake it)
 
 - There's no relief or land cover yet, so mountains and deserts can only be suggested with labels or areas.

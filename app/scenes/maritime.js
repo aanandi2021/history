@@ -6,7 +6,14 @@
 window.SCENES = window.SCENES || {};
 (function () {
   const ABBASID = "#5f7a52", BYZ = "#7a5a8c", TANG = "#b0563a", PALA = "#c58b2c", SRI = "#2f7f86", JAVA = "#8c6a3a", FRANK = "#4f6fa0", SEA = "#2e5f8a",
-    TIBET = "#8c5d9c", MAYA = "#9b5a3c", PLAINS = "#9a6a38", ARCTIC = "#5f7f95", ONT = "#5b8a55";
+    TIBET = "#8c5d9c", MAYA = "#9b5a3c", PLAINS = "#9a6a38", ARCTIC = "#5f7f95", ONT = "#5b8a55", NORSE = "#6d7890", ROAD = "#7b6848";
+
+  // Who each colour stands for, for the map's colour key. One colour per actor across every chapter of the period.
+  (window.SCENE_ACTORS = window.SCENE_ACTORS || {}).maritime = {
+    [ABBASID]: "Abbasid caliphate", [BYZ]: "Byzantine empire", [TANG]: "Tang China", [PALA]: "Pala Bengal", [SRI]: "Srivijaya",
+    [JAVA]: "Java and the Sailendras", [FRANK]: "Franks", [SEA]: "Sea trade", [TIBET]: "Tibetan empire", [MAYA]: "Maya",
+    [PLAINS]: "Plains peoples", [ARCTIC]: "Arctic peoples", [ONT]: "Eastern Woodlands farmers", [NORSE]: "Norse raiders", [ROAD]: "Roads"
+  };
 
   window.SCENES.maritime = {
     "ch-abbasid-baghdad": {
@@ -246,7 +253,7 @@ window.SCENES = window.SCENES || {};
         { type: "area", name: "Kedu Plain", tier: "core", colour: JAVA, labelAt: [110.08, -7.47],
           around: [[109.95, -7.45], [110.18, -7.32], [110.45, -7.38], [110.55, -7.62], [110.42, -7.84], [110.1, -7.86], [109.88, -7.68]] },
         { type: "boundary", style: "dashed", colour: JAVA, path: [[110.05, -7.45], [110.22, -7.61], [110.45, -7.75]] },
-        { type: "route", style: "road", colour: "#7b6848", name: "temple plain", labelAt: [110.35, -7.71],
+        { type: "route", style: "road", colour: ROAD, name: "temple plain", labelAt: [110.35, -7.71],
           path: [[110.2, -7.61], [110.35, -7.69], [110.47, -7.77], [110.49, -7.75]] },
         { type: "arrow", fade: true, colour: SEA, name: "monsoon road ships", labelAt: [110.05, -7.95], side: "l",
           path: [[109.95, -8.05], [110.2, -7.95], [110.45, -7.85], [110.65, -7.76]] },
@@ -287,7 +294,7 @@ window.SCENES = window.SCENES || {};
           path: [[6.08, 50.78], [12.45, 41.9], [17, 40.5], [21, 40.2]] },
         { type: "arrow", colour: ABBASID, name: "Abul-Abbas the elephant", labelAt: [15.5, 48.3], side: "l",
           path: [[21, 45.2], [16, 46.8], [10.5, 49.2], [6.08, 50.78]] },
-        { type: "arrow", colour: "#6d7890", name: "Viking raids", labelAt: [-1.2, 54.6],
+        { type: "arrow", colour: NORSE, name: "Viking raids", labelAt: [-1.2, 54.6],
           path: [[-6, 57], [-3.5, 56.2], [-1.8, 55.67]] },
         { type: "boundary", style: "dashed", colour: FRANK, path: [[4.8, 49.8], [5.38, 49.16], [6.6, 48.8], [8.2, 48.6]] },
         { type: "point", symbol: "capital", name: "Aachen", at: [6.08, 50.78], people: ["Charlemagne's court"] },

@@ -113,6 +113,7 @@
     ds.chapters = (raw.chapters || []).map((c) => Object.assign({}, c, {
       kind: "chapter", id: uid(c.id || `ch-${slug(c.title)}`), t0: parseDate(c.start), t1: parseDate(c.end)
     }));
+    linkChapters(ds.chapters);
     ds.books = (raw.books || []).map((b) => Object.assign({}, b, {
       kind: "book", id: uid(b.id || `bk-${slug(b.title)}`), t0: parseDate(b.start), t1: parseDate(b.end)
     }));
@@ -155,6 +156,54 @@
     let best = null;
     for (const c of activeChapters(ds, t)) if (!best || c.t1 - c.t0 < best.t1 - best.t0) best = c;
     return best;
+  }
+
+  // ---- chapter tree: a chapter can name a `parent` chapter by id, so big parts hold smaller chapters
+
+  /** Fill in parentId, children (ids, by start) and depth. Unknown parents and cycles leave a chapter at the top. */
+  function linkChapters(chapters) {
+    const byId = new Map(chapters.map((c) => [c.id, c]));
+    for (const c of chapters) { c.parentId = null; c.children = []; }
+    for (const c of chapters) {
+      const p = c.parent && byId.get(c.parent);
+      if (!p || p === c) continue;
+      let a = p, loop = false;
+      for (let n = 0; a && n <= chapters.length; n++, a = byId.get(a.parentId)) if (a === c) { loop = true; break; }
+      if (!loop) c.parentId = p.id;
+    }
+    for (const c of chapters) if (c.parentId) byId.get(c.parentId).children.push(c.id);
+    for (const c of chapters) c.children.sort((a, b) => byId.get(a).t0 - byId.get(b).t0);
+    const depth = (c) => (c.parentId ? 1 + depth(byId.get(c.parentId)) : 0);
+    for (const c of chapters) c.depth = depth(c);
+    return chapters;
+  }
+
+  /** Parent, grandparent, … of a chapter, nearest first. */
+  function ancestors(ds, c) {
+    const out = [];
+    for (let p = c && ds.byId.get(c.parentId); p; p = ds.byId.get(p.parentId)) out.push(p);
+    return out;
+  }
+
+  /** Is a an ancestor of b (or b itself)? */
+  function within(ds, a, b) {
+    return !!a && !!b && (a === b || ancestors(ds, b).includes(a));
+  }
+
+  /** Chapters you can see: those whose ancestors are all open. `collapsed(c)` says if a parent is folded. */
+  function openChapters(ds, collapsed) {
+    return ds.chapters.filter((c) => !ancestors(ds, c).some((p) => collapsed(p)));
+  }
+
+  /**
+   * The chapter whose map fits this moment and this zoom. Zoomed out, a big part tells the story; zoomed in, its
+   * detailed chapters do. Among the chapters covering t (and passing `ok`), prefer the shortest one that still fills at
+   * least `share` of the visible span; if none is that long, the shortest of all.
+   */
+  function focusChapter(ds, t, span, ok = () => true, share = 0.2) {
+    const cands = activeChapters(ds, t).filter(ok).sort((a, b) => (a.t1 - a.t0) - (b.t1 - b.t0));
+    if (!cands.length) return null;
+    return (span && cands.find((c) => c.t1 - c.t0 >= span * share)) || cands[0];
   }
 
   /** The map state in force at t: the latest at or before t. */
@@ -324,6 +373,7 @@
         if (lifeKnown && (parseDate(a) < parseDate(l.born) || parseDate(b) > parseDate(l.died))) bad(`${w}: term outside lifetime`);
       }
     }
+    const chIds = new Map((raw.chapters || []).map((c) => [c.id || `ch-${slug(c.title)}`, c]));
     for (const c of raw.chapters || []) {
       const w = `chapter "${c.title}"`;
       dup(c.id, w);
@@ -331,6 +381,18 @@
       const bb = c.bbox;
       if (!bb || !lonlat(bb[0]) || !lonlat(bb[1])) bad(`${w}: bad bbox`);
       else if (bb[0][0] >= bb[1][0] || bb[0][1] >= bb[1][1]) bad(`${w}: bbox must be [[west,south],[east,north]] and must not cross 180°`);
+      if (c.parent) {
+        const p = chIds.get(c.parent);
+        if (!p) bad(`${w}: unknown parent ${c.parent}`);
+        else if (p === c) bad(`${w}: is its own parent`);
+        else if (okDate(p.start) && okDate(p.end) && okDate(c.start) && okDate(c.end) &&
+          (parseDate(c.start) < parseDate(p.start) || parseDate(c.end) > parseDate(p.end))) bad(`${w}: runs outside its parent "${p.title}"`);
+        const seen = new Set([c]);
+        for (let a = p; a && a.parent; a = chIds.get(a.parent)) {
+          if (seen.has(a)) { bad(`${w}: parent chain loops`); break; }
+          seen.add(a);
+        }
+      }
     }
     for (const b of raw.books || []) {
       const w = `book "${b.title}"`;
@@ -438,8 +500,41 @@
     return errs;
   }
 
+  /**
+   * The colour key for a scene, grouped the way the atlas reads: who (areas, with any arrows in the same colour), and
+   * movement in colours no area claims. A layer's `who` names its actor; otherwise an area's name does. `scene.key`
+   * overrides everything. Returns [{ colour, label, marks: ["core"|"conquest"|"influence"|"arrow"|"route"], group }].
+   */
+  function sceneKey(scene, actors) {
+    if (!scene) return [];
+    if (Array.isArray(scene.key)) return scene.key.map((e) => Object.assign({ marks: ["core"], group: "who" }, e));
+    const named = new Map(Object.entries(actors || {}).map(([c, n]) => [c.toLowerCase(), n]));
+    const by = new Map();
+    for (const L of scene.layers || []) {
+      if (!["area", "arrow", "route"].includes(L.type)) continue;
+      const colour = (L.colour || (L.type === "route" ? "#2e5f8a" : "#8a7a5a")).toLowerCase();
+      const mark = L.type === "area" ? (L.tier || "core") : L.type;
+      if (!by.has(colour)) by.set(colour, { colour, who: null, area: null, names: [], marks: [] });
+      const e = by.get(colour);
+      if (L.who && !e.who) e.who = L.who;
+      if (L.type === "area" && L.name && !e.area) e.area = L.name;
+      if (L.type !== "area" && L.name) e.names.push(L.name);
+      if (!e.marks.includes(mark)) e.marks.push(mark);
+    }
+    const out = [];
+    for (const e of by.values()) {
+      const label = e.who || named.get(e.colour) || e.area || (e.names.length ? e.names[0] + (e.names.length > 1 ? ` + ${e.names.length - 1} more` : "") : null);
+      if (!label) continue;
+      const hasArea = e.marks.some((m) => SCENE_TIERS.includes(m));
+      out.push({ colour: e.colour, label, marks: e.marks, group: hasArea || ((e.who || named.has(e.colour)) && e.marks.includes("arrow")) ? "who" : "movement" });
+    }
+    return out.sort((a, b) => (a.group === b.group ? 0 : a.group === "who" ? -1 : 1));
+  }
+
   return {
+    sceneKey,
     sceneFor, visibleAt, linkTerms, termUrl, validateScene, SCENE_SYMBOLS,
+    linkChapters, ancestors, within, openChapters, focusChapter,
     DAY, VAULT, VAULT_ID, parseDate, isPartial, isoDate, fmtDate, fmtRange, slug, normalise, nearWindow,
     nearbyEvents, activeLeaders, activeChapters, activeChapter, mapStateAt, booksFor, fictionFor, ficTarget,
     obsidianUrl, wikiUrl, calibreUrl, plateUrl, libraryUrl, linksFor, parseHash, formatHash, search, stepEvent, validate

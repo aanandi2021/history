@@ -78,6 +78,14 @@ select, input[type=search] { background: var(--panel); border: 1px solid var(--l
 #tl .chapter text { fill: #5d4a2a; }
 #tl .chapter.active rect { fill: #e5d4b2; }
 #tl .chapter.sel rect { stroke: var(--accent); stroke-width: 2; }
+#tl .chapter.depth-0 rect { fill: #e4d5b8; stroke: #c9b48a; }
+#tl .chapter.depth-0 text { font-weight: 600; }
+#tl .chapter.depth-0.active rect { fill: #d9c49c; }
+#tl .item text .twisty, #tl .item text.twisty { pointer-events: all; cursor: pointer; fill: var(--accent); font-weight: 700; }
+#tl .item text.twisty { font-size: 11px; }
+#tl .twisty:hover { fill: var(--ink); }
+#tl .fold-all { font-size: 10px; fill: var(--accent); cursor: pointer; }
+#tl .fold-all:hover { text-decoration: underline; }
 #tl .cursor { stroke: var(--accent); stroke-width: 1.4; stroke-dasharray: 4 3; pointer-events: none; }
 #tl .cursor.pinned { stroke-dasharray: none; stroke-width: 2; }
 #tl .cursor-label { fill: var(--accent); font-size: 11px; font-weight: 600; pointer-events: none; }
@@ -103,6 +111,11 @@ select, input[type=search] { background: var(--panel); border: 1px solid var(--l
 
 #card { border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; background: #fffaf0; position: relative; }
 #card .kind { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+#card .crumbs { font-size: 11.5px; color: var(--muted); margin: 0 0 2px; }
+#card .crumbs a { color: var(--accent); }
+ul.kids { list-style: none; padding: 0; margin: 4px 0 8px; }
+ul.kids li { margin: 0 0 4px; }
+ul.kids .d { color: var(--muted); font-size: 12px; }
 #card h2 { font-size: 18px; padding-right: 24px; }
 #card .close { position: absolute; top: 6px; right: 6px; border: 0; background: none; font-size: 16px; color: var(--muted); }
 #card p { margin: 6px 0; }
@@ -151,6 +164,15 @@ kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4p
 /* ---- chapter scenes (atlas grammar on the viewer map) */
 .scene-cap { top: auto; bottom: 38px; left: 10px; font: italic 12px var(--serif); max-width: 55%; border-radius: 6px; }
 .scene-cap[hidden] { display: none; }
+#scene-key { position: absolute; top: 8px; right: 10px; max-width: 240px; background: rgba(255,253,248,.93); border: 1px solid var(--line); border-radius: 6px; font-size: 11.5px; padding: 3px 8px 5px; }
+#scene-key[hidden] { display: none; }
+#scene-key .sk-toggle { border: 0; background: none; padding: 0; font: 600 10px var(--sans, inherit); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); cursor: pointer; }
+#scene-key .sk-h { font-size: 10px; color: var(--muted); margin: 4px 0 1px; }
+#scene-key .sk-row { display: flex; align-items: center; gap: 4px; line-height: 15px; }
+#scene-key .sk-row svg { flex: none; }
+#scene-key .sk-foot { margin-top: 4px; font-size: 10.5px; color: var(--muted); font-style: italic; }
+#map .scene .s-medal circle { fill: rgba(255,253,248,.85); stroke-width: 2.2; }
+#map .scene .s-medal text { font: 700 13px var(--serif); }
 #map .scene .s-fill { vector-effect: non-scaling-stroke; stroke-width: 1.4; }
 #map .scene .s-fill.core { fill-opacity: .30; }
 #map .scene .s-fill.conquest { stroke-dasharray: 5 3; }
