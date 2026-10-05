@@ -7,7 +7,7 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
-## 0.5.0 (in progress, `next`)
+## 0.5.0 (5 Oct 2026)
 
 - Version badge on every page; this changelog; `npm run stamp` and `npm run serve` (port 8766).
 - Atlas round 4 (PDF pp. 74–93, Rome): dated layers that appear as the timeline reaches them, with a growth ladder in the key; campaign itineraries with numbered, dated legs and an arrowhead that moves with the date; fronts with teeth; an ally ring.
