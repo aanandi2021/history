@@ -1,9 +1,11 @@
 {
   "name": "amits-world-history",
-  "version": "0.1.0",
+  "version": "0.5.0-dev",
   "private": true,
   "description": "Amit's Notes of the History of the World: a static timeline and map viewer.",
   "scripts": {
+    "stamp": "node scripts/stamp_version.mjs",
+    "serve": "python -m http.server 8766 --bind 127.0.0.1",
     "test": "node --test --test-concurrency=1 tests/*.test.mjs",
     "test:data": "node --test tests/data.test.mjs tests/model.test.mjs",
     "test:e2e": "node --test tests/e2e.test.mjs tests/walkthrough.test.mjs",

@@ -118,6 +118,12 @@ window.ARTIFACTS = {
    "date": "2026-10-05",
    "subject": "Scenes for every chapter: Maritime (10), Russia (16), WW2 (11); pin labels give way to scene labels",
    "stat": "7 files changed, 1283 insertions(+), 8 deletions(-)"
+  },
+  {
+   "hash": "6dfd741",
+   "date": "2026-10-05",
+   "subject": "Chapter tree with fold triangles, part overview maps, zoom-aware map focus, scene colour key",
+   "stat": "16 files changed, 946 insertions(+), 65 deletions(-)"
   }
  ]
 };
