@@ -85,7 +85,7 @@ others, before `js/plate.js`.
       sections: [{ heading: "…", entries: [{ date: "755–763", text: "…", refs: ["campaign", "city"] }] }]
     },
     sources: ["…"],
-    from: { label: "<note title>", href: "obsidian://open?vault=Fourth%20Vault%20July%202023&file=" + encodeURIComponent("<vault path without .md>") }
+    from: { label: "<note title>", href: "obsidian://open?vault=333bfdd695459a48&file=" + encodeURIComponent("<vault path without .md>") }
   };
 })();
 ```

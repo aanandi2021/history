@@ -58,7 +58,7 @@ Format: `- [ ] T### [P] [US#] description (path)`. `[P]` means it can run in par
 - [x] T028 [P] Make `mockups/index.html` link to the new app
 - [x] T029 Check timing: interactive in under 2 s and fly-to in under 1.5 s, measured in e2e (tests/e2e.test.mjs)
 - [x] T030 Run the quickstart scenarios and record the screenshots (tests/screenshots)
-- [ ] T040 Manual (Amit): click an Obsidian heading link and a Calibre link on his PC and confirm they open
+- [ ] T040 (Obsidian links fixed 2026-10-05: vault id instead of name, checked by launching one; Calibre still to confirm) Manual (Amit): click an Obsidian heading link and a Calibre link on his PC and confirm they open
 
 ## Dependencies
 

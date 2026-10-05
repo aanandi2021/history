@@ -173,6 +173,6 @@
       ]
     },
     sources: ["Coordinates from Wikipedia", "Coastlines and rivers: Natural Earth 1:50m"],
-    from: { label: NOTE, href: "obsidian://open?vault=Fourth%20Vault%20July%202023&file=" + encodeURIComponent(NOTE) }
+    from: { label: NOTE, href: "obsidian://open?vault=333bfdd695459a48&file=" + encodeURIComponent(NOTE) }
   };
 })();

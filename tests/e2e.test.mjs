@@ -128,7 +128,7 @@ test("US3: Russia cards link to the vault note, Wikipedia and books", async () =
   const links = await page.$$eval("#card a[data-link]", (as) => as.map((a) => ({ kind: a.dataset.link, href: a.href, target: a.target })));
   const note = links.find((l) => l.kind === "note");
   assert.ok(note, "has an Open note link");
-  assert.match(note.href, /^obsidian:\/\/open\?vault=Fourth%20Vault%20July%202023&file=.*Russia.*%23Peter/);
+  assert.match(note.href, /^obsidian:\/\/open\?vault=333bfdd695459a48&file=.*Russia.*%23Peter/);
   assert.equal(note.target, "", "obsidian links open in place");
   const wiki = links.find((l) => l.kind === "wiki");
   assert.equal(wiki.target, "_blank");
@@ -158,7 +158,7 @@ test("US3: Amit's Fiction — the novel's lane, its links, and history cards tha
   assert.ok(await page.$("#card .tag.amits"), "marked as fiction, not history");
   const fic = await page.$eval('#card .links a[data-link="fiction"]', (a) => ({ href: a.href, text: a.textContent, target: a.target }));
   assert.equal(fic.text, "Amit's Fiction");
-  assert.match(fic.href, /^obsidian:\/\/open\?vault=Fourth%20Vault%20July%202023&file=Writing%2FThe%20Unseen%20Tomorrow%2F/);
+  assert.match(fic.href, /^obsidian:\/\/open\?vault=333bfdd695459a48&file=Writing%2FThe%20Unseen%20Tomorrow%2F/);
   assert.equal(fic.target, "");
   // A real event from the novel's years lists the novel under its own heading, after the reading list.
   await page.evaluate(() => APP.select(APP.state.ds.events.find((e) => e.title === "Borobudur rises").id));

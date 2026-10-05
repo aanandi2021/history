@@ -11,6 +11,9 @@
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const DATE_RE = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/;
   const VAULT = "Fourth Vault July 2023";
+  // Obsidian's id for the A:\ vault (from %APPDATA%\obsidian\obsidian.json). Links use the id, not the name, because a
+  // stale OneDrive copy is registered under the same name and Obsidian would open that one instead.
+  const VAULT_ID = "333bfdd695459a48";
   const CALIBRE_LIBRARY = "CalibreLibrary";
 
   function utc(y, m, d) {
@@ -187,7 +190,7 @@
 
   // ---- links -------------------------------------------------------------
 
-  function obsidianUrl(notePath, section, vault = VAULT) {
+  function obsidianUrl(notePath, section, vault = VAULT_ID) {
     if (!notePath) return null;
     const file = section ? `${notePath}#${section}` : notePath;
     return `obsidian://open?vault=${encodeURIComponent(vault)}&file=${encodeURIComponent(file)}`;
@@ -343,7 +346,7 @@
   }
 
   return {
-    DAY, VAULT, parseDate, isPartial, isoDate, fmtDate, fmtRange, slug, normalise, nearWindow,
+    DAY, VAULT, VAULT_ID, parseDate, isPartial, isoDate, fmtDate, fmtRange, slug, normalise, nearWindow,
     nearbyEvents, activeLeaders, activeChapters, activeChapter, mapStateAt, booksFor, fictionFor, ficTarget,
     obsidianUrl, wikiUrl, calibreUrl, libraryUrl, linksFor, parseHash, formatHash, search, stepEvent, validate
   };

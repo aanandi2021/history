@@ -5,6 +5,7 @@
 - **Decision**: `obsidian://open?vault=<vault>&file=<path>%23<heading>` — the note path relative to the vault, with the heading appended after an encoded `#`.
 - **Rationale**: This is Obsidian's built-in URI scheme. It needs no plugins, and Obsidian resolves `file` the same way it resolves wikilinks.
 - **Alternatives considered**: The Advanced URI plugin (`obsidian://adv-uri?...&heading=`) is more precise but needs a plugin installed. A `file:///` link to the .md file opens a text editor rather than Obsidian.
+- **Update (2026-10-05)**: Use the vault **id** (`333bfdd695459a48`), not its name. A stale OneDrive copy is registered in Obsidian under the same name, and name links opened that one. Verified by launching both forms and reading the Obsidian window title.
 - **Risk**: Whether the heading anchor scrolls to the section depends on the Obsidian version. If it doesn't, the note still opens. Verification is a manual task (T040).
 
 ## R2. Wikipedia links when titles are uncertain

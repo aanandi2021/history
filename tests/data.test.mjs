@@ -45,8 +45,8 @@ for (const id of ids) {
         if (l.kind === "wiki") assert.match(l.href, /^https:\/\/en\.wikipedia\.org\/w\/index\.php\?search=[^&]+&title=Special%3ASearch&go=Go$/);
         if (l.kind === "library") assert.match(l.href, /^https:\/\/ottawa\.bibliocommons\.com\/v2\/search\?query=/);
         if (l.kind === "calibre") assert.match(l.href, /^calibre:\/\/show-book\/CalibreLibrary\/\d+$/);
-        if (l.kind === "note") assert.match(l.href, /^obsidian:\/\/open\?vault=Fourth%20Vault%20July%202023&file=.+%23.+/);
-        if (l.kind === "fiction") assert.match(l.href, /^obsidian:\/\/open\?vault=Fourth%20Vault%20July%202023&file=Writing%2F.+/);
+        if (l.kind === "note") assert.match(l.href, /^obsidian:\/\/open\?vault=333bfdd695459a48&file=.+%23.+/);
+        if (l.kind === "fiction") assert.match(l.href, /^obsidian:\/\/open\?vault=333bfdd695459a48&file=Writing%2F.+/);
       }
     }
   });
