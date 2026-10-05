@@ -2,7 +2,8 @@
 
 What makes a Kinder & Hilgemann plate (*The Penguin Atlas of World History*, Vol. 1) work, written down so the
 `mapify` skill and `atlas/js/plate.js` can follow it. Source: a close reading of the first ten spreads of Vol. 1
-(PDF pages 14–33: the Palaeolithic to the Neo-Babylonian empire) plus the book's own symbol key (PDF p. 9).
+(PDF pages 14–33: the Palaeolithic to the Neo-Babylonian empire) plus the book's own symbol key (PDF p. 9),
+and a second pass over the next ten (PDF pages 34–53: the Indo-Europeans to Greek colonization), in §12.
 
 The study files (page renders, OCR text, and one JSON analysis per spread) live in `C:\Users\amita\atlas-study\`,
 **outside this repo**. The book is under copyright, so the scans, crops and analyses never get committed. This
@@ -162,7 +163,51 @@ Sea `#b9dff5`, land `#f3ebcb`–`#f7f7fb`, desert `#efd96d`, cultivation `#72ad4
 | Local legend, auto-built, one or two columns | done |
 | Text page: date-led entries, linked to map layers, hover both ways | done |
 | Self-review: label collisions, labels under the legend, arrow labels that don't fit | done (`ATLAS.current.warnings`) |
-| Relief / environment tints | **not yet**: needs a hillshade or land-cover layer |
+| Degrees of control: `tier` core / conquest (stripe) / influence (pale, dashed) | done (round 2) |
+| Fortified frontier (`boundary` style `wall`), dates printed on lines (`dates`) | done (round 2), with a run-off check |
+| Built roads (`route` style `road`), fine stipple for fuzzy social zones | done (round 2) |
+| Origin halos on points (colony by founder) | done (round 2) |
+| Relief / environment tints | **not yet**: needs a hillshade or land-cover layer. Round 2 used terrain only faintly, so this stays low priority |
 | Coastlines finer than 1:50m for insets under about 2° | **not yet**: add Natural Earth 1:10m |
 | Charts, org charts, family trees, pies (later volumes; see the Austria-Hungary plate) | **not yet** |
 | Collision checks against arrow bodies (not just text) | **not yet**: do it by eye |
+
+## 12. Round 2: the next ten spreads (PDF pp. 34–53)
+
+Indo-Europeans and Crete, Asia Minor, Palestine I and II with Phoenicia, China, India, Persia, and Greece (the
+Mycenaeans, the city-states and their cults, colonization). Analysed the same way as the first ten.
+
+| | |
+|---|---|
+| Figures analysed | 20, every one a thematic map. Still no charts, trees or city plans in this stretch |
+| Text-to-figure links | 134: locates 69 · explains movement 23 · classifies 22 · sequences 13 · compares 4 · quantifies 3 |
+
+Classification doubled compared with round 1 (22 against 11). These plates sort places into kinds: palace or
+tomb, tyranny or oligarchy, cult of which god, colony of which mother city. The grammar grows to carry that.
+
+What was new, in the order it matters for us:
+
+1. **Degrees of control.** China under the Han and India under Asoka separate a solid core, striped conquests
+   and a pale wash of influence, all in one hue. Persia does the same with successive tints of one colour for
+   cumulative growth. This is the most reusable move for any empire thread (Rome, the Mongols, the Mughals,
+   the British in India). Implemented as `tier`.
+2. **Lines that carry their own dates.** Frontier and campaign dates are printed on the line itself instead of
+   in a tag or the legend, and a wall is drawn with battlements so a fortified frontier reads differently from a
+   treaty line. Implemented as `style: "wall"` and `dates`.
+3. **Infrastructure kept apart from movement.** The Persian royal road is drawn in its own dotted two-colour style
+   so it is never mistaken for a campaign. Implemented as `route` `style: "road"`.
+4. **Same-extent grids.** Palestine and India each get four small maps of the same ground in sequence. Our
+   renderer already allows four figures. The skill now says when to use them.
+5. **Labels instead of borders when borders would overclaim.** The tribes of Israel and the Greek dialects are
+   giant names over the land, with no lines. Uncertain language limits are dashed arcs.
+6. **Classification by symbol.** Mycenaean sites are sorted into palace, fortress and domed tomb; Greek cities
+   get a black triangle for tyranny; cult sites carry the god's name in brackets as a micro-legend. The symbol
+   set already has most of these. The bracket trick needs nothing new.
+7. **Sea-first networks.** Phoenician and Greek colonization put the sea at the centre and mark each colony by
+   its mother city with a coloured dot, the mother city with a square, and rival colonizers as competing fields.
+   Implemented as `halo` on points.
+8. **Dense regions without insets.** The Aegean is handled by fine coastlines, tiny symbols and rotated labels
+   in open sea, not by an inset. When we need this, the fix is 1:10m coastlines rather than a new figure kind.
+
+The fidelity plate for round 2 is `atlas/plates/han-china.js`: an overview of Wudi's empire plus a large-scale
+figure of the Hexi Corridor, using every new primitive.

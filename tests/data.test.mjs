@@ -41,7 +41,8 @@ for (const id of ids) {
   test(`${id}: every link is well formed (SC-003)`, () => {
     for (const it of ds.byId.values()) {
       for (const l of HM.linksFor(ds, it)) {
-        assert.doesNotThrow(() => new URL(l.href), `${it.id}: ${l.href}`);
+        assert.doesNotThrow(() => new URL(l.href, "file:///A:/coding/history/app/index.html"), `${it.id}: ${l.href}`);
+        if (l.kind === "plate") assert.match(l.href, /^\.\.\/atlas\/index\.html#[a-z0-9-]+$/);
         if (l.kind === "wiki") assert.match(l.href, /^https:\/\/en\.wikipedia\.org\/w\/index\.php\?search=[^&]+&title=Special%3ASearch&go=Go$/);
         if (l.kind === "library") assert.match(l.href, /^https:\/\/ottawa\.bibliocommons\.com\/v2\/search\?query=/);
         if (l.kind === "calibre") assert.match(l.href, /^calibre:\/\/show-book\/CalibreLibrary\/\d+$/);
@@ -112,4 +113,22 @@ test("no family birth years are committed to the repository (Principle VII)", ()
   const src = fs.readFileSync(path.join(ROOT, "app", "js", "viewer.js"), "utf8");
   const famBlock = src.slice(src.indexOf("const FAMILY = ["), src.indexOf("];", src.indexOf("const FAMILY = [")));
   assert.doesNotMatch(famBlock, /born|\d{4}/);
+});
+
+test("events inside a plate's span link to the plate; books and events outside do not", () => {
+  const ds = HM.normalise(DATASETS.maritime);
+  const inside = ds.events.find((e) => e.t0 >= HM.parseDate("0760") && e.t1 <= HM.parseDate("0840"));
+  const outside = ds.events.find((e) => e.t0 > HM.parseDate("0851"));
+  const plateLinks = (it) => HM.linksFor(ds, it).filter((l) => l.kind === "plate");
+  assert.deepEqual(plateLinks(inside).map((l) => l.href), ["../atlas/index.html#maritime-monsoon"]);
+  if (outside) assert.deepEqual(plateLinks(outside), []);
+  assert.deepEqual(plateLinks(ds.books[0]), []);
+});
+
+test("validate catches a malformed plate reference", () => {
+  const raw = { ...DATASETS.maritime, plates: [{ id: "Bad Id", title: "", start: "0900", end: "0800" }] };
+  const errs = HM.validate(raw).join("\n");
+  assert.match(errs, /lowercase/);
+  assert.match(errs, /needs a title/);
+  assert.match(errs, /bad dates/);
 });

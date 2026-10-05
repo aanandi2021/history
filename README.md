@@ -55,7 +55,7 @@ maps with soft realm washes, hatched rivals, banner arrows, dotted trade lanes, 
 local legend on the left page, and date-led text on the right. Hovering a text entry lights up its map layers,
 and the other way round.
 
-- `docs/atlas-design-language.md` is the grammar, reverse-engineered from the first ten spreads of Vol. 1.
+- `docs/atlas-design-language.md` is the grammar, reverse-engineered from the first twenty spreads of Vol. 1 (two rounds of ten).
 - `atlas/plates/*.js` are the plates (`maritime-monsoon` is mapified from the Maritime Asia note; `hammurabi` is a
   fidelity test on the book's own ground). `atlas/index.html#key` shows every symbol.
 - `.github/skills/mapify/SKILL.md` is the Copilot CLI skill that turns a vault note into a plate. It's linked into

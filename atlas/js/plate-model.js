@@ -26,7 +26,11 @@
     "Resources (local legend on each plate)": ["gold", "silver", "copper", "tin", "iron", "stone", "gem", "spice", "textile", "porcelain", "timber", "horse", "salt"]
   };
   const LAYER_TYPES = ["area", "arrow", "route", "boundary", "point", "label"];
-  const PATTERNS = ["solid", "hatch", "hatch-back", "crosshatch", "dots", "none"];
+  const PATTERNS = ["solid", "hatch", "hatch-back", "crosshatch", "dots", "stripe", "stipple", "none"];
+  // degrees of control, from round 2 (China, Asoka, Persia): solid core, striped conquest, pale influence
+  const TIERS = ["core", "conquest", "influence"];
+  const BOUNDARY_STYLES = ["dashed", "solid", "dashdot", "wall"];
+  const ROUTE_STYLES = ["dotted", "dashed", "road"];
   const LABEL_STYLES = ["region", "people", "water", "date", "note", "realm"];
 
   const isLonLat = (p) => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite) && p[0] >= -180 && p[0] <= 180 && p[1] >= -90 && p[1] <= 90;
@@ -56,13 +60,20 @@
           const pts = L.around || L.polygon;
           if (!Array.isArray(pts) || !pts.length || !pts.every(isLonLat)) bad(`${lw}: needs around:[[lon,lat],...] or polygon`);
           if (L.pattern && !PATTERNS.includes(L.pattern)) bad(`${lw}: unknown pattern ${L.pattern}`);
+          if (L.tier && !TIERS.includes(L.tier)) bad(`${lw}: unknown tier ${L.tier} (core, conquest or influence)`);
         }
         if (L.type === "arrow" || L.type === "route" || L.type === "boundary") {
           if (!Array.isArray(L.path) || L.path.length < 2 || !L.path.every(isLonLat)) bad(`${lw}: needs path of at least two [lon,lat]`);
+          if (L.type === "boundary" && L.style && !BOUNDARY_STYLES.includes(L.style)) bad(`${lw}: unknown boundary style ${L.style}`);
+          if (L.type === "route" && L.style && !ROUTE_STYLES.includes(L.style)) bad(`${lw}: unknown route style ${L.style}`);
+          for (const dt of L.dates || []) {
+            if (!Array.isArray(dt) || typeof dt[0] !== "number" || dt[0] < 0 || dt[0] > 1 || !dt[1]) bad(`${lw}: dates must be [[0..1, "text"], ...]`);
+          }
         }
         if (L.type === "point") {
           if (!isLonLat(L.at)) bad(`${lw}: needs at:[lon,lat]`);
           if (!SYMBOLS[L.symbol || "city"]) bad(`${lw}: unknown symbol ${L.symbol}`);
+          if (L.halo && !isColour(L.halo)) bad(`${lw}: bad halo colour ${L.halo}`);
         }
         if (L.type === "label") {
           if (!L.text) bad(`${lw}: label needs text`);
@@ -116,5 +127,5 @@
     };
   }
 
-  return { SYMBOLS, SYMBOL_GROUPS, LAYER_TYPES, PATTERNS, LABEL_STYLES, validate, legendItems, crossRefs, coverage, isLonLat };
+  return { SYMBOLS, SYMBOL_GROUPS, LAYER_TYPES, PATTERNS, TIERS, BOUNDARY_STYLES, ROUTE_STYLES, LABEL_STYLES, validate, legendItems, crossRefs, coverage, isLonLat };
 });

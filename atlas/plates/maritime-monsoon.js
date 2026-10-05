@@ -10,6 +10,7 @@
     title: "Maritime Asia, 750–850",
     head: "Maritime Asia / Bengal, Srivijaya and Java",
     folio: "1",
+    viewer: "maritime/0800",
     figures: [
       {
         caption: "The monsoon road, c. 750–850",

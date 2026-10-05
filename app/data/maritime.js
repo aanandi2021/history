@@ -211,6 +211,7 @@
       { id: "unseen", label: "The Unseen Tomorrow (Amit's fiction)", fiction: true }
     ],
     events, leaders, chapters, books,
+    plates: [{ id: "maritime-monsoon", title: "The monsoon road", start: "0750", end: "0850" }],
     colours: {
       lanes: { canada: "#b22d2d", india: "#c07a2a", sea: "#2f7f8c", china: "#a0452e", west: "#5d6f9c", unseen: "#2e7d6b" },
       sides: { pala: "#c07a2a", sailendra: "#2f7f8c", tang: "#a0452e", abbasid: "#3f7a4a", franks: "#5d6f9c", tibet: "#8c5d9c" }

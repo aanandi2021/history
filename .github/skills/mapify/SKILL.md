@@ -70,11 +70,11 @@ others, before `js/plate.js`.
       base: { rivers: true, riverRank: 6 },                                            // optional
       layers: [
         { id: "empire-x", type: "area", colour: "#e07b39", opacity: 0.5, pad: 1.2, around: [[lon, lat], …], legend: "Empire of X" },
-        { id: "rival", type: "area", colour: "#7d5a9e", pattern: "hatch", around: […], legend: "…" },          // hatch | hatch-back | crosshatch | dots
+        { id: "rival", type: "area", colour: "#7d5a9e", pattern: "hatch", around: […], legend: "…" },          // hatch | hatch-back | crosshatch | dots | stripe | stipple; or tier: "core" | "conquest" | "influence"
         { id: "campaign", type: "arrow", colour: "#b8341f", width: 12, label: "Name", date: "755", path: [[lon, lat], …], legend: "…" },
-        { id: "trade", type: "route", colour: "#a8642c", path: […], legend: "Trade lanes" },                  // style: "dashed" for non-trade links; head: true
-        { id: "frontier", type: "boundary", style: "dashdot", path: […] },
-        { id: "city", type: "point", symbol: "capital", at: [lon, lat], name: "…", labelPos: "e", tag: { text: "762", colour: "#f1c75b" } },
+        { id: "trade", type: "route", colour: "#a8642c", path: […], legend: "Trade lanes" },                  // style: "dashed" for journeys and non-trade links, "road" for built roads; head: true
+        { id: "frontier", type: "boundary", style: "dashdot", path: […] },                                      // solid | dashed | dashdot | wall; dates: [[0.3, "214 B.C."]] prints dates on the line
+        { id: "city", type: "point", symbol: "capital", at: [lon, lat], name: "…", labelPos: "e", tag: { text: "762", colour: "#f1c75b" } },  // halo: "#f1c75b" colours a point by who founded it
         { type: "label", style: "realm", colour: "#a8521f", text: "…", at: [lon, lat] },                      // or along: [[lon, lat], …] to curve it
         { type: "label", style: "water", text: "…", at: […] }                                                  // styles: region realm people water date note
       ],
@@ -102,6 +102,17 @@ Grammar to follow (design language §4–8):
   Black for an outside shock, yellow for migration, the actor's colour for campaigns.
 - **Dotted routes** for trade. Resource glyphs at the sources. Goods go in the legend once.
 - **Date tags** only for decisive moments (founding, sack, battle). Everything else goes in the text.
+- **Degrees of control** (round 2, from the China, India and Persia plates): `tier: "core"` for the heartland,
+  `"conquest"` (upright stripes) for newly taken land, `"influence"` (pale, dashed edge) for loose overlordship.
+  Use one hue for all three tiers of one power.
+- **Fortified frontiers** are `boundary` with `style: "wall"`. When the text is date-led, print the dates on the line
+  (`dates: [[t, "214 B.C."]]`, `t` from 0 to 1 along the path as drawn) rather than in a tag.
+- **Built roads** (`route`, `style: "road"`) must never look like a journey (`dashed`) or trade (dotted).
+- **Colonies and outposts**: a `halo` colours each settlement by who founded it. Mother cities get a different symbol.
+- **One small region over many periods**: a grid of up to four same-extent figures, not one crowded overlay.
+  **Approximate peoples** get large `people` labels and no borders; borders would claim more than we know.
+- **A sea-borne story** (Phoenicians, Greeks, the monsoon road) puts the sea at the centre of the extent and keeps
+  inland detail out.
 - **Legend** lists only what the eye can't read directly. Give a `legend` text to the first layer of each kind
   only. Put place names on the map, not in the legend.
 - **Text entries are date-led and short.** Each entry's `refs` names every layer it talks about; every named

@@ -57,11 +57,28 @@
       if (kind === "crosshatch") p.append("line").attr("x1", 0).attr("y1", 3.5).attr("x2", 7).attr("y2", 3.5).attr("stroke", colour).attr("stroke-width", 1.6);
     } else if (kind === "dots") {
       p.append("circle").attr("cx", 3.5).attr("cy", 3.5).attr("r", 1.3).attr("fill", colour);
+    } else if (kind === "stripe") {
+      // upright stripes: conquered or garrisoned land, as on the Han and Asoka plates
+      p.append("rect").attr("width", 7).attr("height", 7).attr("fill", colour).attr("fill-opacity", 0.14);
+      p.append("line").attr("x1", 1.5).attr("y1", 0).attr("x2", 1.5).attr("y2", 7).attr("stroke", colour).attr("stroke-width", 2.4);
+    } else if (kind === "stipple") {
+      // fine stipple: fuzzy social or cultural zones that should not read as states
+      p.append("rect").attr("width", 7).attr("height", 7).attr("fill", colour).attr("fill-opacity", 0.1);
+      for (const [cx, cy] of [[1.2, 1.4], [4.6, 2.3], [2.6, 5.1], [6.1, 5.9]]) p.append("circle").attr("cx", cx).attr("cy", cy).attr("r", 0.75).attr("fill", colour);
     }
     return id;
   }
 
+  const TIER_LOOK = {
+    core: { opacity: 0.62, edge: "strong" },
+    conquest: { pattern: "stripe" },
+    influence: { opacity: 0.18, edge: "dashed" }
+  };
+  /** An area with its tier defaults filled in; anything set on the layer wins. */
+  function areaLook(L) { return L.tier ? Object.assign({}, TIER_LOOK[L.tier], L) : L; }
+
   function areaFill(defs, L) {
+    L = areaLook(L);
     const c = L.colour || AREA_DEFAULT, pat = L.pattern || "solid";
     if (pat === "solid") return { fill: c, op: L.opacity != null ? L.opacity : 0.55 };
     if (pat === "none") return { fill: "none", op: 1 };
@@ -188,7 +205,8 @@
     const layers = fig.layers || [];
 
     // areas first, largest first so cores sit on top of extents
-    for (const L of layers.filter((l) => l.type === "area")) {
+    for (const L0 of layers.filter((l) => l.type === "area")) {
+      const L = areaLook(L0);
       const d = zonePath(L, proj);
       if (!d) continue;
       const g = layerG(L_AREA, L);
@@ -201,19 +219,27 @@
 
     for (const L of layers.filter((l) => l.type === "boundary")) {
       const g = layerG(L_LINES, L);
-      g.append("path").attr("d", d3.line().curve(d3.curveCatmullRom.alpha(0.5))(L.path.map(proj))).attr("fill", "none")
-        .attr("stroke", L.colour || "#4a3f35").attr("stroke-width", L.width || 1.3)
-        .attr("stroke-dasharray", L.style === "solid" ? null : L.style === "dashdot" ? "7 3 1.5 3" : "6 3.5");
+      const c = L.colour || "#4a3f35";
+      const d = d3.line().curve(d3.curveCatmullRom.alpha(0.5))(L.path.map(proj));
+      const line = g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", L.width || (L.style === "wall" ? 1.8 : 1.3))
+        .attr("stroke-dasharray", L.style === "solid" || L.style === "wall" ? null : L.style === "dashdot" ? "7 3 1.5 3" : "6 3.5");
+      if (L.style === "wall") crenellate(g, line.node(), c, L.side === "right" ? 1 : -1);
+      lineDates(g, svg, L, proj, c);
     }
 
     for (const L of layers.filter((l) => l.type === "route")) {
       const g = layerG(L_LINES, L);
       const d = d3.line().curve(d3.curveCatmullRom.alpha(0.5))(L.path.map(proj));
       const c = L.colour || "#b0753a";
-      if (L.style === "dashed") g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", L.width || 2).attr("stroke-dasharray", "7 4");
+      if (L.style === "road") {
+        // a built road (the Persian royal road, the Roman roads): pale bed with dark dashes, never confused with a campaign
+        g.append("path").attr("d", d).attr("fill", "none").attr("stroke", L.bed || "#f0d27a").attr("stroke-width", (L.width || 2.4) + 1.6).attr("stroke-linecap", "round");
+        g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", L.width || 2.4).attr("stroke-dasharray", "6 4");
+      } else if (L.style === "dashed") g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", L.width || 2).attr("stroke-dasharray", "7 4");
       else g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", L.width || 3).attr("stroke-linecap", "round").attr("stroke-dasharray", "0.1 5.5");
       if (L.head) arrowHead(svg, g, d, L.width || 3, c, 6);
       if (L.label) alongLabel(g, svg, readable(L.path, proj), L.label, { size: 8.5, fill: shade(c, -1.2), dy: -5, italic: true });
+      lineDates(g, svg, L, proj, c);
     }
 
     for (const L of layers.filter((l) => l.type === "arrow")) {
@@ -235,7 +261,11 @@
         if (!res.fits) { res.node.remove(); res = alongLabel(g, svg, readable(L.path, proj), L.label.toUpperCase(), Object.assign(o, { size: o.size * 0.8, spacing: "0.05em", at: 0.5 })); }
         if (!res.fits) warn(`arrow ${L.id || L.label}: label "${L.label}" is longer than the arrow; lengthen the path or shorten the label`);
       }
-      if (L.date) alongLabel(g, svg, readable(L.path, proj), L.date, { size: 8, fill: shade(c, -1.4), dy: -(wdt / 2 + 3), at });
+      if (L.date) {
+        let r = alongLabel(g, svg, readable(L.path, proj), L.date, { size: 8, fill: shade(c, -1.4), dy: -(wdt / 2 + 3), at });
+        if (!r.fits) { r.node.remove(); r = alongLabel(g, svg, readable(L.path, proj), L.date, { size: 7, fill: shade(c, -1.4), dy: -(wdt / 2 + 3), at: 0.5 }); }
+        if (!r.fits) warn(`arrow ${L.id || L.label}: date "${L.date}" is longer than the arrow`);
+      }
     }
 
     for (const L of layers.filter((l) => l.type === "point")) {
@@ -243,6 +273,8 @@
       const g = layerG(L_POINTS, L).attr("transform", `translate(${x},${y})`);
       const size = L.size || (L.symbol === "capital" || L.symbol === "large-city" ? 9 : 8.5);
       g.append("circle").attr("class", "hit").attr("r", size + 2).attr("fill", "transparent");
+      // origin halo: who founded it (colony maps colour each settlement by its mother city)
+      if (L.halo) g.append("circle").attr("r", size * 0.9).attr("fill", L.halo).attr("fill-opacity", 0.7);
       drawSymbol(g, L.symbol || "city", size, L.colour);
       if (L.name) {
         const pos = L.labelPos || "e", off = 6 + size * 0.25;
@@ -323,6 +355,32 @@
     g.append("path").attr("d", `M${back.x - uy * hw},${back.y + ux * hw}L${tip.x},${tip.y}L${back.x + uy * hw},${back.y - ux * hw}Z`).attr("fill", c).attr("fill-opacity", op);
   }
 
+  // battlements on one side of a fortified frontier (the Great Wall, the Roman limes)
+  function crenellate(g, node, c, side) {
+    const len = node.getTotalLength(), step = 7, m = 3.2;
+    let d = "";
+    for (let s = step / 2; s < len - 1; s += step) {
+      const a = node.getPointAtLength(Math.max(0, s - 0.5)), b = node.getPointAtLength(Math.min(len, s + 0.5));
+      const n = Math.hypot(b.x - a.x, b.y - a.y) || 1, ux = (b.x - a.x) / n, uy = (b.y - a.y) / n;
+      const p = node.getPointAtLength(s), nx = -uy * side, ny = ux * side, h = m / 2;
+      d += `M${p.x - ux * h},${p.y - uy * h}L${p.x - ux * h + nx * m},${p.y - uy * h + ny * m}L${p.x + ux * h + nx * m},${p.y + uy * h + ny * m}L${p.x + ux * h},${p.y + uy * h}Z`;
+    }
+    g.append("path").attr("class", "merlons").attr("d", d).attr("fill", c);
+  }
+
+  // dates printed on a line itself ([[0..1, "text"], ...] measured from the first point of the path)
+  function lineDates(g, svg, L, proj, c) {
+    if (!L.dates) return;
+    const pts = L.path.map(proj), flip = pts[0][0] > pts[pts.length - 1][0];
+    for (const [t, text] of L.dates) {
+      const r = alongLabel(g, svg, readable(L.path, proj), text, { size: 7.5, fill: shade(c, -1.2), dy: -5, at: flip ? 1 - t : t, halo: LAND });
+      r.node.attr("class", "line-date");
+      // a textPath silently drops glyphs that run off either end of its path
+      const room = Math.min(t, 1 - t) * 2 * svg.select(`#tp-${pathSeq}`).node().getTotalLength();
+      if (r.node.node().getComputedTextLength() > room) warn(`${L.type} ${L.id}: date "${text}" runs off the end of the line; move it toward the middle`);
+    }
+  }
+
   // a text path that always reads left to right, whatever direction the line was drawn in
   function readable(path, proj) {
     let pts = path.map(proj);
@@ -370,6 +428,7 @@
   }
 
   function swatch(g, defs, L, sw) {
+    L = L.type === "area" ? areaLook(L) : L;
     const c = L.colour;
     if (L.type === "area") {
       const { fill, op } = areaFill(defs, L);
@@ -378,12 +437,18 @@
       const wd = Math.min(7, L.width || 5);
       g.append("path").attr("d", `M0,0L${sw - 7},0`).attr("stroke", c || "#c0392b").attr("stroke-width", wd);
       g.append("path").attr("d", `M${sw - 8},${-wd}L${sw},0L${sw - 8},${wd}Z`).attr("fill", c || "#c0392b");
+    } else if (L.type === "route" && L.style === "road") {
+      g.append("path").attr("d", `M1,0L${sw - 1},0`).attr("stroke", L.bed || "#f0d27a").attr("stroke-width", 4).attr("stroke-linecap", "round");
+      g.append("path").attr("d", `M1,0L${sw - 1},0`).attr("stroke", c || "#b0753a").attr("stroke-width", 2.4).attr("stroke-dasharray", "6 4");
     } else if (L.type === "route") {
       g.append("path").attr("d", `M1,0L${sw - 1},0`).attr("stroke", c || "#b0753a").attr("stroke-width", 3).attr("stroke-linecap", "round").attr("stroke-dasharray", L.style === "dashed" ? "5 3" : "0.1 5.5");
     } else if (L.type === "boundary") {
-      g.append("path").attr("d", `M0,0L${sw},0`).attr("stroke", c || "#4a3f35").attr("stroke-width", 1.3).attr("stroke-dasharray", L.style === "dashdot" ? "7 3 1.5 3" : "6 3.5");
+      const p = g.append("path").attr("d", `M0,0L${sw},0`).attr("stroke", c || "#4a3f35").attr("stroke-width", L.style === "wall" ? 1.8 : 1.3)
+        .attr("stroke-dasharray", L.style === "solid" || L.style === "wall" ? null : L.style === "dashdot" ? "7 3 1.5 3" : "6 3.5");
+      if (L.style === "wall") crenellate(g, p.node(), c || "#4a3f35", -1);
     } else if (L.type === "point" || L.symbol) {
       const s = g.append("g").attr("transform", `translate(${sw / 2},0)`);
+      if (L.halo) s.append("circle").attr("r", 7).attr("fill", L.halo).attr("fill-opacity", 0.7);
       drawSymbol(s, L.symbol || "city", 8, c);
     }
   }
@@ -522,10 +587,16 @@
     const sel = $("#plate");
     sel.innerHTML = ids.map((k) => `<option value="${esc(k)}"${k === id ? " selected" : ""}>${esc(window.PLATES[k].title)}</option>`).join("")
       + `<option value="key"${id === "key" ? " selected" : ""}>Symbol key</option>`;
-    if (id === "key") { renderKey(host); window.ATLAS.current = { id, errors: [] }; document.title = "Symbol key · Amit's Atlas"; window.ATLAS.ready = true; return; }
     const spec = window.PLATES[id];
-    if (!spec) { host.innerHTML = `<p class="empty">${ids.length ? `No plate called “${esc(id)}”.` : "No plates yet."}</p>`; window.ATLAS.current = { id, errors: [`no plate ${id}`] }; window.ATLAS.ready = true; return; }
-    const res = render(spec, host);
+    const home = document.querySelector("a.home");
+    if (home) {
+      const v = spec && spec.viewer;
+      home.href = v ? `../app/index.html#${v}` : "../app/index.html";
+      home.textContent = v ? "← On the timeline" : "← Amit's World";
+    }
+    if (id === "key") { renderKey(host); window.ATLAS.current = { id, errors: [] }; document.title = "Symbol key · Amit's Atlas"; window.ATLAS.ready = true; return; }
+        if (!spec) { host.innerHTML = `<p class="empty">${ids.length ? `No plate called “${esc(id)}”.` : "No plates yet."}</p>`; window.ATLAS.current = { id, errors: [`no plate ${id}`] }; window.ATLAS.ready = true; return; }
+        const res = render(spec, host);
     window.ATLAS.current = { id, ...res };
     document.title = `${spec.title} · Amit's Atlas`;
     window.ATLAS.ready = true;

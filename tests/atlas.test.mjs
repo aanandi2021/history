@@ -65,6 +65,12 @@ test("validate catches the mistakes a generator is likely to make", () => {
   assert.match(bad((s) => { s.figures = [1, 2, 3, 4, 5].map(() => good.figures[0]); }), /at most four/);
   assert.match(bad((s) => { s.figures[0].layers.push({ id: "a", type: "point", at: [1, 1] }); }), /duplicate layer id a/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "arrow", path: [[1, 1]] }); }), /at least two/);
+  // round 2 grammar (PDF pp. 34–53)
+  assert.match(bad((s) => { s.figures[0].layers.push({ type: "area", around: [[1, 1]], tier: "vassal" }); }), /unknown tier vassal/);
+  assert.match(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "zigzag", path: [[1, 1], [2, 2]] }); }), /unknown boundary style/);
+  assert.match(bad((s) => { s.figures[0].layers.push({ type: "route", style: "highway", path: [[1, 1], [2, 2]] }); }), /unknown route style/);
+  assert.match(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "wall", path: [[1, 1], [2, 2]], dates: [[1.5, "214"]] }); }), /dates must be/);
+  assert.match(bad((s) => { s.figures[0].layers.push({ type: "point", at: [1, 1], halo: "not a colour!" }); }), /bad halo/);
 });
 
 let browser;
@@ -148,5 +154,51 @@ test("the symbol key draws every registered symbol", async () => {
   assert.deepEqual(errors, []);
   const drawn = await page.$$eval(".keyitem svg", (s) => s.filter((x) => x.childElementCount > 0).length);
   assert.equal(drawn, Object.keys(P.SYMBOLS).length);
+  await page.close();
+});
+
+test("viewer datasets and plates point at each other", async () => {
+  const { loadDatasets } = await import("./load.mjs");
+  const DS = loadDatasets();
+  for (const [dsId, ds] of Object.entries(DS)) {
+    for (const p of ds.plates || []) assert.ok(PLATES[p.id], `${dsId} lists plate ${p.id}, which does not exist`);
+  }
+  for (const [id, spec] of Object.entries(PLATES)) {
+    if (!spec.viewer) continue;
+    const period = spec.viewer.split("/")[0];
+    assert.ok(DS[period], `plate ${id} points at viewer period ${period}, which does not exist`);
+    assert.ok((DS[period].plates || []).some((p) => p.id === id), `plate ${id} links to ${period} but ${period} does not list it back`);
+  }
+});
+
+test("a plate's header link goes back to its moment on the timeline", async () => {
+  const { page, errors } = await open("#maritime-monsoon");
+  const home = await page.$eval("a.home", (a) => ({ href: a.getAttribute("href"), text: a.textContent }));
+  assert.equal(home.href, "../app/index.html#maritime/0800");
+  assert.match(home.text, /timeline/);
+  await page.evaluate(() => { location.hash = "key"; });
+  await page.waitForFunction(() => document.querySelector("a.home").getAttribute("href") === "../app/index.html");
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test("round 2 grammar draws: wall battlements, dates on lines, tiers, roads and origin halos", async () => {
+  const { page, errors } = await open("#han-china");
+  const st = await page.evaluate(() => ({
+    merlons: document.querySelectorAll('[data-layer="wall"] path.merlons, [data-layer="wall-2"] path.merlons').length,
+    dates: [...document.querySelectorAll("text.line-date")].map((t) => t.textContent),
+    stripe: !!document.querySelector('pattern[id^="pat-stripe-"]'),
+    stipple: !!document.querySelector('pattern[id^="pat-stipple-"]'),
+    road: document.querySelectorAll('[data-layer="zhidao"] path').length,
+    halos: document.querySelectorAll('[data-layer="dunhuang"] circle:not(.hit)').length,
+    influenceOpacity: +document.querySelector('[data-layer="western-regions"] path').getAttribute("fill-opacity")
+  }));
+  assert.deepEqual(errors, []);
+  assert.equal(st.merlons, 2);
+  assert.deepEqual(st.dates.sort(), ["121–111 B.C.", "138–126 B.C.", "c. 101 B.C."]);
+  assert.ok(st.stripe && st.stipple, "conquest stripes and Qiang stipple are defined");
+  assert.equal(st.road, 2, "a road is a pale bed plus dark dashes");
+  assert.ok(st.halos >= 1, "commandery seats carry an origin halo");
+  assert.ok(st.influenceOpacity < 0.3, "influence reads paler than the core");
   await page.close();
 });

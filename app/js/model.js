@@ -116,6 +116,7 @@
     ds.books = (raw.books || []).map((b) => Object.assign({}, b, {
       kind: "book", id: uid(b.id || `bk-${slug(b.title)}`), t0: parseDate(b.start), t1: parseDate(b.end)
     }));
+    ds.plates = (raw.plates || []).map((p) => Object.assign({}, p, { t0: parseDate(p.start), t1: parseDate(p.end) }));
     ds.mapStates = (raw.mapStates || []).map((s) => Object.assign({}, s, { t: parseDate(s.date) }))
       .sort((a, b) => a.t - b.t);
     ds.byId = new Map();
@@ -205,6 +206,11 @@
     return `calibre://show-book/${encodeURIComponent(library)}/${id}`;
   }
 
+  /** Plates live in the sibling atlas app; links are relative so the repo can move. */
+  function plateUrl(id) {
+    return `../atlas/index.html#${encodeURIComponent(id)}`;
+  }
+
   function libraryUrl(book) {
     const q = `${book.title.replace(/\s*\(.*?\)\s*/g, " ").trim()} ${book.author}`;
     return `https://ottawa.bibliocommons.com/v2/search?query=${encodeURIComponent(q)}&searchType=smart`;
@@ -217,6 +223,11 @@
     if (item.section && note) out.push({ kind: "note", label: "Open note", href: obsidianUrl(note, item.section) });
     const fic = ficTarget(ds, item);
     if (fic) out.push({ kind: "fiction", label: "Amit's Fiction", href: obsidianUrl(fic.note, fic.heading) });
+    if (item.kind !== "book") {
+      for (const p of ds.plates || []) {
+        if (item.t0 <= p.t1 && item.t1 >= p.t0) out.push({ kind: "plate", label: `Atlas plate: ${p.title}`, href: plateUrl(p.id) });
+      }
+    }
     if (item.kind === "book" && item.amits) {
       out.push({ kind: "fiction", label: "Open in Amit's Fiction", href: obsidianUrl(item.note, item.heading) });
     } else if (item.kind === "book") {
@@ -336,6 +347,12 @@
       if (it.fic && !works.length) bad(`${w}: has fic but the dataset lists none of Amit's works`);
       if (it.fic && typeof it.fic !== "string" && !(it.fic && typeof it.fic.note === "string")) bad(`${w}: fic must be a heading or {note, heading}`);
     }
+    for (const p of raw.plates || []) {
+      const w = `plate "${p.id}"`;
+      if (!p.id || !/^[a-z0-9-]+$/.test(p.id)) bad(`${w}: id must be the atlas plate id (lowercase, hyphens)`);
+      if (!p.title) bad(`${w}: needs a title`);
+      if (!okDate(p.start) || !okDate(p.end) || parseDate(p.start) > parseDate(p.end)) bad(`${w}: bad dates`);
+    }
     for (const s of raw.mapStates || []) {
       if (!okDate(s.date)) bad(`map state "${s.label}": bad date`);
       for (const k of Object.keys(s.status || {})) if (!sides.has(k)) bad(`map state "${s.label}": unknown side ${k}`);
@@ -348,6 +365,6 @@
   return {
     DAY, VAULT, VAULT_ID, parseDate, isPartial, isoDate, fmtDate, fmtRange, slug, normalise, nearWindow,
     nearbyEvents, activeLeaders, activeChapters, activeChapter, mapStateAt, booksFor, fictionFor, ficTarget,
-    obsidianUrl, wikiUrl, calibreUrl, libraryUrl, linksFor, parseHash, formatHash, search, stepEvent, validate
+    obsidianUrl, wikiUrl, calibreUrl, plateUrl, libraryUrl, linksFor, parseHash, formatHash, search, stepEvent, validate
   };
 });
