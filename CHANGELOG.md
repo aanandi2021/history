@@ -7,7 +7,7 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
-## 0.6.0 (in progress, `next`)
+## 0.6.0 (5 Oct 2026)
 
 - Master timeline across the very top: every period on one strip, the open one highlighted with its from/to years and the current date, in sync with the Period dropdown both ways.
 - New header (mockup D): a status line with the selection and clickable breadcrumbs; the title is the period dropdown; one fixed row that no longer jumps between periods; playback moved onto the timeline, World onto the map; every period named on the strip, gaps marked "not yet covered", and a bracket for what the lower timeline shows.
