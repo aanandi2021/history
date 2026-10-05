@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cause and effect · Amit's Notes of the History of the World</title>
+  <link rel="stylesheet" href="css/viewer.css">
+  <link rel="stylesheet" href="css/board.css">
+</head>
+<body class="board-page">
+  <header id="bar">
+    <div class="brand">
+      <span class="series">Amit's Notes of the History of the World · cause and effect</span>
+      <h1 id="b-title">…</h1>
+    </div>
+    <label class="ctl">Board <select id="b-pick" aria-label="Board"></select></label>
+    <label class="ctl"><input type="checkbox" id="b-dates"> Show dates</label>
+    <a id="b-viewer" class="ctl navlink" href="index.html">← Timeline</a>
+  </header>
+  <main id="b-main">
+    <section id="b-stage" aria-label="Board">
+      <svg id="b-arrows" aria-hidden="true">
+        <defs>
+          <marker id="h-draft" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5d5a54"/></marker>
+          <marker id="h-ok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2f7d4a"/></marker>
+          <marker id="h-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8423a"/></marker>
+          <marker id="h-missed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c08a1e"/></marker>
+        </defs>
+        <g id="b-lines"></g>
+      </svg>
+      <div id="b-tiles"></div>
+    </section>
+    <aside id="b-side">
+      <p id="b-question"></p>
+      <p class="how">Click a tile, then click the tile it led to. Click an arrow to remove it. Drag tiles to arrange them.</p>
+      <div class="legend"><span><i style="background:#6b7f99"></i>Background</span><span><i style="background:#a07a3a"></i>Crisis</span><span><i style="background:#8c3b3b"></i>Trigger</span><span><i style="background:#b8653a"></i>July 1914</span><span><i style="background:#4b4642"></i>War</span></div>
+      <div class="scorebox">
+        <div><span id="b-score">0</span><small>points</small></div>
+        <div><span id="b-found">0 / 0</span><small>found</small></div>
+        <div><span id="b-checks">0</span><small>checks</small></div>
+      </div>
+      <p class="pts">An arrow is worth <b id="b-worth">10</b> if it's right on this check.</p>
+      <div class="actions">
+        <button id="b-check" class="primary">Check</button>
+        <button id="b-hint">Hint (−3)</button>
+        <button id="b-reveal">Show the answer</button>
+        <button id="b-reset">Start over</button>
+      </div>
+      <div id="b-msg" role="status" aria-live="polite"></div>
+      <ol id="b-why"></ol>
+      <div id="b-books"></div>
+      <p id="b-due" class="due"></p>
+    </aside>
+  </main>
+  <script src="js/board-model.js"></script>
+  <script src="boards/ww1-origins.js"></script>
+  <script src="js/board.js"></script>
+</body>
+</html>

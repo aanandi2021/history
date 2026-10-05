@@ -71,6 +71,23 @@ and the other way round.
 
 The book scans used for the study stay in `study\`, which is git-ignored, and must never be committed.
 
+## Cause-and-effect boards
+
+`app/board.html#<id>` is a retention game, opened from **⇄ Board** in the viewer header. The board scatters event
+tiles at random. You draw arrows from memory (click a cause, then what it led to), press **Check**, and try again.
+Correct arrows lock green; wrong ones turn red and cost nothing. An arrow scores 10, 6, 3 or 1 depending on which
+check it was first right on. A hint costs 3. When every required arrow is found, or you give up and **Show the
+answer**, the tiles slide into the causal chain and each link shows its reason, followed by three books. The score
+sets when the board comes back (21, 7, 3 or 1 days), and that date is kept in localStorage.
+
+- `app/js/board-model.js` holds the rules: `validate`, `check`, `hint`, `percent`, `nextReviewDays`, the seeded
+  `layout` and the after-game `tidy`. It works in the browser and in Node.
+- `app/boards/*.js` are the boards. Each has `tiles`, required `links` (each with a `why`), and `also` for arrows
+  that are fair readings but not required. `ww1-origins` ("The road to 1914") is the first.
+- `?seed=N` fixes the starting layout. `window.BOARD` exposes `connect`, `check`, `hint`, `reveal` and `state` for
+  the tests and the console.
+- `tests/board.test.mjs` covers the rules, every board's data (no cycles, every tile used), and an end-to-end game.
+
 ## Mockups
 
 `mockups/` holds the three variants that came before the viewer, built on a hand-entered WW2 dataset:
