@@ -270,3 +270,16 @@ sea; constitutional diagrams in the same frames as maps; city dots classed by fo
 
 Not yet: small multiples (the Diadochi triptych), coalition envelopes as their own layer type, and diagram
 plates for institutions.
+
+## 15. Round 4: Rome (PDF pp. 74–93)
+
+The Rome section adds time to the grammar. The atlas shows a state growing by repeating the same extent with dated tiers (Rome in Italy c. 380, to 303, to 272), and it prints acquisition years in place (Sicily 241, Africa 146). The legend becomes a chronological ladder rather than a plain colour key. Wars between two powers give each commander a route of their own: Hannibal, the Scipios and Caesar get one heavy line each, with dates beside the stops, black X marks at battles, and numbered route styles where a campaign is too tangled to follow. Fronts and sea control are drawn as lines with teeth, not arrows. Movement is an arrow; pressure is a toothed line. Allies get hollow rings over the area, separate from territory. The section also has the first non-map figure, the Roman constitution, drawn as an institution diagram (people at the base, offices stacked above, edges labelled with verbs). Culture pages carry their material as text, with no figures.
+
+What the viewer took from it (v0.5.0):
+
+- **Dated layers.** Any layer can carry `from` and `until` (YYYY, YYYY-MM or YYYY-MM-DD). A tier appears when the timeline reaches its date. The key shows a **Growth** ladder of the dated area tiers, with the ones already reached in bold. Overlapping tiers stack, so older ground reads darker, as on the atlas. First example: Muscovy 1462 → 1478 → 1552 → 1582.
+- **`itinerary`.** A campaign drawn as stops with dates: numbered legs, the date beside each stop, X at battles (`battle: true`), and optional `via` points to bend a leg. Legs already marched are solid, legs still to come are faint, and an arrowhead sits where the army is on the timeline's date, interpolated between stops. `style: "dashed"` is for a second phase by the same actor (a retreat), and `numbered: false` drops the leg numbers. First example: Napoleon's 1812 advance and retreat, which now share France's colour instead of the retreat using an unrelated one.
+- **`front`.** A line with teeth on the side being pressed (`side: "l"` or `"r"` of the direction drawn). First examples: the Eastern Front in Dec 1941 and Nov 1942, each live only in its own months, and the siege line around Leningrad.
+- **`ally` symbol.** A hollow ring for allied or free cities.
+
+Not built yet: small multiples (the same extent at several dates side by side), coalition and settlement hatches by recipient, and institution diagrams. Institution diagrams belong with the atlas figures, not on the geographic map. A Rome period needs BC dates first, because the model only reads four-digit AD years.

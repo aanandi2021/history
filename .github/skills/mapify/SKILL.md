@@ -180,6 +180,10 @@ When the text is a period with sub-chapters, mapify it for the viewer as well as
   Then write each chapter's **detail scene** in the same colours. That's the atlas's paired-maps move
   (`docs/atlas-design-language.md` §14).
 - Name every colour in `window.SCENE_ACTORS[period]` (one colour per actor). The on-map key reads from it.
+- When the text says **when** things happened, use time rather than more maps: `from`/`until` on areas for dated
+  growth tiers, an `itinerary` with dated stops for any campaign or journey, and a `front` (teeth toward the side
+  being pressed) for sieges, blockades and front lines. Each date must come from the text or a source you cite
+  (`docs/atlas-design-language.md` §15).
 - Check with `node --test tests/scenes.test.mjs tests/chapters.test.mjs`, then screenshot both the zoomed-out
   part and a zoomed-in chapter.
 

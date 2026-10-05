@@ -437,6 +437,66 @@
     return (layer.minK == null || k >= layer.minK) && (layer.maxK == null || k < layer.maxK);
   }
 
+  // The first and last instant a partial date covers: "1505" runs from 1 Jan to 31 Dec, "1812-09" through September.
+  function dateStart(s) {
+    const t = parseDate(s);
+    if (!t || !isPartial(s)) return t;
+    return /^\d{4}$/.test(s) ? utc(t.getUTCFullYear(), 0, 1) : utc(t.getUTCFullYear(), t.getUTCMonth(), 1);
+  }
+  function dateEnd(s) {
+    const t = parseDate(s);
+    if (!t || !isPartial(s)) return t;
+    return /^\d{4}$/.test(s) ? utc(t.getUTCFullYear(), 11, 31) : utc(t.getUTCFullYear(), t.getUTCMonth() + 1, 0);
+  }
+
+  /**
+   * Is a dated layer true at moment t? `from` / `until` take YYYY, YYYY-MM or YYYY-MM-DD. This is the atlas's dated
+   * growth tier ("conquests to 201", "areas conquered 241–218") played out on the timeline: a tier appears when its
+   * date comes. Undated layers, or no moment at all, are always live.
+   */
+  function liveAt(layer, t) {
+    if (!t) return true;
+    if (layer.from && t < dateStart(layer.from)) return false;
+    if (layer.until && t > dateEnd(layer.until)) return false;
+    return true;
+  }
+
+  /**
+   * Where a dated campaign itinerary stands at moment t. Stops carry `at` and `date`; leg i runs from stop i to stop i+1.
+   * Returns { done: legs finished, leg: the leg under way (or -1), f: 0..1 along it, pos: [lon, lat] or null, started, ended }.
+   * Before the first stop nothing has happened; after the last, everything has. With no moment, the whole route is shown done.
+   */
+  function itineraryAt(L, t) {
+    const stops = L.stops || [], n = stops.length - 1;
+    const ts = stops.map((s) => parseDate(s.date).getTime());
+    if (!t) return { done: n, leg: -1, f: 1, pos: null, started: true, ended: true };
+    const x = t.getTime();
+    if (x < ts[0]) return { done: 0, leg: -1, f: 0, pos: null, started: false, ended: false };
+    if (x >= ts[n]) return { done: n, leg: -1, f: 1, pos: stops[n].at, started: true, ended: true };
+    let i = 0;
+    while (i < n - 1 && x >= ts[i + 1]) i++;
+    const f = ts[i + 1] > ts[i] ? (x - ts[i]) / (ts[i + 1] - ts[i]) : 1;
+    const [a, b] = [stops[i].at, stops[i + 1].at];
+    return { done: i, leg: i, f, pos: [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f], started: true, ended: false };
+  }
+
+  /** A stop's date as the atlas prints it beside the route: "7 Sep", "Sep" or "1812", plus the year when it changes. */
+  function stopLabel(stops, i) {
+    const s = stops[i], t = parseDate(s.date), y = t.getUTCFullYear();
+    const prevY = i ? parseDate(stops[i - 1].date).getUTCFullYear() : null;
+    const yr = i === 0 || y !== prevY ? ` ${y}` : "";
+    if (/^\d{4}$/.test(s.date)) return String(y);
+    if (/^\d{4}-\d{2}$/.test(s.date)) return `${MONTHS[t.getUTCMonth()]}${yr}`;
+    return `${t.getUTCDate()} ${MONTHS[t.getUTCMonth()]}${yr}`;
+  }
+
+  /** The dated growth tiers in a scene, oldest first, for the key's chronology ladder: [{ from, label }]. */
+  function sceneLadder(scene) {
+    const seen = new Map();
+    for (const L of (scene && scene.layers) || []) if (L.type === "area" && L.from && !seen.has(L.from)) seen.set(L.from, L.name || L.from);
+    return [...seen].map(([from, label]) => ({ from, label })).sort((a, b) => dateStart(a.from) - dateStart(b.from));
+  }
+
   /**
    * Split text into plain runs and linked terms. Each term links at its first mention only; longer terms win,
    * so "House of Wisdom" isn't eaten by "Wisdom". Returns [{ text, term? }].
@@ -470,9 +530,9 @@
     return term.note ? obsidianUrl(term.note, term.heading) : wikiUrl(term.wiki || term.t);
   }
 
-  const SCENE_TYPES = ["area", "arrow", "route", "boundary", "point", "label"];
+  const SCENE_TYPES = ["area", "arrow", "route", "boundary", "point", "label", "itinerary", "front"];
   const SCENE_TIERS = ["core", "conquest", "influence"];
-  const SCENE_SYMBOLS = ["city", "large-city", "capital", "port", "university", "temple", "stupa", "monastery", "battle", "fortress", "treaty", "insurrection", "find"];
+  const SCENE_SYMBOLS = ["city", "large-city", "capital", "port", "university", "temple", "stupa", "monastery", "battle", "fortress", "treaty", "insurrection", "find", "ally"];
 
   /** Problems with one chapter's scene (layers in the atlas grammar, plus terms). Empty means it can be drawn. */
   function validateScene(scene, ch) {
@@ -491,6 +551,19 @@
       if (L.type === "point" && !L.name) bad(`${w}: point needs a name`);
       if (L.type === "label" && !(L.text && ll(L.at))) bad(`${w}: label needs text and at`);
       if (L.minK != null && !(L.minK >= 1)) bad(`${w}: minK must be 1 or more`);
+      if (L.type === "front" && !(Array.isArray(L.path) && L.path.length >= 2 && L.path.every(ll))) bad(`${w}: front needs a path of 2+ [lon,lat]`);
+      for (const k of ["from", "until"]) if (L[k] != null && !parseDate(L[k])) bad(`${w}: ${k} must be YYYY, YYYY-MM or YYYY-MM-DD`);
+      if (L.from && L.until && dateStart(L.from) > dateEnd(L.until)) bad(`${w}: until is before from`);
+      if (L.type === "itinerary") {
+        const st = L.stops;
+        if (!(Array.isArray(st) && st.length >= 2)) return bad(`${w}: itinerary needs 2+ stops`);
+        st.forEach((s, j) => {
+          if (!ll(s.at)) bad(`${w}: stop ${j + 1} needs at`);
+          if (!parseDate(s.date)) bad(`${w}: stop ${j + 1} (${s.name || "?"}) needs a date`);
+          else if (j && parseDate(st[j - 1].date) && parseDate(s.date) < parseDate(st[j - 1].date)) bad(`${w}: stop ${j + 1} (${s.name || "?"}) is earlier than the stop before`);
+          if (s.via && !(Array.isArray(s.via) && s.via.every(ll))) bad(`${w}: stop ${j + 1} via must be [lon,lat] points`);
+        });
+      }
     });
     const text = ch && ch.text ? ch.text : "";
     for (const term of scene.terms || []) {
@@ -511,9 +584,9 @@
     const named = new Map(Object.entries(actors || {}).map(([c, n]) => [c.toLowerCase(), n]));
     const by = new Map();
     for (const L of scene.layers || []) {
-      if (!["area", "arrow", "route"].includes(L.type)) continue;
+      if (!["area", "arrow", "route", "itinerary", "front"].includes(L.type)) continue;
       const colour = (L.colour || (L.type === "route" ? "#2e5f8a" : "#8a7a5a")).toLowerCase();
-      const mark = L.type === "area" ? (L.tier || "core") : L.type;
+      const mark = L.type === "area" ? (L.tier || "core") : L.type === "itinerary" ? (L.style === "dashed" ? "itinerary-dashed" : "itinerary") : L.type;
       if (!by.has(colour)) by.set(colour, { colour, who: null, area: null, names: [], marks: [] });
       const e = by.get(colour);
       if (L.who && !e.who) e.who = L.who;
@@ -526,14 +599,14 @@
       const label = e.who || named.get(e.colour) || e.area || (e.names.length ? e.names[0] + (e.names.length > 1 ? ` + ${e.names.length - 1} more` : "") : null);
       if (!label) continue;
       const hasArea = e.marks.some((m) => SCENE_TIERS.includes(m));
-      out.push({ colour: e.colour, label, marks: e.marks, group: hasArea || ((e.who || named.has(e.colour)) && e.marks.includes("arrow")) ? "who" : "movement" });
+      out.push({ colour: e.colour, label, marks: e.marks, group: hasArea || ((e.who || named.has(e.colour)) && e.marks.some((m) => m === "arrow" || m.startsWith("itinerary"))) ? "who" : "movement" });
     }
     return out.sort((a, b) => (a.group === b.group ? 0 : a.group === "who" ? -1 : 1));
   }
 
   return {
     sceneKey,
-    sceneFor, visibleAt, linkTerms, termUrl, validateScene, SCENE_SYMBOLS,
+    sceneFor, visibleAt, liveAt, itineraryAt, stopLabel, sceneLadder, dateStart, dateEnd, linkTerms, termUrl, validateScene, SCENE_SYMBOLS,
     linkChapters, ancestors, within, openChapters, focusChapter,
     DAY, VAULT, VAULT_ID, parseDate, isPartial, isoDate, fmtDate, fmtRange, slug, normalise, nearWindow,
     nearbyEvents, activeLeaders, activeChapters, activeChapter, mapStateAt, booksFor, fictionFor, ficTarget,

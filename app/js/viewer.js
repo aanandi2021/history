@@ -127,9 +127,10 @@
     fortress: "M-3.6,-3.6h7.2v7.2h-7.2Z",
     battle: "M-4,-4L4,4M4,-4L-4,4",
     treaty: "M0,-4.6L4.6,0L0,4.6L-4.6,0Z",
-    insurrection: "M0,-5L1.4,-1.4L5,0L1.4,1.4L0,5L-1.4,1.4L-5,0L-1.4,-1.4Z"
+    insurrection: "M0,-5L1.4,-1.4L5,0L1.4,1.4L0,5L-1.4,1.4L-5,0L-1.4,-1.4Z",
+    ally: "M-6.5,0a6.5,6.5 0 1,0 13,0a6.5,6.5 0 1,0 -13,0"
   };
-  const STROKED = new Set(["port", "battle", "find", "stupa", "monastery"]);
+  const STROKED = new Set(["port", "battle", "find", "stupa", "monastery", "ally"]);
 
   function stripeFill(colour) {
     const id = "stripe-" + colour.replace(/[^a-z0-9]/gi, "");
@@ -161,8 +162,64 @@
     return t;
   }
 
+  /**
+   * A dated campaign itinerary (atlas round 4: Hannibal, Caesar, the Cimbri). One heavy line in the actor's colour,
+   * numbered legs, dates beside the stops and an X at battles. The legs already marched are solid; the ones still to
+   * come are faint, and an arrowhead shows where the army is on the timeline's date (see updateItineraries).
+   */
+  function drawItinerary(g, L, colour) {
+    const stops = L.stops;
+    g.classed("dashed", L.style === "dashed");
+    stops.slice(1).forEach((s, i) => {
+      const pts = [stops[i].at, ...(s.via || []), s.at].map((p) => projection(p));
+      g.append("path").attr("d", smooth(pts)).attr("class", "s-itin-leg").attr("data-leg", i).style("stroke", colour);
+      if (L.numbered !== false && stops.length > 2) {
+        const m = pts.length > 2 ? pts[Math.floor(pts.length / 2)] : [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2];
+        const b = screenSized(g, m[0], m[1]).attr("class", "sc s-itin-n").attr("data-leg", i);
+        b.append("circle").attr("r", 6).style("stroke", colour);
+        b.append("text").attr("dy", 3).attr("text-anchor", "middle").text(i + 1);
+      }
+    });
+    stops.forEach((s, i) => {
+      const [x, y] = projection(s.at);
+      const p = screenSized(g, x, y).attr("class", "sc s-itin-stop").attr("data-stop", i);
+      if (s.battle) p.append("path").attr("d", SYMBOL_PATHS.battle).attr("class", "s-sym-s");
+      else p.append("circle").attr("r", 2.4).style("fill", colour);
+      if (s.name) {
+        const lines = [{ text: `${s.name ? s.name + " " : ""}${M.stopLabel(stops, i)}`, cls: "s-name" }];
+        if (s.note) lines.push({ text: s.note, cls: "s-who" });
+        const t = sceneText(p, lines, s.side === "l" ? "end" : "start");
+        if (s.dy) t.attr("transform", `translate(0,${s.dy})`);
+      }
+      if (s.minK) p.classed("s-itin-minK", true).attr("data-mink", s.minK);
+    });
+    screenSized(g, 0, 0).attr("class", "sc s-itin-head").append("path").attr("d", "M3,0L-9,-6L-6.5,0L-9,6Z").style("fill", colour);
+    if (L.name) {
+      const at = projection(L.labelAt || stops[0].at);
+      sceneText(screenSized(g, at[0], at[1]), [{ text: L.name, cls: "s-note" }], L.side === "l" ? "end" : "start").style("fill", d3.color(colour).darker(0.8));
+    }
+  }
+
+  /** Move each itinerary to the scene's moment: legs done or to come, and the arrowhead at the army's position. */
+  function updateItineraries() {
+    const t = state.sceneT;
+    sceneLayer.selectAll(".s-itinerary").each(function (L) {
+      const g = d3.select(this), at = M.itineraryAt(L, t), n = L.stops.length - 1;
+      g.selectAll(".s-itin-leg").classed("todo", function () { const i = +this.dataset.leg; return !at.started || i > at.done || (i === at.done && !at.ended); })
+        .classed("now", function () { return +this.dataset.leg === at.leg; });
+      g.selectAll(".s-itin-stop").classed("todo", function () { const i = +this.dataset.stop; return !at.started || (!at.ended && i > at.done); })
+        .attr("display", function () { return this.dataset.mink && (state.mapK || 1) < +this.dataset.mink ? "none" : null; });
+      // d3.select on the node, not g.select, which would copy the layer's datum onto the head
+      const head = d3.select(this.querySelector(".s-itin-head"));
+      if (!at.started) { head.attr("display", "none"); return; }
+      const i = at.ended ? n - 1 : at.leg, a = projection(L.stops[i].at), b = projection(L.stops[i + 1].at);
+      const p = at.ended ? b : projection(at.pos);
+      head.attr("display", null).datum({ x: p[0], y: p[1], rot: Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI });
+    });
+  }
+
   function drawSceneLayers(root, layers, ghost) {
-    const order = ["area", "boundary", "route", "arrow", "label", "point"];
+    const order = ["area", "boundary", "front", "route", "arrow", "itinerary", "label", "point"];
     for (const L of [...layers].sort((a, b) => order.indexOf(a.type) - order.indexOf(b.type))) {
       const g = root.append("g").attr("class", `s-L s-${L.type}`).datum(L);
       const colour = L.colour || "#8a7a5a";
@@ -179,6 +236,22 @@
         }
       } else if (L.type === "boundary") {
         g.append("path").attr("d", geoPath({ type: "LineString", coordinates: L.path })).attr("class", `s-line ${L.style || "dashed"}`).style("stroke", L.colour || null);
+      } else if (L.type === "front") {
+        // the atlas's blockade or front: a line with teeth on the side being pressed (side "r" or "l" of the direction drawn)
+        const pts = L.path.map((p) => projection(p));
+        const line = g.append("path").attr("d", smooth(pts)).attr("class", "s-front").style("stroke", colour);
+        const node = line.node(), len = node.getTotalLength(), step = Math.max(len / 40, 6), flip = L.side === "l" ? -1 : 1;
+        for (let d = step / 2; d < len; d += step) {
+          const p = node.getPointAtLength(d), q = node.getPointAtLength(Math.min(d + 1, len));
+          const rot = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI;
+          screenSized(g, p.x, p.y, rot).append("path").attr("d", `M-3,0L0,${4.5 * flip}L3,0Z`).style("fill", colour);
+        }
+        if (L.name && !ghost) {
+          const at = L.labelAt ? projection(L.labelAt) : pts[Math.floor(pts.length / 2)];
+          sceneText(screenSized(g, at[0], at[1]), [{ text: L.name, cls: "s-note" }], L.side === "l" ? "start" : "end").style("fill", d3.color(colour).darker(0.8));
+        }
+      } else if (L.type === "itinerary") {
+        drawItinerary(g, L, colour);
       } else if (L.type === "route" || L.type === "arrow") {
         const pts = L.path.map((p) => projection(p));
         const path = g.append("path").attr("d", smooth(pts)).attr("class", L.type === "route" ? `s-route ${L.style || "dotted"}` : "s-arrow");
@@ -242,7 +315,8 @@
       .filter((c) => !focus || !(M.within(ds, focus, c) || M.within(ds, c, focus)))
       .filter((c) => !live.some((k) => k.parentId === c.id));
     const key = [state.dsId, focus && focus.id, ...ghosts.map((c) => c.id)].join("|");
-    if (key === sceneKey) return;
+    state.sceneT = t;
+    if (key === sceneKey) { scaleScene(); return; }
     sceneKey = key;
     sceneLayer.selectAll("*").remove();
     sceneDefs.selectAll("linearGradient").remove();
@@ -267,6 +341,8 @@
     if (area === "influence") s += `<rect x="1" y="2" width="12" height="9" rx="1.5" fill="${colour}" fill-opacity=".12" stroke="${colour}" stroke-dasharray="1.5 2"/>`;
     const x0 = area ? 16 : 1;
     if (marks.includes("arrow")) s += `<path d="M${x0},6.5H${x0 + 9}" stroke="${colour}" stroke-width="2.4"/><path d="M${x0 + 13},6.5l-5,-3.4v6.8z" fill="${colour}"/>`;
+    else if (marks.some((m) => m.startsWith("itinerary"))) s += `<path d="M${x0},6.5H${x0 + 9}" stroke="${colour}" stroke-width="3"${marks.includes("itinerary-dashed") && !marks.includes("itinerary") ? ' stroke-dasharray="4 2"' : ""}/><path d="M${x0 + 13},6.5l-5,-3.4v6.8z" fill="${colour}"/>`;
+    else if (marks.includes("front")) s += `<path d="M${x0},5H${x0 + 13}" stroke="${colour}" stroke-width="1.6"/><path d="M${x0 + 1},5l2,4l2,-4M${x0 + 6},5l2,4l2,-4" fill="${colour}"/>`;
     else if (marks.includes("route")) s += `<path d="M${x0},6.5H${x0 + 13}" stroke="${colour}" stroke-width="2" stroke-dasharray="1.4 3" stroke-linecap="round"/>`;
     return `<svg width="32" height="13" aria-hidden="true">${s}</svg>`;
   }
@@ -276,6 +352,8 @@
     if (!rows.length) { box.hidden = true; box.innerHTML = ""; return; }
     const open = localStorage.getItem(KEY_OPEN) !== "0";
     const tiers = new Set(rows.flatMap((r) => r.marks).filter((m) => m === "conquest" || m === "influence"));
+    const ladder = M.sceneLadder(scene);
+    const hasItin = rows.some((r) => r.marks.some((m) => m.startsWith("itinerary")));
     const group = (g, title) => {
       const rs = rows.filter((r) => r.group === g);
       return rs.length ? `<div class="sk-h">${title}</div>` + rs.map((r) => `<div class="sk-row">${keySwatch(r.colour, r.marks)}<span>${esc(r.label)}</span></div>`).join("") : "";
@@ -283,6 +361,9 @@
     box.innerHTML = `<button class="sk-toggle" aria-expanded="${open}">Key ${open ? "▾" : "▸"}</button>` +
       (open ? `<div class="sk-body">${group("who", "Who")}${group("movement", "Routes and lines")}` +
         (tiers.size ? `<div class="sk-foot">solid: held${tiers.has("conquest") ? " · stripes: newly won" : ""}${tiers.has("influence") ? " · pale: influence" : ""}</div>` : "") +
+        (ladder.length ? `<div class="sk-h">Growth</div><div class="sk-ladder">` + ladder.map((r) => `<span data-from="${esc(r.from)}" title="${esc(r.label)}">${esc(r.from.slice(0, 4))}</span>`).join(" → ") +
+          `</div><div class="sk-foot">Each tier appears when the timeline reaches its date; older ground shows darker where tiers overlap.</div>` : "") +
+        (hasItin ? `<div class="sk-foot">Campaign lines are numbered by leg and dated at each stop. Solid: marched by this date; faint: still to come.</div>` : "") +
         `<div class="sk-foot">An arrow takes the colour of whoever is moving.</div></div>` : "");
     box.hidden = false;
   }
@@ -291,11 +372,14 @@
     localStorage.setItem(KEY_OPEN, localStorage.getItem(KEY_OPEN) === "0" ? "1" : "0");
     const sc = state.sceneFocus && M.sceneFor(SCENES, state.dsId, state.ds.byId.get(state.sceneFocus));
     renderSceneKey(sc);
+    scaleScene();
   });
 
   function scaleScene() {
-    const k = state.mapK || 1;
-    sceneLayer.selectAll(".s-L").attr("display", (L) => (M.visibleAt(L, k) ? null : "none"));
+    const k = state.mapK || 1, t = state.sceneT;
+    sceneLayer.selectAll(".s-L").attr("display", (L) => (M.visibleAt(L, k) && M.liveAt(L, t) ? null : "none"));
+    updateItineraries();
+    $("#scene-key").querySelectorAll("[data-from]").forEach((el) => el.classList.toggle("on", !t || t >= M.dateStart(el.dataset.from)));
     sceneLayer.selectAll(".sc").attr("transform", (d) => `translate(${d.x},${d.y}) scale(${1 / k})${d.rot != null ? ` rotate(${d.rot})` : ""}`);
     sceneDefs.selectAll("pattern").attr("width", 7 / k).attr("height", 7 / k)
       .call((p) => p.select("line").attr("y2", 7 / k).attr("stroke-width", 2.2 / k));

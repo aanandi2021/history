@@ -10,7 +10,8 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 ## 0.5.0 (in progress, `next`)
 
 - Version badge on every page; this changelog; `npm run stamp` and `npm run serve` (port 8766).
-- Atlas round 4 (PDF pp. 74–93, Rome).
+- Atlas round 4 (PDF pp. 74–93, Rome): dated layers that appear as the timeline reaches them, with a growth ladder in the key; campaign itineraries with numbered, dated legs and an arrowhead that moves with the date; fronts with teeth; an ally ring.
+- Muscovy grows tier by tier, Napoleon's 1812 march plays out day by day, and the Eastern Front shows its Dec 1941 and Nov 1942 lines and the Leningrad siege.
 
 ## 0.4.0 (5 Oct 2026), 6dfd741
 

@@ -91,6 +91,10 @@ is the worked example of a detail scene, and `ch-muscovy` in `scenes/russia.js` 
   extras for the viewer: `minK`/`maxK` (detail that appears or goes with map zoom), `fade` (an arrow that fades out
   when its destination is general), `people` and `year` on points, and `style: "medallion"` labels (a great
   power's initial in a ring, for overviews). `bbox` sets the camera, and `caption` describes the map.
+- **Time.** Any layer can carry `from`/`until`, so it appears and goes as the timeline moves, and dated areas build
+  a growth ladder in the key (`ch-muscovy`). An `itinerary` is a campaign with dated stops: numbered legs, X at
+  battles, solid where already marched and an arrowhead where the army is on that date (`ch-1812`). A `front` is a
+  line with teeth on the side being pressed (`ch-barbarossa-to-stalingrad`). See `docs/atlas-design-language.md` §15.
 - **Colour key.** The box at the top right of the map names who each colour is. Each scene file declares
   `window.SCENE_ACTORS[period]`, a map from colour to actor, and uses one colour per actor in every chapter. A layer's
   `who` or a scene's `key` overrides it. An arrow is always in the colour of whoever is moving.
