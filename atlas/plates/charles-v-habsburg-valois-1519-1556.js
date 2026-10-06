@@ -31,20 +31,20 @@
       {id:"ottoman-arrow",type:"arrow",colour:OTT,width:3.0,legend:"Ottoman advance to Vienna",path:[[28.98,41.01],[22.0,44.8],MOH,VIE],label:"1526-29"},
       {id:"charles",type:"point",symbol:"monarch",at:GHE,name:"Ghent",labelPos:"nw",tag:{text:"1500",colour:"#f1c75b"}}, {id:"aachen",type:"point",symbol:"monarch",at:AIX,name:"Aachen",labelPos:"se",tag:{text:"1520",colour:"#f1c75b"}}, {id:"madrid",type:"point",symbol:"capital",at:MAD,name:"Madrid"}, {id:"besancon",type:"point",symbol:"large-city",at:BES,name:"Franche-Comte",labelPos:"w"}, {id:"milan",type:"point",symbol:"capital",at:MILAN,name:"Milan",labelPos:"ne",tag:{text:"1535",colour:"#f1c75b"}}, {id:"naples",type:"point",symbol:"capital",at:NAP,name:"Naples"}, {id:"pavia",type:"point",symbol:"battle",at:PAV,name:"Pavia",labelPos:"s",tag:{text:"1525",colour:"#e8806a"}}, {id:"rome-sack",type:"point",symbol:"destroyed",at:ROM,name:"Rome",tag:{text:"1527",colour:"#e8806a"}}, {id:"mohacs",type:"point",symbol:"battle",at:MOH,name:"Mohacs",tag:{text:"1526",colour:"#e8806a"}}, {id:"vienna",type:"point",symbol:"siege",at:VIE,name:"Vienna",tag:{text:"1529",colour:"#e8806a"}}, {id:"tunis",type:"point",symbol:"battle",at:TUN,name:"Tunis",tag:{text:"1535",colour:"#e8806a"}}
     ], legend:{position:"bottom-left",columns:1}},
-    {kind:"diagram",caption:"Habsburg inheritance, Catholic renewal and the 1556 split", share:0.38, diagram:{height:0.42, compartments:[
-      {id:"inheritance-frame",label:"Composite inheritance",x:0.04,y:0.04,w:0.92,h:0.43,colour:HAB,fill:"#f3e4be",labelY:0.00},
-      {id:"split-frame",label:"1556 split and Catholic renewal",x:0.04,y:0.52,w:0.92,h:0.42,colour:CAT,fill:"#f0dccb"}
+    {kind:"diagram",caption:"Habsburg inheritance, Catholic renewal and the 1556 split", share:0.38, diagram:{height:0.56, compartments:[
+      {id:"inheritance-frame",label:"Composite inheritance",x:0.04,y:0.03,w:0.92,h:0.47,colour:HAB,fill:"#f3e4be"},
+      {id:"split-frame",label:"1556 split and Catholic renewal",x:0.04,y:0.55,w:0.92,h:0.42,colour:CAT,fill:"#f0dccb"}
     ], nodes:[
-      {id:"burgundy",label:"Burgundy\nLow Countries",x:0.18,y:0.19,w:0.22,h:0.10,colour:HAB},
-      {id:"spain-node",label:"Spain\nCastile-Aragon",x:0.43,y:0.19,w:0.22,h:0.10,colour:SPA},
-      {id:"austria-node",label:"Austria\nBohemia-Hungary",x:0.68,y:0.19,w:0.24,h:0.10,colour:AUS},
-      {id:"charles-node",label:"Charles V\n1519-1556",x:0.43,y:0.40,w:0.22,h:0.11,colour:HAB,strong:true},
-      {id:"philip",label:"Philip II\nSpain, NL, Italy",x:0.20,y:0.72,w:0.23,h:0.11,colour:SPA,strong:true},
-      {id:"ferdinand",label:"Ferdinand I\nAustria, Empire",x:0.48,y:0.72,w:0.23,h:0.11,colour:AUS,strong:true},
-      {id:"trent",label:"Trent\nJesuits",x:0.77,y:0.72,w:0.20,h:0.11,colour:CAT}
+      {id:"burgundy",label:"Burgundy\nLow Countries",x:0.19,y:0.19,w:0.24,h:0.11,colour:HAB},
+      {id:"spain-node",label:"Spain\nCastile-Aragon",x:0.50,y:0.19,w:0.24,h:0.11,colour:SPA},
+      {id:"austria-node",label:"Austria\nBohemia-Hungary",x:0.81,y:0.19,w:0.24,h:0.11,colour:AUS},
+      {id:"charles-node",label:"Charles V\n1519-1556",x:0.50,y:0.41,w:0.24,h:0.11,colour:HAB,strong:true},
+      {id:"philip",label:"Philip II\nSpain, NL, Italy",x:0.21,y:0.81,w:0.24,h:0.11,colour:SPA,strong:true},
+      {id:"ferdinand",label:"Ferdinand I\nAustria, Empire",x:0.50,y:0.81,w:0.24,h:0.11,colour:AUS,strong:true},
+      {id:"trent",label:"Trent\nJesuits",x:0.80,y:0.81,w:0.22,h:0.11,colour:CAT}
     ], arrows:[
-      {id:"burgundy-link",from:"burgundy",to:"charles-node",label:"1506",colour:HAB,labelAt:[0.30,0.32],via:[[0.30,0.30],[0.38,0.38]]}, {id:"spain-link",from:"spain-node",to:"charles-node",label:"1516",colour:SPA,labelAt:[0.43,0.31],via:[[0.43,0.30]]}, {id:"austria-link",from:"austria-node",to:"charles-node",label:"1519",colour:AUS,labelAt:[0.58,0.32],via:[[0.62,0.30],[0.54,0.38]]},
-      {id:"philip-link",from:"charles-node",to:"philip",label:"abdicates",colour:SPA,labelAt:[0.27,0.56]}, {id:"ferdinand-link",from:"charles-node",to:"ferdinand",label:"imperial line",colour:AUS,labelAt:[0.49,0.57]}, {id:"trent-link",from:"ferdinand",to:"trent",label:"reform",colour:CAT,labelAt:[0.63,0.72]}
+      {id:"burgundy-link",from:"burgundy",to:"charles-node",label:"1506",colour:HAB}, {id:"spain-link",from:"spain-node",to:"charles-node",label:"1516",colour:SPA}, {id:"austria-link",from:"austria-node",to:"charles-node",label:"1519",colour:AUS},
+      {id:"philip-link",from:"charles-node",to:"philip",label:"Spain line",colour:SPA}, {id:"ferdinand-link",from:"charles-node",to:"ferdinand",label:"imperial line",colour:AUS}, {id:"trent-link",from:"ferdinand",to:"trent",label:"reform",colour:CAT}
     ]}}
   ], text:{intro:"Charles V ruled a stack of inheritances rather than one tidy state. That made France feel encircled, tied Spain to Germany and Italy, and put Catholic renewal inside imperial politics.", sections:[
     {heading:"Composite empire", entries:[{date:"1516-1519",text:"Burgundy, Spain, Austria and the imperial title converge on Charles V, with the Low Countries, Franche-Comte, the Milanese and Naples making France the central rival.",refs:["spain","low-countries","austria","bohemia","tyrol","franche-comte","milanese","naples-sicily","charles","aachen","burgundy-link","spain-link","austria-link"]},{date:"1525-1529",text:"Pavia, the sack of Rome, Mohacs and Vienna show the same map under pressure: France, the papacy and the Ottomans all exploit the Habsburg system.",refs:["france-east-pressure","lowcountry-pressure","italian-pressure","spain-pressure","pavia","rome-sack","ottoman-balkans","ottoman-arrow","mohacs","vienna"]}]},
