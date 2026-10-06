@@ -235,16 +235,19 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
   const panels = fig.panels || [];
   const gap = 10, cols = fig.columns || panels.length, rows = Math.ceil(panels.length / cols);
   const pw = (w - gap * (cols + 1)) / cols;
-  const legendReserve = fig.legend && fig.legend.hidden ? 16 : 126;
+  const legendReserve = fig.legend && fig.legend.hidden ? 16 : 62;
   const ph = Math.min((h - legendReserve - gap * (rows + 1) - 26 * rows) / rows, fig.panelHeight || pw * (fig.panelAspect || 1.18));
   panels.forEach((panel, i) => {
     const x = gap + (i % cols) * (pw + gap), y = gap + Math.floor(i / cols) * (ph + 36);
     const g = svg.append("g").attr("transform", `translate(${x},${y})`);
     const proj = projectionFor(fig, pw, ph);
     const geo = d3.geoPath(proj);
-    const clipId = `sm-frame-${fi}-${i}`, landClip = `sm-land-${fi}-${i}`;
+    const clipId = `sm-frame-${fi}-${i}`, landClip = `sm-land-${fi}-${i}`, landMask = `sm-land-mask-${fi}-${i}`;
     defs.append("clipPath").attr("id", clipId).append("rect").attr("width", pw).attr("height", ph);
     defs.append("clipPath").attr("id", landClip).append("path").attr("d", geo(LANDF));
+    const lm = defs.append("mask").attr("id", landMask).attr("maskUnits", "userSpaceOnUse");
+    lm.append("rect").attr("width", pw).attr("height", ph).attr("fill", "#000");
+    lm.append("path").attr("d", geo(LANDF)).attr("fill", "#fff");
     const root = g.append("g").attr("clip-path", `url(#${clipId})`);
     root.append("rect").attr("width", pw).attr("height", ph).attr("fill", SEA);
     root.append("path").attr("d", geo(LANDF)).attr("fill", LAND).attr("stroke", "#7fa9c4").attr("stroke-width", 0.5);
@@ -259,7 +262,7 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
       const L = areaLook(L0), d = zonePath(L, proj);
       if (!d) continue;
       const lg = areaLayer.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null);
-      if (L.clipToLand || (L.clip !== "none" && L.clip !== false)) lg.attr("clip-path", `url(#${landClip})`);
+      if (L.clipToLand || (L.clip !== "none" && L.clip !== false)) lg.attr("clip-path", `url(#${landClip})`).attr("mask", `url(#${landMask})`);
       const fill = areaFill(defs, L);
       lg.append("path").attr("d", d).attr("fill", fill.fill).attr("fill-opacity", fill.op)
         .attr("stroke", L.edge === false || L.clipToLand ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", 0.7)
@@ -295,7 +298,10 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
       .attr("font-family", SERIF).attr("font-weight", 700).attr("font-size", 15).text(panel.caption || panel.date || "");
   });
   const items = P.legendItems(fig);
-  if (items.length && !(fig.legend && fig.legend.hidden)) drawLegend(svg, defs, items, fig.legend || { position: "bottom-left" }, w, h, { land: LAND, sea: SEA });
+  if (items.length && !(fig.legend && fig.legend.hidden)) {
+    const y = gap + rows * (ph + 36) - 4;
+    drawLegend(svg, defs, items, Object.assign({ x: gap, y }, fig.legend || {}), w, h, { land: LAND, sea: SEA });
+  }
   return svg.node();
 }
 
@@ -561,7 +567,8 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
     const bb = rows.node().getBBox();
     const bw = bb.width + pad * 2, bh = perCol * rowH + pad * 2;
     const pos = cfg.position || "bottom-left";
-    const x = /right/.test(pos) ? w - bw - 6 : 6, y = /top/.test(pos) ? 6 : h - bh - 6;
+    const x = cfg.x != null ? cfg.x : /right/.test(pos) ? w - bw - 6 : 6;
+    const y = cfg.y != null ? cfg.y : /top/.test(pos) ? 6 : h - bh - 6;
     g.attr("transform", `translate(${x},${y})`);
     g.insert("rect", "g").attr("width", bw).attr("height", bh).attr("fill", PAPER).attr("fill-opacity", 0.88).attr("stroke", cfg.boxed ? INK : "none").attr("stroke-width", 0.6);
   }
