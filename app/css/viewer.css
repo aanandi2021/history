@@ -280,6 +280,8 @@ ul.terms .copy-ask { margin-left: 6px; font-size: 11px; padding: 1px 6px; }
 #world-date-label { font-style: italic; }
 #map .world-underlay .polity { fill-opacity: .26; stroke-opacity: .62; stroke-width: .9; vector-effect: non-scaling-stroke; }
 #map .world-underlay .polity-label { font: italic 10.5px var(--serif); fill: #5f5a52; stroke: rgba(255,253,248,.86); stroke-width: 3px; paint-order: stroke; text-anchor: middle; pointer-events: none; }
+#map .tour-places .tour-place circle { fill: #7a5a8c; stroke: #fffdf8; stroke-width: 2.2px; vector-effect: non-scaling-stroke; }
+#map .tour-places .tour-place text { font: 700 11px var(--sans); fill: #4b3658; stroke: rgba(255,253,248,.92); stroke-width: 3px; paint-order: stroke; pointer-events: none; }
 #master .m-gap-band { fill: url(#gap-hatch); stroke: #c3b8a2; stroke-dasharray: 3 2; opacity: .55; }
 #tour-card { border: 1px solid #d4bea0; border-left: 4px solid #7a5a8c; border-radius: 8px; padding: 9px 10px; margin-bottom: 10px; background: #fbf6ea; }
 #tour-card h2 { font-size: 16px; margin: 0 22px 2px 0; }

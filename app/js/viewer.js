@@ -63,6 +63,7 @@
   const sceneLayer = mapRoot.insert("g", ".chapter-box").attr("class", "scene");
   const sceneDefs = mapSvg.append("defs");
   const pinLayer = mapRoot.append("g");
+  const tourLayer = mapRoot.append("g").attr("class", "tour-places");
 
   const mapZoom = d3.zoom().scaleExtent([1, 40])
     .translateExtent([[0, 0], [MAP_W, MAP_H]])
@@ -72,6 +73,7 @@
       scaleScene();
       scalePins();
       scaleWorldLabels();
+      scaleTourPlaces();
     });
   mapSvg.call(mapZoom).on("dblclick.zoom", null);
 
@@ -380,24 +382,43 @@
     return M.focusChapter(state.ds, t, span, (c) => open.has(c) && !!M.sceneFor(SCENES, state.dsId, c));
   }
 
+  function currentTourStop() {
+    return state.tour && state.tourStop < state.tour.stops.length ? state.tour.stops[state.tourStop] : null;
+  }
+  function tourChapter() {
+    const stop = currentTourStop();
+    if (!stop || !stop.chapter || !state.ds) return null;
+    const ch = state.ds.byId.get(stop.chapter);
+    return ch && ch.kind === "chapter" ? ch : null;
+  }
+
   /** Draw the focused chapter's scene, plus the areas of other chapters running at the same time, faintly. */
   function drawScene(t) {
     const ds = state.ds;
     const sel = state.selected && ds.byId.get(state.selected);
     const withScene = (c) => M.sceneFor(SCENES, state.dsId, c);
-    const focus = sel && sel.kind === "chapter" && withScene(sel) ? sel : focusAt(t);
+    const tourCh = tourChapter();
+    const focus = tourCh && withScene(tourCh) ? tourCh : sel && sel.kind === "chapter" && withScene(sel) ? sel : focusAt(t);
     // "Meanwhile" stories only: a part's own chapters, or the part above a chapter, are the same story at another scale
     const open = new Set(M.openChapters(ds, isFolded));
     const live = M.activeChapters(ds, t).filter((c) => withScene(c) && open.has(c));
     const ghosts = live
       .filter((c) => !focus || !(M.within(ds, focus, c) || M.within(ds, c, focus)))
       .filter((c) => !live.some((k) => k.parentId === c.id));
-    const key = [state.dsId, focus && focus.id, ...ghosts.map((c) => c.id)].join("|");
+    const key = [state.tour ? "tour" : "normal", state.dsId, focus && focus.id, ...ghosts.map((c) => c.id)].join("|");
     state.sceneT = t;
     if (key === sceneKey) { scaleScene(); return; }
     sceneKey = key;
     sceneLayer.selectAll("*").remove();
     sceneDefs.selectAll("linearGradient").remove();
+    if (state.tour) {
+      if (focus) drawSceneLayers(sceneLayer.append("g").attr("class", "focus tour-scene").attr("data-ch", focus.id), withScene(focus).layers.filter((L) => L.type === "point"), false);
+      state.sceneFocus = focus ? focus.id : null;
+      $("#scene-cap").hidden = true;
+      renderSceneKey(null);
+      scaleScene();
+      return;
+    }
     for (const c of ghosts) drawSceneLayers(sceneLayer.append("g").attr("class", "ghost").attr("data-ch", c.id), withScene(c).layers.filter((L) => L.type === "area"), true);
     if (focus) drawSceneLayers(sceneLayer.append("g").attr("class", "focus").attr("data-ch", focus.id), withScene(focus).layers, false);
     state.sceneFocus = focus ? focus.id : null;
@@ -462,6 +483,45 @@
     sceneDefs.selectAll("pattern").attr("width", 7 / k).attr("height", 7 / k)
       .call((p) => p.select("line").attr("y2", 7 / k).attr("stroke-width", 2.2 / k));
     scaleWorldLabels();
+    scaleTourPlaces();
+  }
+
+  function tourFocus(stop) {
+    if (!stop) return null;
+    const pts = (stop.places || []).map((p) => [p.lon, p.lat]).filter((p) => Number.isFinite(p[0]) && Number.isFinite(p[1]));
+    if (!pts.length) return stop.focus || null;
+    let w = Math.min(...pts.map((p) => p[0])), e = Math.max(...pts.map((p) => p[0]));
+    let s = Math.min(...pts.map((p) => p[1])), n = Math.max(...pts.map((p) => p[1]));
+    const cx = (w + e) / 2, cy = (s + n) / 2;
+    const naturalW = Math.max(0, e - w), naturalH = Math.max(0, n - s);
+    const width = Math.max(15, Math.min(Math.max(35, naturalW + 5), naturalW * 1.45 + 4));
+    const height = Math.max(8, Math.min(24, Math.max(naturalH * 1.7 + 3, width * 0.55)));
+    return [[cx - width / 2, cy - height / 2], [cx + width / 2, cy + height / 2]];
+  }
+
+  function drawTourPlaces() {
+    const stop = currentTourStop();
+    const places = stop && Array.isArray(stop.places) ? stop.places : [];
+    tourLayer.attr("display", places.length ? null : "none");
+    tourLayer.selectAll("g.tour-place").data(places, (d) => d.name).join(
+      (e) => {
+        const g = e.append("g").attr("class", "tour-place sc");
+        g.append("circle").attr("r", 4.6);
+        g.append("text").attr("dy", 3.5);
+        return g;
+      },
+      (u) => u,
+      (x) => x.remove()
+    ).each(function (d, i) {
+      const p = projection([d.lon, d.lat]);
+      d.x = p[0]; d.y = p[1]; d.side = i % 3 === 1 ? "l" : "r";
+      d3.select(this).select("text").attr("text-anchor", d.side === "l" ? "end" : "start").attr("x", d.side === "l" ? -8 : 8).text(d.name);
+    });
+    scaleTourPlaces();
+  }
+  function scaleTourPlaces() {
+    const k = state.mapK || 1;
+    tourLayer.selectAll(".tour-place.sc").attr("transform", (d) => `translate(${d.x},${d.y}) scale(${1 / k})`);
   }
 
   /** Chapter text with its terms linked one move ahead: your note if it exists, else Wikipedia. ★ marks the ones worth asking about. */
@@ -955,7 +1015,7 @@
     let h = `<h2 id="cursor-date">${esc(fmtCursor(t))}</h2><div class="when">${state.pinned ? "Pinned. Click the timeline again to let go." : "Hover the timeline, or click to pin."} Showing ${span}.</div>`;
     if (chapters.length) {
       // the selected chapter, else the one whose map is showing, tells the story of this moment
-      const picked = state.selected && chapters.find((c) => c.id === state.selected && c.text);
+      const picked = tourChapter() || (state.selected && chapters.find((c) => c.id === state.selected && c.text));
       const shown = focusAt(t);
       const now = picked || (shown && shown.text ? shown : null) || chapters.filter((c) => c.text).sort((a, b) => (a.t1 - a.t0) - (b.t1 - b.t0))[0];
       if (now) h += `<div class="now" id="now"><div class="now-h">Now · <a class="it" href="#" data-id="${esc(now.id)}">${esc(now.title)}</a></div><p>${richText(now)}</p></div>`;
@@ -1085,6 +1145,7 @@
     drawWorldUnderlay(t);
     drawScene(t);
     renderPins(t);
+    drawTourPlaces();
     scaleWorldLabels();
     renderPanel();
     if (state.follow && (state.playing || opts.scrub)) followChapter(t);
@@ -1249,7 +1310,7 @@
     applyTourStop();
   }
   function exitTour() {
-    state.tour = null; state.tourStop = 0; renderTourCard(); scheduleHash();
+    state.tour = null; state.tourStop = 0; drawTourPlaces(); drawScene(state.cursor); renderTourCard(); scheduleHash();
   }
   function moveTour(dir) {
     if (!state.tour) return;
@@ -1263,7 +1324,20 @@
       const t = M.parseDate(tourYearDate(stop.year));
       if (stop.era !== state.dsId) loadDataset(stop.era, { cursor: t, quiet: true });
       else setCursor(t);
-      if (stop.focus) flyToBBox(stop.focus);
+      const ch = stop.chapter && state.ds.byId.get(stop.chapter);
+      state.selected = ch && ch.kind === "chapter" ? ch.id : null;
+      if (ch && ch.kind === "chapter") unfoldTo(ch);
+      tlSvg.selectAll("g.item").classed("sel", (d) => d && d.id === state.selected);
+      drawScene(state.cursor);
+      drawTourPlaces();
+      renderStatus();
+      renderPanel();
+      const bb = tourFocus(stop);
+      if (bb) flyToBBox(bb);
+    } else {
+      drawTourPlaces();
+      drawScene(state.cursor);
+      renderPanel();
     }
     renderTourCard();
     scheduleHash();
@@ -1279,11 +1353,10 @@
       if (t.answer.openQuestions && t.answer.openQuestions.length) h += `<h3>Open questions</h3><ul>${t.answer.openQuestions.map((q) => `<li>${esc(q)}</li>`).join("")}</ul>`;
       if (t.answer.reading && t.answer.reading.length) h += `<h3>Reading</h3><ul>${t.answer.reading.map((r) => `<li><b>${esc(r.title)}</b>, ${esc(r.author)} <span class="d">${esc(r.note || "")}</span></li>`).join("")}</ul>`;
     } else {
-      const y = stop.year <= 0 ? `${1 - stop.year} BC` : String(stop.year);
+      const y = M.fmtYear(M.parseDate(tourYearDate(stop.year)).getUTCFullYear());
       h += `<div class="meta">Stop ${state.tourStop + 1} of ${t.stops.length} · ${esc(y)}</div><h2>${esc(stop.title)}</h2><p>${esc(stop.text)}</p>`;
       if (stop.plate) {
-        const raw = window.DATASETS[stop.era] || state.ds;
-        const p = (raw.plates || []).find((x) => x.id === stop.plate) || { id: stop.plate, title: stop.plate };
+        const p = Object.values(window.DATASETS || {}).flatMap((d) => d.plates || []).find((x) => x.id === stop.plate) || { id: stop.plate, title: stop.plate };
         h += `<div class="plate-tiles tour-plate">${plateTile(p)}</div>`;
       }
       if (stop.meanwhile) h += `<p class="meanwhile">Meanwhile: ${esc(stop.meanwhile)}</p>`;

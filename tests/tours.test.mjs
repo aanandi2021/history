@@ -32,6 +32,12 @@ test("tour schema: two pilot tours with answer cards and plain stops", () => {
       assert.ok(stop.title && stop.text);
       assert.ok(!/\bfloor\b/i.test(stop.text), `${tour.id}/${stop.title}: banned word`);
       if (stop.focus) assert.equal(stop.focus.length, 2, `${tour.id}/${stop.title}: focus bounds`);
+      assert.ok(Array.isArray(stop.places) && stop.places.length >= 2, `${tour.id}/${stop.title}: tour places`);
+      for (const p of stop.places) {
+        assert.ok(p.name, `${tour.id}/${stop.title}: place name`);
+        assert.equal(typeof p.lon, "number", `${tour.id}/${stop.title}/${p.name}: lon`);
+        assert.equal(typeof p.lat, "number", `${tour.id}/${stop.title}/${p.name}: lat`);
+      }
     }
   }
 });
@@ -42,5 +48,19 @@ test("tour references resolve to datasets, years and plates", () => {
     const t = HM.parseDate(tourYearDate(stop.year));
     assert.ok(t >= HM.parseDate(ds.range[0]) && t <= HM.parseDate(ds.range[1]), `${tour.id}/${stop.title}: ${stop.year} inside ${stop.era}`);
     if (stop.plate) assert.ok(plateIds.has(stop.plate), `${tour.id}/${stop.title}: plate ${stop.plate} exists`);
+    if (stop.chapter) {
+      const ch = HM.normalise(ds).byId.get(stop.chapter);
+      assert.ok(ch && ch.kind === "chapter", `${tour.id}/${stop.title}: chapter ${stop.chapter} exists`);
+      assert.ok(t >= ch.t0 && t <= ch.t1, `${tour.id}/${stop.title}: chapter ${stop.chapter} covers stop year`);
+    }
+  }
+});
+
+test("tour BC labels use historical years with no year zero", () => {
+  const t = HM.parseDate(tourYearDate(-264));
+  assert.equal(HM.fmtYear(t.getUTCFullYear()), "264 BC");
+  for (const tour of Object.values(TOURS)) for (const stop of tour.stops.filter((s) => s.year < 0)) {
+    const label = HM.fmtYear(HM.parseDate(tourYearDate(stop.year)).getUTCFullYear());
+    assert.equal(label, `${Math.abs(stop.year)} BC`, `${tour.id}/${stop.title}: BC label`);
   }
 });
