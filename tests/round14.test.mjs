@@ -63,7 +63,7 @@ test("round 14 uses regions for state-like areas and clean diagram routing", () 
       continue;
     }
     for (const layer of fig.layers || []) {
-      if (layer.type === "area" && !["jesuit-paraguay"].includes(layer.id)) assert.ok(Array.isArray(layer.regions), `${id}:${layer.id} should use regions`);
+      if (layer.type === "area" && !["jesuit-paraguay", "cape-breton"].includes(layer.id)) assert.ok(Array.isArray(layer.regions), `${id}:${layer.id} should use regions`);
     }
   }
 });

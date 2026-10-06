@@ -15,32 +15,33 @@
     ], legend:{position:"bottom-left",columns:1}},
     {caption:"The partitions of Poland, 1772-1795", share:0.37, extent:[[12,47],[33,57]], projection:"conic", layers:[
       {id:"poland-1760",type:"area",tier:"influence",colour:POL,legend:"Poland-Lithuania before partition",regions:["POL","LTU","BLR","UA-07","UA-56","UA-18","UA-32","UA-46","UA-61","UA-68","UA-05","UA-71","UA-53","UA-74"]},
-      {id:"prussian-partitions",type:"area",pattern:"hatch",colour:PRUS,legend:"Prussian gains: Royal Prussia, Posen, Warsaw",regions:["PL-PM","PL-WP","PL-KP","PL-LD","PL-MZ"]},
-      {id:"russian-partitions",type:"area",pattern:"hatch",colour:RUS,legend:"Russian gains: Lithuania, Belarus, Right-Bank Ukraine",regions:["LTU","BLR","UA-07","UA-56","UA-18","UA-32","UA-46","UA-61","UA-68","UA-05","UA-71","UA-53","UA-74"]},
-      {id:"austrian-partitions",type:"area",pattern:"hatch",colour:AUS,legend:"Austrian gains: Galicia",regions:["PL-PK","PL-LU","PL-MA","UA-46","UA-21","UA-26"]},
+      {id:"prussian-1772",type:"area",tier:"core",colour:PRUS,legend:"Prussia: 1772 Royal Prussia / Netze",regions:["PL-PM","PL-KP"]},
+      {id:"prussian-later",type:"area",pattern:"hatch",colour:PRUS,legend:"Prussia: 1793-1795 Posen and Warsaw",regions:["PL-WP","PL-LD","PL-MZ"]},
+      {id:"russian-1772",type:"area",tier:"core",colour:RUS,legend:"Russia: 1772 Belarus frontier",regions:["BLR"]},
+      {id:"russian-later",type:"area",pattern:"hatch",colour:RUS,legend:"Russia: 1793-1795 Lithuania and Ukraine",regions:["LTU","UA-07","UA-56","UA-18","UA-32","UA-46","UA-61","UA-68","UA-05","UA-71","UA-53","UA-74"]},
+      {id:"austrian-1772",type:"area",tier:"core",colour:AUS,legend:"Austria: 1772 Galicia",regions:["PL-PK","PL-LU","PL-MA","UA-46","UA-21","UA-26"]},
       {id:"kosciuszko",type:"route",style:"dashed",weight:2.4,colour:WAR,legend:"Kosciuszko rising, 1794",path:[CRAC,WARSAW,GROD]},
-      {id:"bar-targowice",type:"route",style:"dotted",weight:2,colour:WAR,legend:"Bar to Targowice confederations",path:[[27.68,49.08],TARG]},
       {id:"warsaw",type:"point",symbol:"capital",at:WARSAW,name:"Warsaw",tag:{text:"1794",colour:"#e8806a"}}, {id:"cracow",type:"point",symbol:"battle",at:CRAC,name:"Cracow",labelPos:"sw"}, {id:"grodno",type:"point",symbol:"treaty",at:GROD,name:"Grodno",labelPos:"e",tag:{text:"1793",colour:"#f1c75b"}}, {id:"vilna",type:"point",symbol:"large-city",at:VIL,name:"Vilna",labelPos:"ne"}, {id:"danzig",type:"point",symbol:"port",at:DAN,name:"Danzig",labelPos:"n"}, {id:"posen",type:"point",symbol:"large-city",at:POS,name:"Posen",labelPos:"s"}
-    ], legend:{x:760,y:8,columns:1}},
-    {caption:"Enlightened despotism: reform from above", kind:"diagram", share:0.28, diagram:{height:0.58, compartments:[
+    ], legend:{position:"top-left",columns:1}},
+    {caption:"Enlightened despotism: reform from above", kind:"diagram", share:0.28, diagram:{height:0.50, compartments:[
       {id:"state",label:"Reason of state",x:0.04,y:0.05,w:0.92,h:0.38,colour:IDEA,fill:"#eee8d5"},
-      {id:"limits",label:"Limits",x:0.04,y:0.52,w:0.92,h:0.36,colour:WAR,fill:"#f3e4be"}
+      {id:"limits",label:"Limits",x:0.04,y:0.52,w:0.92,h:0.30,colour:WAR,fill:"#f3e4be"}
     ], nodes:[
       {id:"frederick",label:"Frederick II\nPrussia",x:0.18,y:0.20,w:0.20,h:0.12,colour:PRUS,strong:true},
       {id:"maria",label:"Maria Theresa\nAustria",x:0.50,y:0.20,w:0.20,h:0.12,colour:AUS,strong:true},
       {id:"catherine",label:"Catherine II\nRussia",x:0.82,y:0.20,w:0.20,h:0.12,colour:RUS,strong:true},
-      {id:"law",label:"law, schools\nand officials",x:0.18,y:0.70,w:0.20,h:0.12,colour:IDEA},
-      {id:"serfdom",label:"serfdom\nand estates",x:0.50,y:0.70,w:0.20,h:0.12,colour:WAR},
-      {id:"poland",label:"Poland\npartitioned",x:0.82,y:0.70,w:0.20,h:0.12,colour:POL}
+      {id:"law",label:"law, schools\nand officials",x:0.18,y:0.68,w:0.20,h:0.12,colour:IDEA},
+      {id:"serfdom",label:"serfdom\nand estates",x:0.50,y:0.68,w:0.20,h:0.12,colour:WAR},
+      {id:"poland",label:"Poland\npartitioned",x:0.82,y:0.68,w:0.20,h:0.12,colour:POL}
     ], arrows:[
       {id:"prus-law",from:"frederick",to:"law"},
       {id:"aus-law",from:"maria",to:"law"},
-      {id:"rus-serf",from:"catherine",to:"serfdom",label:"noble power"},
-      {id:"serf-pol",from:"serfdom",to:"poland",label:"army + empire"},
+      {id:"rus-serf",from:"catherine",to:"serfdom"},
+      {id:"serf-pol",from:"serfdom",to:"poland"},
       {id:"three",from:"catherine",to:"poland",label:"1772 / 1793 / 1795"}
     ]}},
   ], text:{intro:"The last European pages show the eighteenth-century state becoming more rational, more militarized and more dangerous: Prussia rises, Poland is partitioned, and enlightened reform rarely means popular rule.", sections:[
     {heading:"Prussia and cabinet politics", entries:[{date:"1713-1748",text:"Frederick William I builds the military-bureaucratic Prussian state; Frederick II then takes Silesia and forces Austria to accept Prussia as a great power.",refs:["prussia-1740","silesia-gain","silesian-war","berlin","breslau","dresden"]},{date:"1713-1748",text:"Cabinet politics after Utrecht rearrange Sardinia, Sicily, Naples, Tuscany, Parma, Lorraine and the Austrian Netherlands by dynastic exchange as much as battle.",refs:["france-ancien","austria-1740","italian-exchanges","lorraine","vienna"]}]},
-    {heading:"Poland and enlightened absolutism", entries:[{date:"1772-1795",text:"Russia, Prussia and Austria use confederations, reform panic and military occupation to erase Poland-Lithuania in three partitions.",refs:["poland-1760","prussian-partitions","russian-partitions","austrian-partitions","bar-targowice","kosciuszko","warsaw","grodno"]},{date:"1740-1796",text:"Frederick, Maria Theresa, Joseph II and Catherine all speak the language of reason, law and useful subjects, but estates, serfdom and empire set the hard limits.",refs:["frederick","maria","catherine","law","serfdom","poland"]}]}
+    {heading:"Poland and enlightened absolutism", entries:[{date:"1772-1795",text:"Russia, Prussia and Austria use confederations, reform panic and military occupation to erase Poland-Lithuania in three partitions.",refs:["poland-1760","prussian-1772","prussian-later","russian-1772","russian-later","austrian-1772","kosciuszko","warsaw","grodno"]},{date:"1740-1796",text:"Frederick, Maria Theresa, Joseph II and Catherine all speak the language of reason, law and useful subjects, but estates, serfdom and empire set the hard limits.",refs:["frederick","maria","catherine","law","serfdom","poland"]}]}
   ]}, sources:["Penguin Atlas Vol. 1 pp. 281-288", "Natural Earth admin-1 regions approximate Silesia, Galicia, Lithuania and partition zones"] };
 })();
