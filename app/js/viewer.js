@@ -123,7 +123,16 @@
   function polityFeature(P) {
     if (P.polygon) return { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [[...P.polygon, P.polygon[0]]] } };
     const idx = regionIndex();
-    const geoms = (P.regions || []).map((c) => idx.get(c)).filter(Boolean);
+    const minus = new Set(P.minus || []);
+    let codes = P.regions || [];
+    if (minus.size) {
+      // A whole country minus some of its provinces: swap the country for its remaining provinces.
+      const cut = new Set([...minus].map((c) => idx.get(c)).filter(Boolean).map((g) => g.properties.adm0));
+      codes = codes.flatMap((c) => cut.has(c) && idx.get(c) && idx.get(c).properties.kind === "admin0"
+        ? [...idx.values()].filter((g) => g.properties.kind === "admin1" && g.properties.adm0 === c).map((g) => g.properties.code)
+        : [c]).filter((c) => !minus.has(c));
+    }
+    const geoms = codes.map((c) => idx.get(c)).filter(Boolean);
     if (!geoms.length) return null;
     return { type: "Feature", properties: {}, geometry: topojson.merge(REGIONS, geoms) };
   }
