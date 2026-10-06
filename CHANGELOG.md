@@ -7,6 +7,10 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
+## 1.0.0 (Unreleased / 1.0.0-dev)
+
+- Atlas round 14 in progress: closing the atlas proper with eighteenth-century balance of power, global war, Enlightenment and the world on the eve of revolution.
+
 ## 0.9.0 (6 Oct 2026)
 
 - Added Natural Earth Europe region building blocks for atlas area layers, with `regions` / `minus` support and rebuilt round 13 plates from administrative shapes.
