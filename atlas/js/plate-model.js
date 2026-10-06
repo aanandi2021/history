@@ -49,9 +49,28 @@
     spec.figures.forEach((f, fi) => {
       const w = `figure ${fi + 1}`;
       if (!f.caption) bad(`${w}: caption is required (the atlas always captions under the frame)`);
+      if (f.kind === "diagram") {
+        const d = f.diagram || {};
+        for (const c of d.compartments || []) {
+          if (c.id) { if (ids.has(c.id)) bad(`duplicate layer id ${c.id}`); ids.add(c.id); }
+          if (!c.label) bad(`${w} compartment ${c.id || "?"}: needs a label`);
+        }
+        for (const n of d.nodes || []) {
+          if (!n.id) bad(`${w}: every diagram node needs an id`);
+          else { if (ids.has(n.id)) bad(`duplicate layer id ${n.id}`); ids.add(n.id); }
+          if (!n.label) bad(`${w} node ${n.id || "?"}: needs a label`);
+        }
+        for (const a of d.arrows || []) {
+          if (a.id) { if (ids.has(a.id)) bad(`duplicate layer id ${a.id}`); ids.add(a.id); }
+          if (!a.from || !a.to) bad(`${w} arrow ${a.id || "?"}: needs from and to`);
+        }
+        return;
+      }
       const e = f.extent;
       if (!e || !isLonLat(e[0]) || !isLonLat(e[1]) || e[0][0] >= e[1][0] || e[0][1] >= e[1][1]) bad(`${w}: extent must be [[west,south],[east,north]] and not cross 180°`);
-      for (const L of f.layers || []) {
+      if (f.kind === "small-multiples" && (!Array.isArray(f.panels) || f.panels.length < 2)) bad(`${w}: small-multiples needs at least two panels`);
+      const layerList = f.kind === "small-multiples" ? [...(f.layers || []), ...(f.panels || []).flatMap((p) => p.layers || [])] : (f.layers || []);
+      for (const L of layerList) {
         const lw = `${w} layer ${L.id || L.name || L.text || L.type}`;
         if (!LAYER_TYPES.includes(L.type)) { bad(`${lw}: unknown type ${L.type}`); continue; }
         if (L.id) { if (ids.has(L.id)) bad(`duplicate layer id ${L.id}`); ids.add(L.id); }
@@ -94,7 +113,8 @@
   /** Legend rows for a figure: one per distinct legend text, in layer order, then any extras. */
   function legendItems(fig) {
     const seen = new Set(), out = [];
-    for (const L of fig.layers || []) {
+    const layers = fig.kind === "small-multiples" ? [...(fig.layers || []), ...(fig.panels || []).flatMap((p) => p.layers || [])] : (fig.layers || []);
+    for (const L of layers) {
       if (!L.legend || seen.has(L.legend)) continue;
       seen.add(L.legend);
       out.push({ text: L.legend, layer: L });
@@ -113,14 +133,24 @@
         byEntry[k] = en.refs || [];
         for (const r of en.refs || []) { if (!byLayer.has(r)) byLayer.set(r, []); byLayer.get(r).push(k); }
       }
+
     }
     return { byLayer, byEntry };
   }
 
+function namedThings(spec) {
+  const out = [];
+  for (const f of spec.figures || []) {
+    out.push(...(f.layers || []).filter((L) => L.id));
+    if (f.kind === "small-multiples") out.push(...(f.panels || []).flatMap((p) => p.layers || []).filter((L) => L.id));
+    if (f.kind === "diagram" && f.diagram) out.push(...["compartments", "nodes", "arrows"].flatMap((k) => (f.diagram[k] || []).filter((x) => x.id)));
+  }
+  return out;
+}
   /** Share of drawn layers that the text mentions, and of text entries that point at the map. */
   function coverage(spec) {
     const { byLayer, byEntry } = crossRefs(spec);
-    const named = spec.figures.flatMap((f) => (f.layers || []).filter((L) => L.id));
+    const named = namedThings(spec);
     const entries = byEntry.length;
     return {
       layersExplained: named.length ? named.filter((L) => byLayer.has(L.id)).length / named.length : 1,

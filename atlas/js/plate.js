@@ -173,9 +173,154 @@
   }
 
   const haloText = (sel, colour = LAND, w = 2.6) => sel.attr("stroke", colour).attr("stroke-width", w).attr("stroke-linejoin", "round").attr("paint-order", "stroke");
+function drawDiagramFigure(container, fig, fi, w, h) {
+  h = fig.diagram && fig.diagram.height ? Math.round(w * fig.diagram.height) : h;
+  const svg = d3.select(container).append("svg")
+    .attr("xmlns", "http://www.w3.org/2000/svg").attr("viewBox", `0 0 ${w} ${h}`).attr("width", w).attr("height", h)
+    .attr("class", "fig").attr("data-fig", fi).attr("font-family", SANS);
+  const defs = svg.append("defs");
+  defs.append("marker").attr("id", `diag-head-${fi}`).attr("viewBox", "0 0 10 10").attr("refX", 9).attr("refY", 5)
+    .attr("markerWidth", 7).attr("markerHeight", 7).attr("orient", "auto-start-reverse")
+    .append("path").attr("d", "M0,0L10,5L0,10Z").attr("fill", INK);
+  defs.append("marker").attr("id", `diag-bar-${fi}`).attr("viewBox", "0 0 10 10").attr("refX", 5).attr("refY", 5)
+    .attr("markerWidth", 8).attr("markerHeight", 8).attr("orient", "auto")
+    .append("path").attr("d", "M5,1L5,9").attr("stroke", INK).attr("stroke-width", 2);
+  svg.append("rect").attr("width", w).attr("height", h).attr("fill", LAND);
+  const d = fig.diagram || {};
+  const sx = (x) => x * w, sy = (y) => y * h;
+  const byId = new Map();
+  const layer = svg.append("g").attr("class", "diagram");
+  for (const c of d.compartments || []) {
+    const g = layer.append("g").attr("class", "layer diagram-compartment").attr("data-layer", c.id || null);
+    g.append("rect").attr("x", sx(c.x)).attr("y", sy(c.y)).attr("width", sx(c.w)).attr("height", sy(c.h))
+      .attr("rx", 10).attr("fill", c.fill || "#efe2bd").attr("fill-opacity", c.opacity == null ? 0.45 : c.opacity)
+      .attr("stroke", c.colour || "#8c6d3f").attr("stroke-width", 1.2);
+    g.append("text").attr("x", sx(c.labelX != null ? c.labelX : c.x) + 10).attr("y", sy(c.labelY != null ? c.labelY : c.y) + 18).attr("font-family", SERIF)
+      .attr("font-weight", 700).attr("font-size", 13).attr("fill", c.colour || INK).text(c.label);
+  }
+  for (const n of d.nodes || []) {
+    byId.set(n.id, n);
+    const g = layer.append("g").attr("class", "layer diagram-node").attr("data-layer", n.id);
+    const x = sx(n.x), y = sy(n.y), bw = sx(n.w || 0.18), bh = sy(n.h || 0.09);
+    g.append("rect").attr("x", x - bw / 2).attr("y", y - bh / 2).attr("width", bw).attr("height", bh).attr("rx", 8)
+      .attr("fill", n.fill || PAPER).attr("stroke", n.colour || INK).attr("stroke-width", n.strong ? 2 : 1.3);
+    const lines = String(n.label).split(/\n/);
+    const text = g.append("text").attr("x", x).attr("y", y - (lines.length - 1) * 6).attr("text-anchor", "middle")
+      .attr("font-family", n.serif ? SERIF : SANS).attr("font-weight", n.strong ? 700 : 600).attr("font-size", n.size || 12).attr("fill", n.colour || INK);
+    lines.forEach((line, i) => text.append("tspan").attr("x", x).attr("dy", i ? 13 : 0).text(line));
+    if (n.note) g.append("text").attr("x", x).attr("y", y + bh / 2 - 8).attr("text-anchor", "middle").attr("font-size", 9).attr("fill", "#6b6255").text(n.note);
+  }
+  const edge = (n, toward) => {
+    const bw = sx(n.w || 0.18), bh = sy(n.h || 0.09), cx = sx(n.x), cy = sy(n.y);
+    const dx = sx(toward.x) - cx, dy = sy(toward.y) - cy;
+    const k = 1 / Math.max(Math.abs(dx) / (bw / 2 + 7), Math.abs(dy) / (bh / 2 + 7), 1e-6);
+    return [cx + dx * k, cy + dy * k];
+  };
+  for (const a of d.arrows || []) {
+    const A = byId.get(a.from), B = byId.get(a.to);
+    if (!A || !B) continue;
+    const route = (a.via || []).map((p) => ({ x: p[0], y: p[1] }));
+    const first = route[0] || B, last = route[route.length - 1] || A;
+    const p = edge(A, first), q = edge(B, last);
+    const pts = [p, ...route.map((v) => [sx(v.x), sy(v.y)]), q];
+    const mid = pts[Math.floor(pts.length / 2)];
+    const g = layer.append("g").attr("class", "layer diagram-arrow").attr("data-layer", a.id || null);
+    const dPath = route.length ? d3.line().curve(d3.curveLinear)(pts) : `M${p[0]},${p[1]}C${p[0]},${mid[1]} ${q[0]},${mid[1]} ${q[0]},${q[1]}`;
+    g.append("path").attr("d", dPath)
+      .attr("fill", "none").attr("stroke", a.colour || INK).attr("stroke-width", a.width || 1.6)
+      .attr("stroke-dasharray", a.dashed ? "5 4" : null).attr("marker-end", `url(#${a.end === "bar" ? "diag-bar" : "diag-head"}-${fi})`);
+    const labelAt = a.labelAt ? [sx(a.labelAt[0]), sy(a.labelAt[1])] : mid;
+    if (a.label) haloText(g.append("text").attr("x", labelAt[0]).attr("y", labelAt[1] - 4).attr("text-anchor", "middle")
+      .attr("font-size", 10).attr("font-style", "italic").attr("fill", a.colour || INK).text(a.label), LAND, 4);
+  }
+  return svg.node();
+}
+
+function drawSmallMultiplesFigure(container, fig, fi, w, h) {
+  const svg = d3.select(container).append("svg")
+    .attr("xmlns", "http://www.w3.org/2000/svg").attr("viewBox", `0 0 ${w} ${h}`).attr("width", w).attr("height", h)
+    .attr("class", "fig").attr("data-fig", fi).attr("font-family", SANS);
+  const defs = svg.append("defs");
+  const panels = fig.panels || [];
+  const gap = 10, cols = fig.columns || panels.length, rows = Math.ceil(panels.length / cols);
+  const pw = (w - gap * (cols + 1)) / cols;
+  const legendReserve = fig.legend && fig.legend.hidden ? 16 : 62;
+  const ph = Math.min((h - legendReserve - gap * (rows + 1) - 26 * rows) / rows, fig.panelHeight || pw * (fig.panelAspect || 1.18));
+  panels.forEach((panel, i) => {
+    const x = gap + (i % cols) * (pw + gap), y = gap + Math.floor(i / cols) * (ph + 36);
+    const g = svg.append("g").attr("transform", `translate(${x},${y})`);
+    const panelDefs = g.append("defs");
+    const proj = projectionFor(fig, pw, ph);
+    const geo = d3.geoPath(proj);
+    const clipId = `sm-frame-${fi}-${i}`, landClip = `sm-land-${fi}-${i}`, landMask = `sm-land-mask-${fi}-${i}`;
+    panelDefs.append("clipPath").attr("id", clipId).attr("clipPathUnits", "userSpaceOnUse").append("rect").attr("width", pw).attr("height", ph);
+    panelDefs.append("clipPath").attr("id", landClip).attr("clipPathUnits", "userSpaceOnUse").append("path").attr("d", geo(LANDF));
+    const lm = panelDefs.append("mask").attr("id", landMask).attr("maskUnits", "userSpaceOnUse");
+    lm.append("rect").attr("width", pw).attr("height", ph).attr("fill", "#000");
+    lm.append("path").attr("d", geo(LANDF)).attr("fill", "#fff");
+    const root = g.append("g").attr("clip-path", `url(#${clipId})`);
+    root.append("rect").attr("width", pw).attr("height", ph).attr("fill", SEA);
+    root.append("path").attr("d", geo(LANDF)).attr("fill", LAND).attr("stroke", "#7fa9c4").attr("stroke-width", 0.5);
+    root.append("path").attr("d", geo(LAKES)).attr("fill", SEA).attr("stroke", "#7fa9c4").attr("stroke-width", 0.35);
+    for (const f of RIVERS.features) if ((f.properties.scalerank || 6) <= 4) root.append("path").attr("d", geo(f)).attr("fill", "none").attr("stroke", RIVER).attr("stroke-width", 0.45);
+    const areaLayer = root.append("g").attr("class", "areas");
+    const lineLayer = root.append("g").attr("class", "lines");
+    const pointLayer = root.append("g").attr("class", "points");
+    const labelLayer = root.append("g").attr("class", "labels");
+    const all = [...(fig.layers || []), ...(panel.layers || [])];
+    for (const L0 of all.filter((l) => l.type === "area")) {
+      const L = areaLook(L0), d = zonePath(L, proj);
+      if (!d) continue;
+      const lg = areaLayer.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null);
+      if (L.clipToLand || (L.clip !== "none" && L.clip !== false)) lg.attr("clip-path", `url(#${landClip})`).attr("mask", `url(#${landMask})`);
+      const fill = areaFill(defs, L);
+      lg.append("path").attr("d", d).attr("fill", fill.fill).attr("fill-opacity", fill.op)
+        .attr("stroke", L.edge === false || L.clipToLand ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", 0.7)
+        .attr("stroke-dasharray", L.edge === "dashed" ? "5 3" : null);
+    }
+    for (const L of all.filter((l) => l.type === "boundary")) {
+      const d = d3.line().curve(d3.curveCatmullRom.alpha(0.5))(L.path.map(proj));
+      lineLayer.append("path").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null)
+        .attr("d", d).attr("fill", "none").attr("stroke", L.colour || INK).attr("stroke-width", L.width || 1.2)
+        .attr("stroke-dasharray", L.style === "solid" ? null : "5 3");
+    }
+    for (const L of all.filter((l) => l.type === "point")) {
+      const p = proj(L.at); if (!p) continue;
+      const pg = pointLayer.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null).attr("transform", `translate(${p[0]},${p[1]})`);
+      drawSymbol(pg, L.symbol || "city", 8, L.colour || INK);
+      if (L.name) {
+        const pos = L.labelPos || "e", off = 5;
+        const dx = { e: off, w: -off, n: 0, s: 0, ne: off, nw: -off, se: off, sw: -off }[pos] || off;
+        const dy = { e: 0, w: 0, n: -off - 2, s: off + 6, ne: -off, nw: -off, se: off + 4, sw: off + 4 }[pos] || 0;
+        const anchor = /w$/.test(pos) || pos === "w" ? "end" : pos === "n" || pos === "s" ? "middle" : "start";
+        haloText(pg.append("text").attr("x", dx).attr("y", dy).attr("dy", "0.35em").attr("text-anchor", anchor)
+          .attr("font-size", 7.5).attr("font-weight", 600).text(L.name), LAND, 3);
+      }
+    }
+    for (const L of all.filter((l) => l.type === "label")) {
+      const p = proj(L.at); if (!p) continue;
+      haloText(labelLayer.append("text").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null)
+        .attr("x", p[0]).attr("y", p[1]).attr("text-anchor", "middle").attr("font-size", L.size || 10)
+        .attr("font-weight", 700).attr("letter-spacing", 2).attr("fill", L.colour || INK).text(L.text), LAND, 3);
+    }
+    g.append("rect").attr("width", pw).attr("height", ph).attr("fill", "none").attr("stroke", INK).attr("stroke-width", 1.1);
+    svg.append("text").attr("x", x + pw / 2).attr("y", y + ph + 20).attr("text-anchor", "middle")
+      .attr("font-family", SERIF).attr("font-weight", 700).attr("font-size", 15).text(panel.caption || panel.date || "");
+  });
+  const items = P.legendItems(fig);
+  if (items.length && !(fig.legend && fig.legend.hidden)) {
+    const y = gap + rows * (ph + 36) - 4;
+    const box = drawLegend(svg, defs, items, Object.assign({ x: gap, y }, fig.legend || {}), w, h, { land: LAND, sea: SEA });
+    const contentH = Math.min(h, Math.ceil(y + (box && box.height || 0) + 8));
+    svg.attr("viewBox", `0 0 ${w} ${contentH}`).attr("height", contentH);
+  }
+  return svg.node();
+}
 
   // ---- one figure
   function drawFigure(container, fig, fi, w, h) {
+    if (fig.kind === "diagram") return drawDiagramFigure(container, fig, fi, w, h);
+    if (fig.kind === "small-multiples") return drawSmallMultiplesFigure(container, fig, fi, w, h);
     const svg = d3.select(container).append("svg")
       .attr("xmlns", "http://www.w3.org/2000/svg").attr("viewBox", `0 0 ${w} ${h}`).attr("width", w).attr("height", h)
       .attr("class", "fig").attr("data-fig", fi).attr("font-family", SANS);
@@ -211,6 +356,9 @@
         if (sr > (base.riverRank || 6)) continue;
         L_WATER.append("path").attr("d", geo(f)).attr("fill", "none").attr("stroke", RIVER).attr("stroke-width", Math.max(0.5, 1.6 - sr * 0.18)).attr("stroke-linecap", "round");
       }
+
+
+
     }
 
     const layerG = (parent, L) => parent.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null);
@@ -439,9 +587,11 @@
     const bb = rows.node().getBBox();
     const bw = bb.width + pad * 2, bh = perCol * rowH + pad * 2;
     const pos = cfg.position || "bottom-left";
-    const x = /right/.test(pos) ? w - bw - 6 : 6, y = /top/.test(pos) ? 6 : h - bh - 6;
+    const x = cfg.x != null ? cfg.x : /right/.test(pos) ? w - bw - 6 : 6;
+    const y = cfg.y != null ? cfg.y : /top/.test(pos) ? 6 : h - bh - 6;
     g.attr("transform", `translate(${x},${y})`);
     g.insert("rect", "g").attr("width", bw).attr("height", bh).attr("fill", PAPER).attr("fill-opacity", 0.88).attr("stroke", cfg.boxed ? INK : "none").attr("stroke-width", 0.6);
+    return { width: bw, height: bh };
   }
 
   function swatch(g, defs, L, sw) {

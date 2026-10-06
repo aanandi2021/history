@@ -169,7 +169,8 @@ Sea `#b9dff5`, land `#f3ebcb`–`#f7f7fb`, desert `#efd96d`, cultivation `#72ad4
 | Origin halos on points (colony by founder) | done (round 2) |
 | Relief / environment tints | **not yet**: needs a hillshade or land-cover layer. Round 2 used terrain only faintly, so this stays low priority |
 | Coastlines finer than 1:50m for insets under about 2° | **not yet**: add Natural Earth 1:10m |
-| Charts, org charts, family trees, pies (later volumes; see the Austria-Hungary plate) | **not yet** |
+| Institution diagrams: compartments, nodes and labelled arrows inside an atlas frame | done for constitution-style "government machine" plates |
+| Charts, family trees, pies (later volumes; see the Austria-Hungary plate) | **not yet** |
 | Collision checks against arrow bodies (not just text) | **not yet**: do it by eye |
 
 ## 12. Round 2: the next ten spreads (PDF pp. 34–53)
@@ -269,8 +270,12 @@ sea; constitutional diagrams in the same frames as maps; city dots classed by fo
   between the Russia and WW2 periods. The key shows pattern beside colour (solid held, stripes newly won, pale
   influence) and folds away.
 
-Not yet: small multiples (the Diadochi triptych), coalition envelopes as their own layer type, and diagram
-plates for institutions.
+Not yet: coalition envelopes as their own layer type and genealogy diagrams.
+
+Side-branch follow-up: atlas figures can now use `kind: "small-multiples"` with one shared projection and a
+list of dated `panels`. Each panel gets the same frame and base map, so changes in territory read as changes in
+history rather than changes in camera position. The first example is `rome-growth-small-multiples`, four
+Mediterranean panels for 264 BC, 133 BC, 44 BC and AD 117.
 
 ## 15. Round 4: Rome (PDF pp. 74–93)
 
@@ -283,7 +288,7 @@ What the viewer took from it (v0.5.0):
 - **`front`.** A line with teeth on the side being pressed (`side: "l"` or `"r"` of the direction drawn). First examples: the Eastern Front in Dec 1941 and Nov 1942, each live only in its own months, and the siege line around Leningrad.
 - **`ally` symbol.** A hollow ring for allied or free cities.
 
-Not built yet: small multiples (the same extent at several dates side by side), coalition and settlement hatches by recipient, and institution diagrams. Institution diagrams belong with the atlas figures, not on the geographic map. A Rome period needs BC dates first, because the model only reads four-digit AD years.
+Not built yet: coalition and settlement hatches by recipient. A Rome period needs BC dates first, because the model only reads four-digit AD years.
 
 §15 plate follow-up: the first Rome-style standalone plates using this grammar are `rome-italy`, `hannibal` and
 `caesar`. `rome-italy` uses four same-extent Italian panels with dated citizen/allied tiers, colony points,
@@ -305,8 +310,8 @@ New moves:
   structure: imperial/senatorial provinces, prefectures, dioceses and client zones. The colour is not a people;
   it is an office or jurisdiction.
 - **Constitution diagrams.** The Principate and Diocletian/Constantine figures use atlas frames for abstract
-  power diagrams: fields, compartments, node shapes and arrows labelled with verbs. We did not build a renderer
-  for these yet; they remain a documented figure kind.
+  power diagrams: fields, compartments, node shapes and arrows labelled with verbs. The renderer now supports
+  that grammar through `kind: "diagram"`; the first built example is `roman-republic-constitution`.
 - **Genealogy diagrams.** The Julian-Claudian tree treats marriages, dynastic lines and ruler marks as political
   geography. Also not yet implemented as a plate primitive.
 - **Fort lattices.** The Limes figure makes the frontier from many coloured fort points by reign, with walls and

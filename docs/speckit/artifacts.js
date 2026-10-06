@@ -192,10 +192,58 @@ window.ARTIFACTS = {
    "stat": "1 file changed, 1 insertion(+), 1 deletion(-)"
   },
   {
+   "hash": "961b14a",
+   "date": "2026-10-06",
+   "subject": "Clip Roman atlas areas to land",
+   "stat": "6 files changed, 19 insertions(+), 13 deletions(-)"
+  },
+  {
+   "hash": "625c21e",
+   "date": "2026-10-06",
+   "subject": "Add Mongols to Mughals board",
+   "stat": "4 files changed, 91 insertions(+)"
+  },
+  {
    "hash": "be498d0",
    "date": "2026-10-06",
    "subject": "Atlas round 6: open the medieval period",
    "stat": "22 files changed, 461 insertions(+), 10 deletions(-)"
+  },
+  {
+   "hash": "a8c51e3",
+   "date": "2026-10-06",
+   "subject": "Add Golden Road aha links",
+   "stat": "10 files changed, 111 insertions(+), 11 deletions(-)"
+  },
+  {
+   "hash": "abc1afc",
+   "date": "2026-10-06",
+   "subject": "Merge side: land clipping, Mongols to Mughals board, Golden Road aha links",
+   "stat": ""
+  },
+  {
+   "hash": "a14e43d",
+   "date": "2026-10-06",
+   "subject": "Round 6 plate fixes",
+   "stat": "6 files changed, 52 insertions(+), 43 deletions(-)"
+  },
+  {
+   "hash": "86c648d",
+   "date": "2026-10-06",
+   "subject": "Atlas round 7: Abbasids and crusades",
+   "stat": "14 files changed, 317 insertions(+), 12 deletions(-)"
+  },
+  {
+   "hash": "a81084b",
+   "date": "2026-10-06",
+   "subject": "Round 6–7 plate fixes",
+   "stat": "11 files changed, 48 insertions(+), 34 deletions(-)"
+  },
+  {
+   "hash": "e81fbf4",
+   "date": "2026-10-06",
+   "subject": "Atlas round 8: France, England and eastern kingdoms",
+   "stat": "12 files changed, 253 insertions(+), 7 deletions(-)"
   }
  ]
 };

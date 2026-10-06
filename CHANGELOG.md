@@ -21,6 +21,8 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 - Atlas figures can now turn the basemap off for diagrammatic city plans while keeping the same legend, label and cross-reference system.
 - Atlas round 8 (PDF pp. 154–173): added Capetian France, Norman/Angevin England, Hohenstaufen Germany, Reconquista context, and the Poland-Hungary-Rus frontier at the Mongol arrival.
 - Three new plates: Capetian France, England and the Angevin empire, and Poland/Hungary/Rus under the Mongol shock.
+- Added institution diagrams to the atlas renderer and a Roman Republic constitution plate, linked from the end-of-the-Republic chapter.
+- Added small-multiple atlas figures and a four-panel Rome growth plate from 264 BC to AD 117.
 
 ## 0.6.0 (5 Oct 2026)
 
