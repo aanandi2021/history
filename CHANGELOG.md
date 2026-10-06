@@ -7,6 +7,10 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
+## 0.8.0 (Unreleased / 0.8.0-dev)
+
+- Atlas round 12 (PDF pp. 234–253): in progress.
+
 ## 0.7.0 (6 Oct 2026)
 
 - Atlas round 6 (PDF pp. 114–133): opened the medieval period with successor kingdoms, Justinian's reconquest, early Islam, Franks/Carolingians, Normans/Vikings and Kievan Rus roots.
