@@ -218,9 +218,82 @@ function drawDiagramFigure(container, fig, fi, w, h) {
   return svg.node();
 }
 
+function drawSmallMultiplesFigure(container, fig, fi, w, h) {
+  const svg = d3.select(container).append("svg")
+    .attr("xmlns", "http://www.w3.org/2000/svg").attr("viewBox", `0 0 ${w} ${h}`).attr("width", w).attr("height", h)
+    .attr("class", "fig").attr("data-fig", fi).attr("font-family", SANS);
+  const defs = svg.append("defs");
+  const panels = fig.panels || [];
+  const gap = 10, cols = fig.columns || panels.length, rows = Math.ceil(panels.length / cols);
+  const pw = (w - gap * (cols + 1)) / cols;
+  const legendReserve = fig.legend && fig.legend.hidden ? 16 : 126;
+  const ph = Math.min((h - legendReserve - gap * (rows + 1) - 26 * rows) / rows, fig.panelHeight || pw * (fig.panelAspect || 1.18));
+  panels.forEach((panel, i) => {
+    const x = gap + (i % cols) * (pw + gap), y = gap + Math.floor(i / cols) * (ph + 36);
+    const g = svg.append("g").attr("transform", `translate(${x},${y})`);
+    const proj = projectionFor(fig, pw, ph);
+    const geo = d3.geoPath(proj);
+    const clipId = `sm-frame-${fi}-${i}`, landClip = `sm-land-${fi}-${i}`;
+    defs.append("clipPath").attr("id", clipId).append("rect").attr("width", pw).attr("height", ph);
+    defs.append("clipPath").attr("id", landClip).append("path").attr("d", geo(LANDF));
+    const root = g.append("g").attr("clip-path", `url(#${clipId})`);
+    root.append("rect").attr("width", pw).attr("height", ph).attr("fill", SEA);
+    root.append("path").attr("d", geo(LANDF)).attr("fill", LAND).attr("stroke", "#7fa9c4").attr("stroke-width", 0.5);
+    root.append("path").attr("d", geo(LAKES)).attr("fill", SEA).attr("stroke", "#7fa9c4").attr("stroke-width", 0.35);
+    for (const f of RIVERS.features) if ((f.properties.scalerank || 6) <= 4) root.append("path").attr("d", geo(f)).attr("fill", "none").attr("stroke", RIVER).attr("stroke-width", 0.45);
+    const areaLayer = root.append("g").attr("class", "areas");
+    const lineLayer = root.append("g").attr("class", "lines");
+    const pointLayer = root.append("g").attr("class", "points");
+    const labelLayer = root.append("g").attr("class", "labels");
+    const all = [...(fig.layers || []), ...(panel.layers || [])];
+    for (const L0 of all.filter((l) => l.type === "area")) {
+      const L = areaLook(L0), d = zonePath(L, proj);
+      if (!d) continue;
+      const lg = areaLayer.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null);
+      if (L.clipToLand || (L.clip !== "none" && L.clip !== false)) lg.attr("clip-path", `url(#${landClip})`);
+      const fill = areaFill(defs, L);
+      lg.append("path").attr("d", d).attr("fill", fill.fill).attr("fill-opacity", fill.op)
+        .attr("stroke", L.edge === false || L.clipToLand ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", 0.7)
+        .attr("stroke-dasharray", L.edge === "dashed" ? "5 3" : null);
+    }
+    for (const L of all.filter((l) => l.type === "boundary")) {
+      const d = d3.line().curve(d3.curveCatmullRom.alpha(0.5))(L.path.map(proj));
+      lineLayer.append("path").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null)
+        .attr("d", d).attr("fill", "none").attr("stroke", L.colour || INK).attr("stroke-width", L.width || 1.2)
+        .attr("stroke-dasharray", L.style === "solid" ? null : "5 3");
+    }
+    for (const L of all.filter((l) => l.type === "point")) {
+      const p = proj(L.at); if (!p) continue;
+      const pg = pointLayer.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null).attr("transform", `translate(${p[0]},${p[1]})`);
+      drawSymbol(pg, L.symbol || "city", 8, L.colour || INK);
+      if (L.name) {
+        const pos = L.labelPos || "e", off = 5;
+        const dx = { e: off, w: -off, n: 0, s: 0, ne: off, nw: -off, se: off, sw: -off }[pos] || off;
+        const dy = { e: 0, w: 0, n: -off - 2, s: off + 6, ne: -off, nw: -off, se: off + 4, sw: off + 4 }[pos] || 0;
+        const anchor = /w$/.test(pos) || pos === "w" ? "end" : pos === "n" || pos === "s" ? "middle" : "start";
+        haloText(pg.append("text").attr("x", dx).attr("y", dy).attr("dy", "0.35em").attr("text-anchor", anchor)
+          .attr("font-size", 7.5).attr("font-weight", 600).text(L.name), LAND, 3);
+      }
+    }
+    for (const L of all.filter((l) => l.type === "label")) {
+      const p = proj(L.at); if (!p) continue;
+      haloText(labelLayer.append("text").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null)
+        .attr("x", p[0]).attr("y", p[1]).attr("text-anchor", "middle").attr("font-size", L.size || 10)
+        .attr("font-weight", 700).attr("letter-spacing", 2).attr("fill", L.colour || INK).text(L.text), LAND, 3);
+    }
+    g.append("rect").attr("width", pw).attr("height", ph).attr("fill", "none").attr("stroke", INK).attr("stroke-width", 1.1);
+    svg.append("text").attr("x", x + pw / 2).attr("y", y + ph + 20).attr("text-anchor", "middle")
+      .attr("font-family", SERIF).attr("font-weight", 700).attr("font-size", 15).text(panel.caption || panel.date || "");
+  });
+  const items = P.legendItems(fig);
+  if (items.length && !(fig.legend && fig.legend.hidden)) drawLegend(svg, defs, items, fig.legend || { position: "bottom-left" }, w, h, { land: LAND, sea: SEA });
+  return svg.node();
+}
+
   // ---- one figure
   function drawFigure(container, fig, fi, w, h) {
     if (fig.kind === "diagram") return drawDiagramFigure(container, fig, fi, w, h);
+    if (fig.kind === "small-multiples") return drawSmallMultiplesFigure(container, fig, fi, w, h);
     const svg = d3.select(container).append("svg")
       .attr("xmlns", "http://www.w3.org/2000/svg").attr("viewBox", `0 0 ${w} ${h}`).attr("width", w).attr("height", h)
       .attr("class", "fig").attr("data-fig", fi).attr("font-family", SANS);
@@ -252,6 +325,8 @@ function drawDiagramFigure(container, fig, fi, w, h) {
         if (sr > (base.riverRank || 6)) continue;
         L_WATER.append("path").attr("d", geo(f)).attr("fill", "none").attr("stroke", RIVER).attr("stroke-width", Math.max(0.5, 1.6 - sr * 0.18)).attr("stroke-linecap", "round");
       }
+
+
 
     }
 

@@ -13,6 +13,7 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 - Added a second cause-and-effect board, "From Mongols to Mughals", connecting Genghis Khan, the khanates, Timur, Babur, Panipat, Mughal India, Russia and maritime Asia.
 - Added Golden Road aha links: datasets can tag events or chapters with a registered book/heading, and viewer cards open Ford's canonical Obsidian note without copying note text into the repo.
 - Added institution diagrams to the atlas renderer and a Roman Republic constitution plate, linked from the end-of-the-Republic chapter.
+- Added small-multiple atlas figures and a four-panel Rome growth plate from 264 BC to AD 117.
 
 ## 0.6.0 (5 Oct 2026)
 
