@@ -9,6 +9,7 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 
 ## 0.9.0 (Unreleased / 0.9.0-dev)
 
+- Added Natural Earth Europe region building blocks for atlas area layers, with `regions` / `minus` support and rebuilt round 13 plates from administrative shapes.
 - Atlas round 13 (PDF pp. 254–273): opened the **Age of Reason** / early-modern period (1600–1789) with Canada-first context for Acadia, Quebec, Montreal, Hudson Bay and Utrecht.
 - Added four plates for the Thirty Years' War and Westphalia, Louis XIV and French absolutism, Austria's Ottoman-Danube frontier, and Sweden/Russia in the Baltic.
 - Added early-modern scenes and tests covering Westphalia, Versailles, Karlowitz/Passarowitz, Stuart Britain, Utrecht, Poltava and Nystad.

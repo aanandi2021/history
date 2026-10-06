@@ -13,22 +13,22 @@
   const brandenburgGains=[[9.2,51.7],[10.5,52.7],[12.0,53.3],[13.0,52.6],[12.0,51.6],[10.4,51.2]], upperPal=[[10.3,48.6],[11.0,49.5],[12.3,49.4],[12.8,48.6],[11.8,48.1]];
   window.PLATES["thirty-years-war-westphalia-1618-1648"] = { id:"thirty-years-war-westphalia-1618-1648", title:"The Thirty Years' War and Westphalia", head:"Age of Reason / German war and settlement", folio:"35", viewer:"early-modern/1618/ch-thirty-years-war-westphalia", figures:[
     {caption:"Bohemian, Danish, Swedish and Franco-Swedish phases, 1618-1648", share:0.58, extent:[[2.0,46.0],[20.5,55.0]], projection:"conic", layers:[
-      {id:"imperial-catholic",type:"area",clipToLand:true,tier:"core",colour:HAB,legend:"Imperial and Catholic League base",polygon:imperialSouth,smooth:false},
-      {id:"bohemian-revolt",type:"area",clipToLand:true,pattern:"hatch",colour:SAX,legend:"Bohemian revolt and war zone",polygon:bohemiaMoravia,smooth:false},
-      {id:"swedish-allied",type:"area",clipToLand:true,tier:"influence",colour:SWE,legend:"Swedish allies and quarters after 1631",polygon:swedishField,smooth:false},
-      {id:"league-heilbronn",type:"area",clipToLand:true,pattern:"hatch",colour:SWE,legend:"League of Heilbronn / south-western allies",polygon:heilbronn,smooth:false},
-      {id:"france-entry",type:"area",clipToLand:true,tier:"influence",colour:FRA,legend:"French entry against Habsburgs",polygon:france1635,smooth:false},
+      {id:"imperial-catholic",type:"area",tier:"core",colour:HAB,legend:"Imperial and Catholic League base",regions:["AUT","CZE","DE-BY"]},
+      {id:"bohemian-revolt",type:"area",pattern:"hatch",colour:SAX,legend:"Bohemian revolt and war zone",regions:["CZE"]},
+      {id:"swedish-allied",type:"area",tier:"influence",colour:SWE,legend:"Swedish allies and quarters after 1631",regions:["DE-NI","DE-ST","DE-BB","DE-MV","DE-SN","DE-TH"]},
+      {id:"league-heilbronn",type:"area",pattern:"hatch",colour:SWE,legend:"League of Heilbronn / south-western allies",regions:["DE-BW","DE-HE","DE-RP"]},
+      {id:"france-entry",type:"area",tier:"influence",colour:FRA,legend:"French entry against Habsburgs",regions:["FRA"]},
       {id:"gustavus-route",type:"route",style:"road",weight:2.5,colour:SWE,legend:"Gustavus Adolphus campaign",path:[USE,MAG,BREIT,MAINZ,RAI,LUT]},
       {id:"wallenstein-route",type:"route",style:"dashed",weight:2.2,colour:WAR,legend:"Imperial counterstroke",path:[VIEN,PRG,EGER,LUT]},
       {id:"french-swedish-route",type:"route",style:"dashed",weight:2.4,colour:FRA,legend:"Franco-Swedish pressure",path:[[2.35,48.86],STR,BREIS,NORD,JANK]},
       {id:"prague",type:"point",symbol:"insurrection",at:PRG,name:"Prague",labelPos:"ne",tag:{text:"1618",colour:"#e8806a"}}, {id:"white-mountain",type:"point",symbol:"battle",at:WM,name:"White Mt.",labelPos:"s",tag:{text:"1620",colour:"#e8806a"}}, {id:"magdeburg",type:"point",symbol:"destroyed",at:MAG,name:"Magdeburg",labelPos:"w",tag:{text:"1631",colour:"#e8806a"}}, {id:"breitenfeld",type:"point",symbol:"battle",at:BREIT,name:"Breitenfeld",labelPos:"e",tag:{text:"1631",colour:"#f1c75b"}}, {id:"lutzen",type:"point",symbol:"battle",at:LUT,name:"Lutzen",labelPos:"sw",tag:{text:"1632",colour:"#f1c75b"}}, {id:"nordlingen",type:"point",symbol:"battle",at:NORD,name:"Nordlingen",labelPos:"s",tag:{text:"1634",colour:"#e8806a"}}, {id:"breisach",type:"point",symbol:"fortress",at:BREIS,name:"Breisach",labelPos:"w",tag:{text:"1638",colour:"#f1c75b"}}
     ], legend:{x:8,y:8,columns:1}},
     {caption:"The Peace of Westphalia and the Empire's losses, 1648", share:0.42, extent:[[1.5,46.8],[19.5,55.0]], projection:"conic", layers:[
-      {id:"france-alsace",type:"area",clipToLand:true,tier:"core",colour:FRA,legend:"France: Alsace, Metz-Toul-Verdun sphere",polygon:frenchAlsace,smooth:false},
-      {id:"swedish-pomerania",type:"area",clipToLand:true,tier:"core",colour:SWE,legend:"Sweden: Hither Pomerania and Stettin",polygon:swedishPomerania,smooth:false},
-      {id:"swedish-bremen-verden",type:"area",clipToLand:true,tier:"core",colour:SWE,legend:"Sweden: Bremen and Verden",polygon:bremenVerden,smooth:false},
-      {id:"brandenburg-gains",type:"area",clipToLand:true,tier:"core",colour:BRAN,legend:"Brandenburg: east-west gains",polygon:brandenburgGains,smooth:false},
-      {id:"bavaria-upper-palatinate",type:"area",clipToLand:true,tier:"core",colour:BAV,legend:"Bavaria keeps Upper Palatinate",polygon:upperPal,smooth:false},
+      {id:"france-alsace",type:"area",tier:"core",colour:FRA,legend:"France: Alsace, Metz-Toul-Verdun sphere",regions:["FR-67","FR-68","FR-57","FR-54","FR-55"]},
+      {id:"swedish-pomerania",type:"area",tier:"core",colour:SWE,legend:"Sweden: Hither Pomerania and Stettin",regions:["DE-MV"]},
+      {id:"swedish-bremen-verden",type:"area",tier:"core",colour:SWE,legend:"Sweden: Bremen and Verden",regions:["DE-HB","DE-NI"]},
+      {id:"brandenburg-gains",type:"area",tier:"core",colour:BRAN,legend:"Brandenburg: east-west gains",regions:["DE-BB","DE-ST"]},
+      {id:"bavaria-upper-palatinate",type:"area",tier:"core",colour:BAV,legend:"Bavaria keeps Upper Palatinate",regions:["DE-BY"]},
       {id:"westphalia-talks",type:"route",style:"dotted",weight:2,colour:WAR,legend:"Muenster and Osnabrueck congress",path:[MUN,OSN]},
       {id:"rhine-frontier",type:"boundary",style:"dashdot",colour:FRA,width:2,legend:"French Rhine bridgeheads",path:[[6.1,49.0],[6.5,48.6],STR,BREIS]},
       {id:"munster",type:"point",symbol:"treaty",at:MUN,name:"Munster",labelPos:"w",tag:{text:"1648",colour:"#f1c75b"}}, {id:"osnabruck",type:"point",symbol:"treaty",at:OSN,name:"Osnabruck",labelPos:"ne",tag:{text:"1648",colour:"#f1c75b"}}, {id:"stettin",type:"point",symbol:"port",at:[14.55,53.43],name:"Stettin",labelPos:"e"}, {id:"bremen",type:"point",symbol:"port",at:[8.80,53.08],name:"Bremen",labelPos:"nw"}, {id:"halberstadt",type:"point",symbol:"bishopric",at:[11.05,51.90],name:"Halberstadt",labelPos:"s"}, {id:"regensburg",type:"point",symbol:"conference",at:REGEN,name:"Regensburg",labelPos:"e",tag:{text:"1663",colour:"#f1c75b"}}

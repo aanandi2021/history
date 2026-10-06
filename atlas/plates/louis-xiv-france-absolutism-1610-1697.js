@@ -10,25 +10,25 @@
   const luxClaim=[[5.6,49.3],[5.9,50.0],[6.5,50.2],[6.7,49.6],[6.3,49.2]];
   window.PLATES["louis-xiv-france-absolutism-1610-1697"] = { id:"louis-xiv-france-absolutism-1610-1697", title:"Louis XIV, absolutism and France's eastern frontier", head:"Age of Reason / France", folio:"36", viewer:"early-modern/1661/ch-louis-xiv-france", figures:[
     {caption:"The advance of France in the east, 1648-1697", share:0.62, extent:[[-5.5,41.5],[9.2,52.6]], projection:"conic", layers:[
-      {id:"france-core",type:"area",clipToLand:true,tier:"core",colour:FRA,legend:"France under Bourbon rule",polygon:franceCore,smooth:false},
-      {id:"roussillon",type:"area",clipToLand:true,tier:"core",colour:GAIN,legend:"Roussillon, Artois and Franche-Comte",polygon:roussillon,smooth:false}, {id:"artois-flanders",type:"area",clipToLand:true,tier:"core",colour:GAIN,polygon:artoisFlanders,smooth:false}, {id:"franche-comte-gain",type:"area",clipToLand:true,tier:"core",colour:GAIN,polygon:francheComte,smooth:false},
-      {id:"alsace-reunions",type:"area",clipToLand:true,pattern:"hatch",colour:GAIN,legend:"Alsace and Reunion pressure",polygon:alsaceLorraine,smooth:false},
-      {id:"luxembourg-1684",type:"area",clipToLand:true,pattern:"hatch",colour:WAR,legend:"Luxembourg occupied 1684",polygon:luxClaim,smooth:false},
+      {id:"france-core",type:"area",tier:"core",colour:FRA,legend:"France under Bourbon rule c.1648",regions:["FRA"],minus:["FR-66","FR-59","FR-62","FR-25","FR-39","FR-90","FR-67","FR-68","FR-57","FR-54","FR-55"]},
+      {id:"roussillon",type:"area",tier:"core",colour:GAIN,legend:"Roussillon, Artois and Franche-Comte",regions:["FR-66"]}, {id:"artois-flanders",type:"area",tier:"core",colour:GAIN,regions:["FR-59","FR-62"]}, {id:"franche-comte-gain",type:"area",tier:"core",colour:GAIN,regions:["FR-25","FR-39","FR-90"]},
+      {id:"alsace-reunions",type:"area",pattern:"hatch",colour:GAIN,legend:"Alsace and Reunion pressure",regions:["FR-67","FR-68","FR-57","FR-54","FR-55"]},
+      {id:"luxembourg-1684",type:"area",pattern:"hatch",colour:WAR,legend:"Luxembourg occupied 1684",regions:["LUX","BE-WLX"]},
       {id:"holland-war",type:"route",style:"dashed",weight:2.4,colour:WAR,legend:"War against Holland",path:[PAR,[3.6,50.0],BRU,NYM,AM],label:"1672-78"},
       {id:"palatinate-war",type:"route",style:"dashed",weight:2.2,colour:WAR,legend:"War of the League of Augsburg",path:[PAR,METZ,STR,WOR,HEID]},
       {id:"vauban-line",type:"boundary",style:"dashdot",colour:ADM,width:2.2,legend:"Vauban fortress belt",path:[[2.9,50.6],[4.0,50.4],LUX,METZ,STR,BES,ROUS]},
       {id:"paris",type:"point",symbol:"capital",at:PAR,name:"Paris"}, {id:"versailles",type:"point",symbol:"castle",at:VER,name:"Versailles",labelPos:"sw",tag:{text:"court",colour:"#f1c75b"}}, {id:"la-rochelle",type:"point",symbol:"siege",at:ROC,name:"La Rochelle",labelPos:"w",tag:{text:"1628",colour:"#e8806a"}}, {id:"aix",type:"point",symbol:"treaty",at:AIX,name:"Aix-la-Chapelle",labelPos:"e",tag:{text:"1668",colour:"#f1c75b"}}, {id:"nijmegen",type:"point",symbol:"treaty",at:NYM,name:"Nijmegen",labelPos:"ne",tag:{text:"1678",colour:"#f1c75b"}}, {id:"strasbourg",type:"point",symbol:"fortress",at:STR,name:"Strasbourg",labelPos:"e",tag:{text:"1681",colour:"#e8806a"}}, {id:"luxembourg",type:"point",symbol:"fortress",at:LUX,name:"Luxembourg",labelPos:"w",tag:{text:"1684",colour:"#e8806a"}}, {id:"rijswijk",type:"point",symbol:"treaty",at:[4.33,52.04],name:"Rijswijk",labelPos:"nw",tag:{text:"1697",colour:"#f1c75b"}}
     ], legend:{x:8,y:8,columns:1}},
-    {kind:"diagram",caption:"The absolutist machine: court, army, finance and faith", share:0.38, diagram:{height:0.44, compartments:[
-      {id:"state-frame",label:"One king, one faith, one law",x:0.05,y:0.06,w:0.90,h:0.36,colour:FRA,fill:"#f3e4be"},
-      {id:"economy-frame",label:"Mercantilist state economy",x:0.05,y:0.52,w:0.90,h:0.34,colour:ADM,fill:"#dce8cf"}
+    {kind:"diagram",caption:"The absolutist machine: court, army, finance and faith", share:0.38, diagram:{height:0.50, compartments:[
+      {id:"state-frame",label:"One king, one faith, one law",x:0.05,y:0.05,w:0.90,h:0.43,colour:FRA,fill:"#f3e4be"},
+      {id:"economy-frame",label:"Mercantilist state economy",x:0.05,y:0.55,w:0.90,h:0.38,colour:ADM,fill:"#dce8cf"}
     ], nodes:[
-      {id:"king",label:"Louis XIV\n1661-1715",x:0.50,y:0.22,w:0.22,h:0.12,colour:FRA,strong:true},
-      {id:"council",label:"Council\nand ministers",x:0.25,y:0.22,w:0.22,h:0.10,colour:FRA},
-      {id:"intendants",label:"Intendants\nprovinces",x:0.75,y:0.22,w:0.22,h:0.10,colour:FRA},
-      {id:"army",label:"Louvois\nstanding army",x:0.25,y:0.68,w:0.22,h:0.10,colour:WAR},
-      {id:"colbert",label:"Colbert\nfinance",x:0.50,y:0.68,w:0.22,h:0.10,colour:ADM,strong:true},
-      {id:"revocation",label:"Nantes revoked\n1685",x:0.75,y:0.68,w:0.22,h:0.10,colour:WAR}
+      {id:"king",label:"Louis XIV\n1661-1715",x:0.50,y:0.18,w:0.24,h:0.14,colour:FRA,strong:true},
+      {id:"council",label:"Council\nand ministers",x:0.25,y:0.35,w:0.24,h:0.13,colour:FRA},
+      {id:"intendants",label:"Intendants\nprovinces",x:0.75,y:0.35,w:0.24,h:0.13,colour:FRA},
+      {id:"army",label:"Louvois\nstanding army",x:0.25,y:0.75,w:0.24,h:0.13,colour:WAR},
+      {id:"colbert",label:"Colbert\nfinance",x:0.50,y:0.75,w:0.24,h:0.13,colour:ADM,strong:true},
+      {id:"revocation",label:"Nantes revoked\n1685",x:0.75,y:0.75,w:0.24,h:0.13,colour:WAR}
     ], arrows:[
       {id:"king-council",from:"king",to:"council",label:"decrees",colour:FRA}, {id:"king-intendants",from:"king",to:"intendants",label:"appoints",colour:FRA}, {id:"council-colbert",from:"council",to:"colbert",label:"budget",colour:ADM}, {id:"colbert-army",from:"colbert",to:"army",label:"taxes",colour:WAR}, {id:"intendants-revocation",from:"intendants",to:"revocation",label:"enforce",colour:WAR}, {id:"colbert-revocation",from:"colbert",to:"revocation",label:"cost",colour:WAR}
     ]}}

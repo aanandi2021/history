@@ -12,21 +12,21 @@
   const siberiaRoute=[MOS,[48,56],[60,57],[72,58],[84,58],[96,58],[110,56],[124,54],[136,52],[143,50]];
   window.PLATES["baltic-russia-sweden-1632-1721"] = { id:"baltic-russia-sweden-1632-1721", title:"Sweden, Russia and the Baltic, 1632-1721", head:"Age of Reason / Northern Europe", folio:"38", viewer:"early-modern/1700/ch-baltic-russia-sweden", figures:[
     {caption:"Sweden's Baltic empire after Westphalia and Roskilde, 1648-1660", share:0.50, extent:[[5,48],[34,66]], projection:"conic", layers:[
-      {id:"sweden-core",type:"area",clipToLand:true,tier:"core",colour:SWE,legend:"Sweden and Finland",polygon:swedenCore,smooth:false},
-      {id:"swedish-baltic",type:"area",clipToLand:true,tier:"core",colour:SWE,legend:"Swedish Baltic provinces",polygon:swedishBaltic,smooth:false},
-      {id:"swedish-pomerania",type:"area",clipToLand:true,tier:"core",colour:SWE,legend:"Swedish Pomerania",polygon:pomerania,smooth:false},
-      {id:"denmark-norway",type:"area",clipToLand:true,tier:"influence",colour:DEN,legend:"Denmark-Norway after Roskilde",polygon:denmarkNorway,smooth:false},
-      {id:"poland-lithuania",type:"area",clipToLand:true,tier:"influence",colour:POL,legend:"Poland-Lithuania",polygon:polandLith,smooth:false},
-      {id:"brandenburg-prussia",type:"area",clipToLand:true,pattern:"hatch",colour:BRAN,legend:"Brandenburg-Prussia corridor",polygon:[[6.5,50.5],[8.5,52.8],[12.0,53.5],[14.0,52.5],[12.0,51.4],[9.0,50.8]],smooth:false},
+      {id:"sweden-core",type:"area",tier:"core",colour:SWE,legend:"Sweden and Finland",regions:["SWE","FIN"]},
+      {id:"swedish-baltic",type:"area",tier:"core",colour:SWE,legend:"Swedish Baltic provinces",regions:["EST","LV-RIX","LV-054","LV-101","LV-007","LV-009","LV-094","LV-017","LV-019","LV-045","LV-076","LV-075","LV-070","LV-048","LV-059","LV-033","LV-039"]},
+      {id:"swedish-pomerania",type:"area",tier:"core",colour:SWE,legend:"Swedish Pomerania",regions:["DE-MV"]},
+      {id:"denmark-norway",type:"area",tier:"influence",colour:DEN,legend:"Denmark-Norway after Roskilde",regions:["DNK","NOR"]},
+      {id:"poland-lithuania",type:"area",tier:"influence",colour:POL,legend:"Poland-Lithuania",regions:["POL","LTU","BLR","UA-07","UA-56","UA-18","UA-32","UA-46","UA-61","UA-68","UA-05","UA-71","UA-53","UA-74","UA-59","UA-30"]},
+      {id:"brandenburg-prussia",type:"area",pattern:"hatch",colour:BRAN,legend:"Brandenburg-Prussia corridor",regions:["DE-BB","DE-BE","DE-ST","DE-MV","DE-NI","PL-WN"]},
       {id:"swedish-polish-war",type:"route",style:"road",weight:2.6,colour:WAR,legend:"Charles X Gustav's Polish war",path:[STOCK,RIGA,WARSAW,CRAC]},
       {id:"roskilde-front",type:"boundary",style:"partition",colour:DEN,width:2,legend:"Roskilde border, 1658",path:[[12.0,55.3],[13.0,56.0],[14.0,56.2]]},
       {id:"stockholm",type:"point",symbol:"capital",at:STOCK,name:"Stockholm"}, {id:"copenhagen",type:"point",symbol:"capital",at:COP,name:"Copenhagen",labelPos:"w",tag:{text:"Roskilde 1658",colour:"#f1c75b"}}, {id:"riga",type:"point",symbol:"port",at:RIGA,name:"Riga"}, {id:"reval",type:"point",symbol:"port",at:REV,name:"Reval",labelPos:"ne"}, {id:"warsaw",type:"point",symbol:"battle",at:WARSAW,name:"Warsaw",tag:{text:"1656",colour:"#f1c75b"}}, {id:"oliva",type:"point",symbol:"treaty",at:[18.64,54.41],name:"Oliva",tag:{text:"1660",colour:"#f1c75b"}}
     ], legend:{position:"bottom-left",columns:1}},
     {caption:"The Great Northern War and Russia's Baltic opening, 1700-1721", share:0.50, extent:[[18,46],[45,62]], projection:"conic", layers:[
-      {id:"swedish-empire-1700",type:"area",clipToLand:true,tier:"core",colour:SWE,legend:"Swedish empire before 1700",polygon:swedishBaltic,smooth:false},
-      {id:"russia-before",type:"area",clipToLand:true,tier:"influence",colour:RUS,legend:"Russia before Peter's Baltic gains",polygon:russianWest,smooth:false},
-      {id:"russian-baltic-gains",type:"area",clipToLand:true,tier:"core",colour:RUS,legend:"Russian Baltic gains by Nystad",polygon:russianGains,smooth:false},
-      {id:"poland-saxony",type:"area",clipToLand:true,tier:"influence",colour:POL,legend:"Saxony-Poland theatre",polygon:polandLith,smooth:false},
+      {id:"swedish-empire-1700",type:"area",tier:"core",colour:SWE,legend:"Swedish empire before 1700",regions:["EST","LV-RIX","LV-054","LV-101","LV-007","LV-009","LV-094","LV-017","LV-019","LV-045","LV-076","LV-075","LV-070","LV-048","LV-059","LV-033","LV-039","DE-MV"]},
+      {id:"russia-before",type:"area",tier:"influence",colour:RUS,legend:"Russia before Peter's Baltic gains",regions:["RUS"],minus:["RU-LEN","RU-SPE"]},
+      {id:"russian-baltic-gains",type:"area",tier:"core",colour:RUS,legend:"Russian Baltic gains by Nystad",regions:["EST","LV-RIX","LV-054","LV-101","LV-007","LV-009","LV-094","LV-017","LV-019","LV-045","LV-076","LV-075","LV-070","LV-048","LV-059","LV-033","LV-039","RU-LEN","RU-SPE"]},
+      {id:"poland-saxony",type:"area",tier:"influence",colour:POL,legend:"Saxony-Poland theatre",regions:["POL","LTU","BLR","UA-07","UA-56","UA-18","UA-32","UA-46","UA-61","UA-68","UA-05","UA-71","UA-53","UA-74","UA-59","UA-30","DE-SN"]},
       {id:"charles-campaign",type:"route",style:"road",weight:2.8,colour:WAR,legend:"Charles XII: Narva to Poltava",path:[NAR,[22.0,54.0],WARSAW,[23.0,51.0],KIEV,POLT,BENDER]},
       {id:"peter-counter",type:"route",style:"dashed",weight:2.5,colour:RUS,legend:"Peter I counterstroke",path:[MOS,NAR,PET,RIGA]},
       {id:"nystad-frontier",type:"boundary",style:"partition",colour:RUS,width:2,legend:"Treaty of Nystad: Baltic provinces to Russia",path:[[23.0,56.0],[25.0,58.0],NAR,[30.0,60.0]]},
