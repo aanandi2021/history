@@ -7,7 +7,7 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
-## 1.0.0 (Unreleased / 1.0.0-dev)
+## 1.0.0 (6 Oct 2026)
 
 - Atlas round 14 (PDF pp. 274-289): closes the atlas proper with Qing China, Mughal/Company India, Atlantic America and New France, the Seven Years' War, Prussia, the partitions of Poland and enlightened despotism.
 - Expanded Natural Earth region building blocks beyond Europe for North America, Atlantic America, India and China, while keeping dissolved admin-0/admin-1 arcs in one compact file.
