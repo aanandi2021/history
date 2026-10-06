@@ -168,7 +168,8 @@ Sea `#b9dff5`, land `#f3ebcb`–`#f7f7fb`, desert `#efd96d`, cultivation `#72ad4
 | Origin halos on points (colony by founder) | done (round 2) |
 | Relief / environment tints | **not yet**: needs a hillshade or land-cover layer. Round 2 used terrain only faintly, so this stays low priority |
 | Coastlines finer than 1:50m for insets under about 2° | **not yet**: add Natural Earth 1:10m |
-| Charts, org charts, family trees, pies (later volumes; see the Austria-Hungary plate) | **not yet** |
+| Institution diagrams: compartments, nodes and labelled arrows inside an atlas frame | done for constitution-style "government machine" plates |
+| Charts, family trees, pies (later volumes; see the Austria-Hungary plate) | **not yet** |
 | Collision checks against arrow bodies (not just text) | **not yet**: do it by eye |
 
 ## 12. Round 2: the next ten spreads (PDF pp. 34–53)

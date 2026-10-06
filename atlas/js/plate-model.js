@@ -49,6 +49,23 @@
     spec.figures.forEach((f, fi) => {
       const w = `figure ${fi + 1}`;
       if (!f.caption) bad(`${w}: caption is required (the atlas always captions under the frame)`);
+      if (f.kind === "diagram") {
+        const d = f.diagram || {};
+        for (const c of d.compartments || []) {
+          if (c.id) { if (ids.has(c.id)) bad(`duplicate layer id ${c.id}`); ids.add(c.id); }
+          if (!c.label) bad(`${w} compartment ${c.id || "?"}: needs a label`);
+        }
+        for (const n of d.nodes || []) {
+          if (!n.id) bad(`${w}: every diagram node needs an id`);
+          else { if (ids.has(n.id)) bad(`duplicate layer id ${n.id}`); ids.add(n.id); }
+          if (!n.label) bad(`${w} node ${n.id || "?"}: needs a label`);
+        }
+        for (const a of d.arrows || []) {
+          if (a.id) { if (ids.has(a.id)) bad(`duplicate layer id ${a.id}`); ids.add(a.id); }
+          if (!a.from || !a.to) bad(`${w} arrow ${a.id || "?"}: needs from and to`);
+        }
+        return;
+      }
       const e = f.extent;
       if (!e || !isLonLat(e[0]) || !isLonLat(e[1]) || e[0][0] >= e[1][0] || e[0][1] >= e[1][1]) bad(`${w}: extent must be [[west,south],[east,north]] and not cross 180°`);
       for (const L of f.layers || []) {
@@ -113,14 +130,23 @@
         byEntry[k] = en.refs || [];
         for (const r of en.refs || []) { if (!byLayer.has(r)) byLayer.set(r, []); byLayer.get(r).push(k); }
       }
+
     }
     return { byLayer, byEntry };
   }
 
+function namedThings(spec) {
+  const out = [];
+  for (const f of spec.figures || []) {
+    out.push(...(f.layers || []).filter((L) => L.id));
+    if (f.kind === "diagram" && f.diagram) out.push(...["compartments", "nodes", "arrows"].flatMap((k) => (f.diagram[k] || []).filter((x) => x.id)));
+  }
+  return out;
+}
   /** Share of drawn layers that the text mentions, and of text entries that point at the map. */
   function coverage(spec) {
     const { byLayer, byEntry } = crossRefs(spec);
-    const named = spec.figures.flatMap((f) => (f.layers || []).filter((L) => L.id));
+    const named = namedThings(spec);
     const entries = byEntry.length;
     return {
       layersExplained: named.length ? named.filter((L) => byLayer.has(L.id)).length / named.length : 1,

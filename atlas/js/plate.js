@@ -165,9 +165,62 @@
   }
 
   const haloText = (sel, colour = LAND, w = 2.6) => sel.attr("stroke", colour).attr("stroke-width", w).attr("stroke-linejoin", "round").attr("paint-order", "stroke");
+function drawDiagramFigure(container, fig, fi, w, h) {
+  const svg = d3.select(container).append("svg")
+    .attr("xmlns", "http://www.w3.org/2000/svg").attr("viewBox", `0 0 ${w} ${h}`).attr("width", w).attr("height", h)
+    .attr("class", "fig").attr("data-fig", fi).attr("font-family", SANS);
+  const defs = svg.append("defs");
+  defs.append("marker").attr("id", `diag-head-${fi}`).attr("viewBox", "0 0 10 10").attr("refX", 9).attr("refY", 5)
+    .attr("markerWidth", 7).attr("markerHeight", 7).attr("orient", "auto-start-reverse")
+    .append("path").attr("d", "M0,0L10,5L0,10Z").attr("fill", INK);
+  svg.append("rect").attr("width", w).attr("height", h).attr("fill", LAND);
+  const d = fig.diagram || {};
+  const sx = (x) => x * w, sy = (y) => y * h;
+  const byId = new Map();
+  const layer = svg.append("g").attr("class", "diagram");
+  for (const c of d.compartments || []) {
+    const g = layer.append("g").attr("class", "layer diagram-compartment").attr("data-layer", c.id || null);
+    g.append("rect").attr("x", sx(c.x)).attr("y", sy(c.y)).attr("width", sx(c.w)).attr("height", sy(c.h))
+      .attr("rx", 10).attr("fill", c.fill || "#efe2bd").attr("fill-opacity", c.opacity == null ? 0.45 : c.opacity)
+      .attr("stroke", c.colour || "#8c6d3f").attr("stroke-width", 1.2);
+    g.append("text").attr("x", sx(c.x) + 10).attr("y", sy(c.y) + 18).attr("font-family", SERIF)
+      .attr("font-weight", 700).attr("font-size", 13).attr("fill", c.colour || INK).text(c.label);
+  }
+  for (const n of d.nodes || []) {
+    byId.set(n.id, n);
+    const g = layer.append("g").attr("class", "layer diagram-node").attr("data-layer", n.id);
+    const x = sx(n.x), y = sy(n.y), bw = sx(n.w || 0.18), bh = sy(n.h || 0.09);
+    g.append("rect").attr("x", x - bw / 2).attr("y", y - bh / 2).attr("width", bw).attr("height", bh).attr("rx", 8)
+      .attr("fill", n.fill || PAPER).attr("stroke", n.colour || INK).attr("stroke-width", n.strong ? 2 : 1.3);
+    const lines = String(n.label).split(/\n/);
+    const text = g.append("text").attr("x", x).attr("y", y - (lines.length - 1) * 6).attr("text-anchor", "middle")
+      .attr("font-family", n.serif ? SERIF : SANS).attr("font-weight", n.strong ? 700 : 600).attr("font-size", n.size || 12).attr("fill", n.colour || INK);
+    lines.forEach((line, i) => text.append("tspan").attr("x", x).attr("dy", i ? 13 : 0).text(line));
+    if (n.note) g.append("text").attr("x", x).attr("y", y + bh / 2 - 8).attr("text-anchor", "middle").attr("font-size", 9).attr("fill", "#6b6255").text(n.note);
+  }
+  const edge = (n, toward) => {
+    const bw = sx(n.w || 0.18), bh = sy(n.h || 0.09), cx = sx(n.x), cy = sy(n.y);
+    const dx = sx(toward.x) - cx, dy = sy(toward.y) - cy;
+    const k = 1 / Math.max(Math.abs(dx) / (bw / 2 + 7), Math.abs(dy) / (bh / 2 + 7), 1e-6);
+    return [cx + dx * k, cy + dy * k];
+  };
+  for (const a of d.arrows || []) {
+    const A = byId.get(a.from), B = byId.get(a.to);
+    if (!A || !B) continue;
+    const p = edge(A, B), q = edge(B, A), mid = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+    const g = layer.append("g").attr("class", "layer diagram-arrow").attr("data-layer", a.id || null);
+    g.append("path").attr("d", `M${p[0]},${p[1]}C${p[0]},${mid[1]} ${q[0]},${mid[1]} ${q[0]},${q[1]}`)
+      .attr("fill", "none").attr("stroke", a.colour || INK).attr("stroke-width", a.width || 1.6)
+      .attr("stroke-dasharray", a.dashed ? "5 4" : null).attr("marker-end", `url(#diag-head-${fi})`);
+    if (a.label) haloText(g.append("text").attr("x", mid[0]).attr("y", mid[1] - 4).attr("text-anchor", "middle")
+      .attr("font-size", 10).attr("font-style", "italic").attr("fill", a.colour || INK).text(a.label), LAND, 4);
+  }
+  return svg.node();
+}
 
   // ---- one figure
   function drawFigure(container, fig, fi, w, h) {
+    if (fig.kind === "diagram") return drawDiagramFigure(container, fig, fi, w, h);
     const svg = d3.select(container).append("svg")
       .attr("xmlns", "http://www.w3.org/2000/svg").attr("viewBox", `0 0 ${w} ${h}`).attr("width", w).attr("height", h)
       .attr("class", "fig").attr("data-fig", fi).attr("font-family", SANS);
@@ -199,6 +252,7 @@
         if (sr > (base.riverRank || 6)) continue;
         L_WATER.append("path").attr("d", geo(f)).attr("fill", "none").attr("stroke", RIVER).attr("stroke-width", Math.max(0.5, 1.6 - sr * 0.18)).attr("stroke-linecap", "round");
       }
+
     }
 
     const layerG = (parent, L) => parent.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null);
