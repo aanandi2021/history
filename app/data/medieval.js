@@ -92,18 +92,83 @@
     R("William the Conqueror","England and Normandy","normans","1035","1087",S.england,{wiki:"William the Conqueror"})
   ];
   const chapters = [
-    {id:"ch-western-europe",title:"Western Europe after Rome",start:"0500",end:"1130",bbox:[[-10,35],[25,57]],section:S.west,text:"Western Europe did not restart from zero after Rome. Roman law, bishops, roads and tax habits survived unevenly inside new kingdoms. The Franks became the strongest western power, Charlemagne briefly rebuilt an imperial frame, and England moved from Anglo-Saxon kingdoms through Viking war to Norman conquest."},
+    {id:"ch-western-europe",title:"Western Europe after Rome",start:"0500",end:"1215",bbox:[[-10,35],[25,57]],section:S.west,text:"Western Europe did not restart from zero after Rome. Roman law, bishops, roads and tax habits survived unevenly inside new kingdoms. The Franks became the strongest western power, Charlemagne briefly rebuilt an imperial frame, and England moved from Anglo-Saxon kingdoms through Viking war to Norman conquest."},
     {id:"ch-barbarian-kingdoms",title:"Successor kingdoms around 500",start:"0500",end:"0568",parent:"ch-western-europe",plate:"barbarian-kingdoms",bbox:[[-10,30],[35,57]],section:S.kingdoms,text:"Around 500 the western empire was a map of successor kingdoms: Franks in northern Gaul, Visigoths in Spain, Ostrogoths in Italy, Vandals in North Africa, Burgundians in the Rhone valley and Anglo-Saxons in Britain. They were not outside Roman history. They ruled Roman land, used Roman taxes where they could, and bargained with bishops and emperors."},
     {id:"ch-franks-carolingians",title:"Franks and Carolingians",start:"0500",end:"0880",parent:"ch-western-europe",plate:"carolingian-partition",bbox:[[-6,36],[18,55]],section:S.franks,text:"The Franks grew from a Rhine frontier people into the strongest western kingdom. Clovis joined Frankish force to Catholic legitimacy. The Carolingians then took royal title, allied with the papacy, conquered Saxony and Lombard Italy, and made Charlemagne emperor. The Treaty of Verdun divided that empire among his grandsons, leaving a western kingdom, an eastern kingdom and a fragile middle."},
     {id:"ch-england-to-1066",title:"England to 1066",start:"0500",end:"1066",parent:"ch-western-europe",bbox:[[-8,49],[3,59]],section:S.england,text:"Britain moved from Roman provinces to Anglo-Saxon kingdoms. Viking armies then forced consolidation around Wessex, where Alfred fought back and his successors built a more unified England. In 1066 Harold Godwinson beat a Norwegian invasion at Stamford Bridge and then lost to William of Normandy at Hastings."},
     {id:"ch-normans-vikings",title:"Normans and Vikings",start:"0790",end:"1130",parent:"ch-western-europe",bbox:[[-25,35],[35,65]],section:S.normans,text:"Viking movement was trade, raiding, settlement and state-building. Scandinavians reached Britain, Ireland, Iceland, Greenland, the Seine, the Volga and the Black Sea. In Normandy, a Viking settlement became a French-speaking duchy; in 1066 that duchy conquered England."},
     {id:"ch-byzantium",title:"Byzantium and the eastern Roman world",start:"0500",end:"1204",bbox:[[10,28],[45,47]],section:S.byz,text:"The eastern empire stayed Roman in law and imperial language, centred on Constantinople. It survived Justinian's expensive reconquest, Persian war, Arab conquest and repeated sieges. It also connected the Mediterranean to the steppe and to Kievan Rus."},
     {id:"ch-justinian-reconquest",title:"Justinian's reconquest",start:"0527",end:"0565",parent:"ch-byzantium",plate:"justinian-reconquest",bbox:[[-8,28],[35,47]],section:S.justinian,text:"Justinian tried to restore Roman rule around the Mediterranean. Belisarius took Vandal North Africa, then Sicily and Italy. Narses finished the Ostrogothic war. The reconquest made the Roman claim visible again, but Italy was devastated and the Lombards soon took much of the north."},
-    {id:"ch-early-islam",title:"Early Islam and the caliphates",start:"0610",end:"0929",bbox:[[-10,15],[75,45]],section:S.islam,text:"Islam began in Arabia and quickly became an empire. Arab armies defeated Byzantium and Persia, took Syria and Egypt, crossed North Africa and entered Spain. The Umayyads ruled from Damascus; the Abbasids moved the centre to Iraq and made Baghdad a world city, linking this story to Maritime Asia."},
+    {id:"ch-early-islam",title:"Early Islam and the caliphates",start:"0610",end:"1055",bbox:[[-10,15],[75,45]],section:S.islam,text:"Islam began in Arabia and quickly became an empire. Arab armies defeated Byzantium and Persia, took Syria and Egypt, crossed North Africa and entered Spain. The Umayyads ruled from Damascus; the Abbasids moved the centre to Iraq and made Baghdad a world city, linking this story to Maritime Asia."},
     {id:"ch-steppe-rus",title:"Steppe peoples and Kievan Rus",start:"0500",end:"1100",bbox:[[5,38],[65,58]],section:S.steppe,text:"The steppe was not empty space around Europe. Huns, Avars, Bulgars, Khazars, Magyars and Pechenegs shaped the borders of Byzantium, the Franks and Rus. The Kievan Rus grew along river routes from the Baltic to the Black Sea, a root of the later Russia period."},
     {id:"ch-kievan-rus",title:"Kievan Rus and the routes north",start:"0860",end:"1054",parent:"ch-steppe-rus",bbox:[[20,43],[45,57]],section:S.kievan,text:"Kievan Rus was a river-route power between Scandinavia and Byzantium. Kiev controlled the Dnieper road to the Black Sea. Vladimir's conversion tied Rus to Orthodox Christianity, which matters later for Muscovy and Russia."},
     {id:"ch-medieval-asia",title:"Asia in the early medieval world",start:"0589",end:"1206",bbox:[[65,5],[145,55]],section:S.asia,text:"While western Europe rebuilt, China reunified under Sui and Tang rule, Japan borrowed and adapted Chinese court models, and Central Asia linked Tang, Turkic and Islamic worlds. Later rounds will carry this lane into the Mongols and the wider Asian medieval world."}
   ];
+
+  Object.assign(S, {
+    abbasid: "Abbasids and the Islamic world after 750",
+    baghdad: "Baghdad and the House of Wisdom",
+    ottonian: "Ottonian and Salian Germany",
+    church: "Monastic reform, papacy and Latin church",
+    crusades: "The Crusades and the eastern Mediterranean"
+  });
+  events.push(
+    E("islam","0750","Abbasids win at the Great Zab",[43.45,35.75],{section:S.abbasid,wiki:"Abbasid Revolution",text:"The Abbasids destroyed Umayyad rule in the east and moved the centre of the caliphate toward Iraq and Iran."}),
+    E("islam","0751","Talas links Abbasid and Tang worlds",[71.9,42.52],{section:S.abbasid,wiki:"Battle of Talas",text:"Abbasid and Tang armies met in Central Asia. The battle matters here because paper-making and Central Asian skills moved west through Samarkand toward Baghdad."}),
+    E("islam","0756","Umayyad emirate founded in Cordoba",[-4.78,37.88],{section:S.abbasid,wiki:"Emirate of Cordoba",text:"An Umayyad survivor built a western Islamic state in Iberia after the Abbasid victory in the east."}),
+    E("islam","0762","Al-Mansur founds Baghdad",[44.37,33.31],{section:S.baghdad,wiki:"Round city of Baghdad",text:"The Abbasids built a new round capital on the Tigris. Baghdad sat where Persian, Greek, Indian and Central Asian learning could be gathered and translated.", aha:[{book:"golden-road",heading:"Indian numerals reaching Baghdad"}]}),
+    E("islam","0786","Harun al-Rashid rules from Baghdad",[44.37,33.31],{end:"0809",section:S.baghdad,wiki:"Harun al-Rashid",text:"Harun's court became the later symbol of Abbasid wealth and scholarship, even as governors at the edges of the empire grew more independent."}),
+    E("islam","0801","Aghlabids rule Ifriqiya from Kairouan",[10.10,35.68],{section:S.abbasid,wiki:"Aghlabids",text:"North Africa was still connected to the Abbasid world, but local dynasties increasingly governed on their own."}),
+    E("islam","0813","Al-Ma'mun takes Baghdad after civil war",[44.37,33.31],{section:S.baghdad,wiki:"Fourth Fitna",text:"The civil war between al-Amin and al-Ma'mun showed that Abbasid politics could be fought over the city itself."}),
+    E("islam","0830","House of Wisdom flourishes",[44.37,33.31],{approx:true,section:S.baghdad,wiki:"House of Wisdom",text:"Translators and scholars in Baghdad worked with Greek philosophy, Persian court learning, Indian mathematics and astronomy, and paper technology from Central Asia.", aha:[{book:"golden-road",heading:"Indian numerals reaching Baghdad"}]}),
+    E("islam","0868","Tulunids take power in Egypt",[31.23,30.04],{section:S.abbasid,wiki:"Tulunids",text:"Egypt became one of the first large provinces to slip from direct Abbasid control while still belonging to the Islamic political world."}),
+    E("islam","0909","Fatimids rise in North Africa",[10.10,35.68],{section:S.abbasid,wiki:"Fatimid Caliphate",text:"The Fatimids claimed descent from Fatima and challenged Abbasid religious authority as well as their politics."}),
+    E("islam","0969","Fatimids found Cairo",[31.23,30.04],{section:S.abbasid,wiki:"Cairo",text:"Cairo became the capital of a rival Shi'a caliphate and a new centre of power in the eastern Mediterranean."}),
+    E("islam","1055","Seljuks enter Baghdad",[44.37,33.31],{section:S.abbasid,wiki:"Seljuk Empire",text:"Turkic military power took over the protection of the Abbasid caliph, leaving the caliph spiritually important but politically dependent."}),
+
+    E("west","0911","Conrad I chosen in East Francia",[10.0,49.7],{section:S.ottonian,wiki:"Conrad I of Germany",text:"When the eastern Carolingian line ended, the leading nobles chose Conrad. The eastern kingdom was becoming a German political world."}),
+    E("west","0919","Henry the Fowler becomes king",[11.0,51.8],{section:S.ottonian,wiki:"Henry the Fowler",text:"Henry worked with the great duchies and prepared a stronger Saxon monarchy."}),
+    E("west","0933","Henry defeats Magyars at Riade",[11.7,51.2],{section:S.ottonian,wiki:"Battle of Riade",text:"Henry bought time, built fortified places and cavalry forces, then checked Magyar raiding."}),
+    E("west","0955","Otto I defeats the Magyars at Lechfeld",[10.9,48.35],{section:S.ottonian,wiki:"Battle of Lechfeld",text:"Lechfeld ended the worst Magyar pressure on Germany and helped Otto claim the role of defender of Latin Christendom."}),
+    E("west","0962","Otto I crowned emperor in Rome",[12.5,41.9],{section:S.ottonian,wiki:"Otto I, Holy Roman Emperor",text:"Otto joined the German kingship to imperial coronation in Rome, creating the Ottonian empire's western claim."}),
+    E("west","1000","Otto III visits Gniezno",[17.03,52.54],{section:S.ottonian,wiki:"Congress of Gniezno",text:"Otto recognized a Polish church centre at Gniezno, showing that empire, mission and new Christian kingdoms were connected."}),
+    E("west","1024","Conrad II begins the Salian dynasty",[8.36,49.63],{section:S.ottonian,wiki:"Conrad II, Holy Roman Emperor",text:"The Salian kings inherited the eastern empire and tightened its hold on Burgundy, Italy and the German duchies."}),
+    E("west","1033","Burgundy joins the empire",[6.63,46.52],{section:S.ottonian,wiki:"Kingdom of Arles",text:"Burgundy gave the empire a bridge between Germany and Italy, including important Alpine routes."}),
+    E("west","1046","Synod of Sutri",[12.74,42.25],{section:S.church,wiki:"Synod of Sutri",text:"Henry III removed rival popes and tried to clean up papal politics, but reform soon made the papacy more independent of emperors."}),
+    E("west","1054","Latin and Greek churches split",[28.98,41.01],{section:S.church,wiki:"East-West Schism",text:"The breach between Rome and Constantinople hardened the divide between Latin Catholic and Greek Orthodox worlds."}),
+    E("west","1059","Papal election decree",[12.5,41.9],{section:S.church,wiki:"Papal election decree of 1059",text:"Cardinals were given the central role in choosing popes, reducing the influence of Roman aristocrats and German emperors."}),
+    E("west","1075","Dictatus Papae and investiture crisis",[12.5,41.9],{section:S.church,wiki:"Dictatus papae",text:"Gregory VII claimed a stronger papal authority over bishops and rulers, setting up the clash with Henry IV."}),
+
+    E("byz","1071","Manzikert opens Anatolia to Seljuks",[42.54,38.74],{section:S.crusades,wiki:"Battle of Manzikert",text:"The Byzantine defeat made Asia Minor harder to hold and helped create the crisis behind the First Crusade."}),
+    E("west","1095-11-26","Urban II calls the First Crusade at Clermont",[3.08,45.78],{section:S.crusades,wiki:"Council of Clermont",text:"Urban called western knights to armed pilgrimage and aid for eastern Christians. Jerusalem became the emotional centre of the appeal."}),
+    E("west","1097","Crusaders take Nicaea",[29.72,40.43],{section:S.crusades,wiki:"Siege of Nicaea",text:"The crusader armies crossed through Byzantine territory and took Nicaea before moving across Anatolia."}),
+    E("west","1098","Antioch falls after a long siege",[36.16,36.20],{section:S.crusades,wiki:"Siege of Antioch",text:"Antioch gave the crusaders a northern anchor but also showed how fragile the expedition was."}),
+    E("west","1099-07-15","First Crusade captures Jerusalem",[35.21,31.77],{section:S.crusades,wiki:"Siege of Jerusalem (1099)",text:"The crusaders stormed Jerusalem and created Latin states along the Levantine coast."}),
+    E("west","1144","Edessa falls to Zengi",[38.79,37.16],{section:S.crusades,wiki:"Siege of Edessa",text:"The fall of the first crusader state shocked western Europe and triggered the Second Crusade."}),
+    E("west","1147","Second Crusade begins",[2.35,48.86],{section:S.crusades,wiki:"Second Crusade",text:"Conrad III and Louis VII led royal armies east, but cooperation failed and Damascus was not taken."}),
+    E("west","1187","Saladin wins at Hattin and takes Jerusalem",[35.46,32.8],{section:S.crusades,wiki:"Battle of Hattin",text:"Hattin broke the kingdom of Jerusalem. Saladin then recovered the city, leaving the crusaders mainly on the coast."}),
+    E("west","1191","Third Crusade takes Acre",[35.08,32.92],{section:S.crusades,wiki:"Siege of Acre (1189-1191)",text:"Richard I and Philip II helped retake Acre. The result was a coastal foothold, not the recovery of Jerusalem."})
+  );
+  leaders.push(
+    R("Al-Mansur","Abbasid Caliphate","islam","0754","0775",S.abbasid,{wiki:"Al-Mansur"}),
+    R("Al-Ma'mun","Abbasid Caliphate","islam","0813","0833",S.baghdad,{wiki:"Al-Ma'mun"}),
+    R("Abd al-Rahman III","Cordoba","islam","0912","0961",S.abbasid,{wiki:"Abd al-Rahman III"}),
+    R("Henry the Fowler","East Francia","franks","0919","0936",S.ottonian,{wiki:"Henry the Fowler"}),
+    R("Conrad II","Holy Roman Empire","franks","1024","1039",S.ottonian,{wiki:"Conrad II, Holy Roman Emperor"}),
+    R("Henry III","Holy Roman Empire","franks","1039","1056",S.ottonian,{wiki:"Henry III, Holy Roman Emperor"}),
+    R("Gregory VII","Papacy","franks","1073","1085",S.church,{wiki:"Pope Gregory VII"}),
+    R("Urban II","Papacy","franks","1088","1099",S.crusades,{wiki:"Pope Urban II"}),
+    R("Saladin","Ayyubid Sultanate","islam","1174","1193",S.crusades,{wiki:"Saladin"}),
+    R("Richard I","England","england","1189","1199",S.crusades,{wiki:"Richard I of England"})
+  );
+  chapters.push(
+    {id:"ch-abbasid-caliphate",title:"Abbasids and the Islamic world after 750",start:"0750",end:"1055",parent:"ch-early-islam",plate:"abbasid-caliphate",bbox:[[-12,15],[82,46]],section:S.abbasid,text:"The Abbasids overthrew the Umayyads and moved the caliphate's centre east to Iraq. Baghdad made the Islamic world look toward Persian administration, Central Asian routes and Indian Ocean knowledge as much as toward Syria and Arabia. Over time, Cordoba, the Fatimids in North Africa and Egypt, and eastern dynasties ruled themselves while still sharing Islamic language, law and scholarly networks."},
+    {id:"ch-abbasid-baghdad",title:"Baghdad and the House of Wisdom",start:"0762",end:"0900",parent:"ch-abbasid-caliphate",plate:"abbasid-baghdad",bbox:[[35,25],[75,43]],section:S.baghdad,text:"Baghdad was built as a round Abbasid capital on the Tigris, then grew beyond the circle into markets, canals and suburbs. The House of Wisdom funded translation and science. Greek texts, Persian court learning, Indian numerals and astronomy, and paper from China through Central Asia all met there before some of that knowledge moved west to al-Andalus, Toledo and Europe."},
+    {id:"ch-ottonian-salian",title:"Ottonian and Salian Germany",start:"0911",end:"1075",parent:"ch-western-europe",bbox:[[0,40],[20,55]],section:S.ottonian,text:"After the eastern Carolingians ended, the German duchies chose kings who had to bargain with dukes, bishops and Italy. Henry the Fowler and Otto I built Saxon power, defeated Magyar raiders at Lechfeld and revived imperial coronation in Rome, the core of the later Holy Roman Empire. The Salian rulers inherited that system and then ran into a stronger reform papacy."},
+    {id:"ch-church-reform",title:"Monastic reform, papacy and the Latin church",start:"0910",end:"1215",parent:"ch-western-europe",bbox:[[-5,40],[20,55]],section:S.church,text:"Cluny and later reformers tried to free church life from local lay control, simony and clerical marriage. The movement strengthened the papacy under figures such as Gregory VII, sharpened the schism with Constantinople and helped create the religious energy behind crusading and new orders."},
+    {id:"ch-crusades",title:"The First, Second and Third Crusades",start:"1071",end:"1192",parent:"ch-western-europe",plate:"first-crusades",bbox:[[-6,28],[42,50]],section:S.crusades,text:"The crusades joined pilgrimage, holy war, papal reform and Byzantine crisis. The First Crusade took Jerusalem and made Latin states on the Levantine coast. Edessa's fall brought a failed Second Crusade. Saladin's victory at Hattin brought the Third Crusade, which recovered Acre and coastal access but not Jerusalem."}
+  );
+
   const B=(title,author,start,end,section,extra)=>Object.assign({title,author,start,end,owned:false},section?{section}:{},extra||{});
   const books=[
     B("The Inheritance of Rome","Chris Wickham","0400","1000",S.west), B("The Formation of Christendom","Judith Herrin","0500","1000",S.byz),
@@ -112,7 +177,9 @@
     B("Muhammad and the Believers","Fred M. Donner","0610","0661",S.islam), B("The Great Arab Conquests","Hugh Kennedy","0630","0750",S.islam),
     B("The Vikings","Else Roesdahl","0790","1066",S.normans), B("The Anglo-Saxons","Marc Morris","0400","1066",S.england),
     B("The Making of Europe","Robert Bartlett","0950","1350",S.west), B("Russia in the Early Middle Ages","Janet Martin","0860","1240",S.kievan),
-    B("1491","Charles C. Mann","0500","1500",S.canada), B("Canada's First Nations","Olive Dickason","0500","1500",S.canada,{canadian:true})
+    B("1491","Charles C. Mann","0500","1500",S.canada), B("Canada's First Nations","Olive Dickason","0500","1500",S.canada,{canadian:true}),
+    B("When Baghdad Ruled the Muslim World","Hugh Kennedy","0750","0950",S.abbasid), B("The House of Wisdom","Jim Al-Khalili","0762","1000",S.baghdad),
+    B("The Holy Roman Empire","Peter H. Wilson","0911","1806",S.ottonian), B("The First Crusade","Thomas Asbridge","1095","1099",S.crusades)
   ];
   window.DATASETS = window.DATASETS || {};
   window.DATASETS.medieval = {
@@ -120,8 +187,8 @@
     mapNote:"No historical borders. Areas show influence, settlement or claims at the scale of the story. This period deliberately overlaps late antiquity from AD 500 to 700.",
     lanes:[{id:"canada",label:"Canada & the Americas",pinned:true},{id:"west",label:"Western Europe"},{id:"byz",label:"Byzantium"},{id:"islam",label:"Islamic world"},{id:"steppe",label:"Steppe & Rus"},{id:"asia",label:"Asia"}],
     events, leaders, chapters, books,
-    plates:[{id:"barbarian-kingdoms",title:"The barbarian kingdoms around 500",start:"0486",end:"0568"},{id:"justinian-reconquest",title:"Justinian's reconquest",start:"0527",end:"0565"},{id:"carolingian-partition",title:"Charlemagne and the Treaty of Verdun",start:"0751",end:"0880"}],
+    plates:[{id:"barbarian-kingdoms",title:"The barbarian kingdoms around 500",start:"0486",end:"0568"},{id:"justinian-reconquest",title:"Justinian's reconquest",start:"0527",end:"0565"},{id:"carolingian-partition",title:"Charlemagne and the Treaty of Verdun",start:"0751",end:"0880"},{id:"abbasid-caliphate",title:"From Umayyad empire to Abbasid world",start:"0750",end:"1055"},{id:"abbasid-baghdad",title:"Abbasid Baghdad and the House of Wisdom",start:"0762",end:"0900"},{id:"first-crusades",title:"The First, Second and Third Crusades",start:"1095",end:"1192"}],
     colours:{lanes:{canada:"#b22d2d",west:"#7a5a8c",byz:"#d66a4a",islam:"#6b8c3f",steppe:"#6b6b6b",asia:"#b36b2e"},sides:{franks:"#7a5a8c",goths:"#5b78a8",vandals:"#2f7f86",byz:"#d66a4a",islam:"#6b8c3f",rus:"#9a6a38",normans:"#c58b32",england:"#8c3b3b"}},
-    changelog:[{date:"2026-10-06",text:"Round 6: opened the medieval period with successor kingdoms, Justinian, Islam, Franks, Vikings and Kievan Rus roots."}]
+    changelog:[{date:"2026-10-06",text:"Round 6: opened the medieval period with successor kingdoms, Justinian, Islam, Franks, Vikings and Kievan Rus roots."},{date:"2026-10-06",text:"Round 7: added Abbasid Baghdad, Ottonian-Salian Germany, church reform and the First through Third Crusades."}]
   };
 })();

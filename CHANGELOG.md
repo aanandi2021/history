@@ -16,6 +16,9 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 - Atlas area layers can opt into land clipping with `clipToLand: true`; the Roman frontier, Augustus and late-antique migration plates now keep empire washes off the Mediterranean, Black Sea and Atlantic water.
 - Added a second cause-and-effect board, "From Mongols to Mughals", connecting Genghis Khan, the khanates, Timur, Babur, Panipat, Mughal India, Russia and maritime Asia.
 - Added Golden Road aha links: datasets can tag events or chapters with a registered book/heading, and viewer cards open Ford's canonical Obsidian note without copying note text into the repo.
+- Atlas round 7 (PDF pp. 134–153): added Abbasid Baghdad and the House of Wisdom, the Abbasid political world, Ottonian/Salian Germany, church reform, and the First through Third Crusades.
+- Three new plates: Abbasid Baghdad's Round City and knowledge flows, the Abbasid caliphate after 750, and the first three crusades with the crusader states.
+- Atlas figures can now turn the basemap off for diagrammatic city plans while keeping the same legend, label and cross-reference system.
 
 ## 0.6.0 (5 Oct 2026)
 

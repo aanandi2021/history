@@ -75,6 +75,39 @@ window.SCENES = window.SCENES || {};
       {type:"area",name:"Japan",tier:"influence",colour:ASIA,around:[[130,31],[139,39],[143,35],[136,31]],labelAt:[137,35]},
       {type:"route",style:"dotted",colour:ROAD,name:"Central Asian routes",path:[[108.94,34.26],[96,40],[82,42],[71.9,42.52],[44.37,33.31]]},
       {type:"point",symbol:"capital",name:"Chang'an",at:[108.94,34.26]}, {type:"point",symbol:"battle",name:"Talas",year:"751",at:[71.9,42.52]}, {type:"point",symbol:"capital",name:"Nara",at:[135.8,34.68]}, {type:"point",symbol:"capital",name:"Heian-kyo",at:[135.76,35.01]}
-    ], terms:[{t:"China",wiki:"History of China"},{t:"Sui",wiki:"Sui dynasty"},{t:"Tang",wiki:"Tang dynasty"},{t:"Japan",wiki:"History of Japan"},{t:"Central Asia",wiki:"History of Central Asia"},{t:"Mongols",wiki:"Mongol Empire"}]}
+    ], terms:[{t:"China",wiki:"History of China"},{t:"Sui",wiki:"Sui dynasty"},{t:"Tang",wiki:"Tang dynasty"},{t:"Japan",wiki:"History of Japan"},{t:"Central Asia",wiki:"History of Central Asia"},{t:"Mongols",wiki:"Mongol Empire"}]},
+    "ch-abbasid-caliphate": { caption:"The Abbasid turn shifts the Islamic centre from Syria toward Iraq, then regional dynasties grow around it.", bbox:[[-12,15],[82,46]], layers:[
+      {type:"area",name:"Abbasid heartland",tier:"core",colour:IS,around:[[38,31],[44,34],[50,32],[47,27],[40,27]],labelAt:[44,31]},
+      {type:"area",name:"al-Andalus",tier:"core",colour:IS,around:[[-8,37],[-4,42],[1,40],[-2,36]],labelAt:[-4,39]},
+      {type:"area",name:"North African dynasties",tier:"conquest",colour:IS,around:[[3,31],[12,36],[22,33],[18,29]],labelAt:[12,32]},
+      {type:"arrow",name:"Abbasid revolution",colour:IS,path:[[66.98,39.65],[50,36],[43.45,35.75],[44.37,33.31]],labelAt:[52,37]},
+      {type:"point",symbol:"battle",name:"Great Zab",year:"750",at:[43.45,35.75]}, {type:"point",symbol:"capital",name:"Baghdad",year:"762",at:[44.37,33.31]}, {type:"point",symbol:"capital",name:"Cordoba",year:"756",at:[-4.78,37.88]}, {type:"point",symbol:"capital",name:"Cairo",year:"969",at:[31.23,30.04]}
+    ], terms:[{t:"Abbasids",wiki:"Abbasid Caliphate"},{t:"Cordoba",wiki:"Caliphate of Cordoba"},{t:"Fatimids",wiki:"Fatimid Caliphate"},{t:"Baghdad",wiki:"Baghdad"}]},
+    "ch-abbasid-baghdad": { caption:"Baghdad gathers court power, translation and long-distance knowledge routes.", bbox:[[25,20],[75,45]], layers:[
+      {type:"route",style:"dotted",colour:ROAD,name:"Silk Road and paper route",path:[[108.94,34.26],[71.9,42.52],[66.98,39.65],[44.37,33.31]]},
+      {type:"arrow",name:"Greek texts",colour:BYZ,path:[[28.98,41.01],[36,39],[44.37,33.31]],labelAt:[36,39]},
+      {type:"arrow",name:"Indian numerals",colour:ASIA,path:[[75.78,23.18],[62,28],[44.37,33.31]],labelAt:[61,28]},
+      {type:"arrow",name:"To al-Andalus and Toledo",colour:ROAD,path:[[44.37,33.31],[15,34],[-4.03,39.86]],labelAt:[13,35]},
+      {type:"point",symbol:"capital",name:"Baghdad",year:"762",at:[44.37,33.31]}, {type:"point",symbol:"university",name:"House of Wisdom",year:"830",at:[44.37,33.31],dy:22}, {type:"point",symbol:"large-city",name:"Samarkand",year:"751",at:[66.98,39.65]}, {type:"point",symbol:"university",name:"Toledo",at:[-4.03,39.86]}
+    ], terms:[{t:"House of Wisdom",wiki:"House of Wisdom"},{t:"Indian numerals",wiki:"Hindu-Arabic numeral system"},{t:"paper",wiki:"History of paper"},{t:"Toledo",wiki:"Toledo School of Translators"}]},
+    "ch-ottonian-salian": { caption:"The eastern kingdom becomes an Ottonian-Salian imperial system tied to Rome, Italy and the church.", bbox:[[0,40],[20,55]], layers:[
+      {type:"area",name:"Saxon royal base",tier:"core",colour:FR,around:[[8,51],[11,53],[13,51],[11,49]],labelAt:[11,51]},
+      {type:"area",name:"German duchies",tier:"conquest",colour:FR,around:[[5,47],[9,52],[15,52],[16,48],[12,46],[7,46]],labelAt:[11,49]},
+      {type:"arrow",name:"Italian coronation road",colour:FR,path:[[6.08,50.78],[9,47],[12.5,41.9]],labelAt:[10,46]},
+      {type:"point",symbol:"battle",name:"Lechfeld",year:"955",at:[10.9,48.35]}, {type:"point",symbol:"capital",name:"Aachen",at:[6.08,50.78]}, {type:"point",symbol:"capital",name:"Rome",year:"962",at:[12.5,41.9]}, {type:"point",symbol:"large-city",name:"Gniezno",year:"1000",at:[17.03,52.54]}
+    ], terms:[{t:"Otto I",wiki:"Otto I, Holy Roman Emperor"},{t:"Lechfeld",wiki:"Battle of Lechfeld"},{t:"Holy Roman Empire",wiki:"Holy Roman Empire"}]},
+    "ch-church-reform": { caption:"Cluny, papal reform and the schism reshape western Christianity before the crusades.", bbox:[[-5,40],[20,55]], layers:[
+      {type:"point",symbol:"monastery",name:"Cluny",year:"910",at:[4.66,46.43]}, {type:"point",symbol:"capital",name:"Rome",at:[12.5,41.9]}, {type:"point",symbol:"capital",name:"Constantinople",year:"1054",at:[28.98,41.01]},
+      {type:"arrow",name:"Reform movement",colour:FR,path:[[4.66,46.43],[8,45],[12.5,41.9]],labelAt:[8,45]},
+      {type:"boundary",style:"dashdot",colour:BYZ,name:"Latin-Greek church divide",path:[[16,45],[20,43],[24,41],[28.98,41.01]]}
+    ], terms:[{t:"Cluny",wiki:"Cluny Abbey"},{t:"papacy",wiki:"History of the papacy"},{t:"schism",wiki:"East-West Schism"},{t:"Gregory VII",wiki:"Pope Gregory VII"}]},
+    "ch-crusades": { caption:"The first crusades move through Byzantium, Anatolia and the Levant, then compress into coastal states.", bbox:[[-6,28],[42,50]], layers:[
+      {type:"area",name:"Crusader states",tier:"core",colour:NORM,around:[[35.2,31.7],[35.9,33.8],[36.2,36.1],[38.8,37.2]],labelAt:[36,34]},
+      {type:"area",name:"Seljuk and Ayyubid powers",tier:"conquest",colour:IS,around:[[30,33],[36,38],[41,36],[39,31],[34,30]],labelAt:[36,33]},
+      {type:"arrow",name:"First Crusade route",colour:NORM,path:[[3.08,45.78],[18,43],[28.98,41.01],[29.72,40.43],[36.16,36.2],[35.21,31.77]],labelAt:[27,41]},
+      {type:"arrow",name:"Third Crusade coast",colour:ROAD,path:[[32,36],[35.08,32.92],[34.75,32.05]],labelAt:[34,34]},
+      {type:"point",symbol:"large-city",name:"Clermont",year:"1095",at:[3.08,45.78]}, {type:"point",symbol:"fortress",name:"Antioch",year:"1098",at:[36.16,36.2]}, {type:"point",symbol:"fortress",name:"Jerusalem",year:"1099",at:[35.21,31.77]}, {type:"point",symbol:"battle",name:"Hattin",year:"1187",at:[35.46,32.8]}, {type:"point",symbol:"fortress",name:"Acre",year:"1191",at:[35.08,32.92]}
+    ], terms:[{t:"First Crusade",wiki:"First Crusade"},{t:"Saladin",wiki:"Saladin"},{t:"Hattin",wiki:"Battle of Hattin"},{t:"Acre",wiki:"Siege of Acre (1189-1191)"}]}
+
   };
 })();

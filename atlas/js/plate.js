@@ -34,6 +34,12 @@
     const corners = { type: "MultiPoint", coordinates: [[W, S], [E, S], [E, N], [W, N], [(W + E) / 2, S], [(W + E) / 2, N]] };
     let proj;
     const kind = fig.projection || ((N - S) > 30 && Math.max(Math.abs(N), Math.abs(S)) > 25 ? "conic" : "mercator");
+    if (kind === "plan") {
+      const pad = 6;
+      const x = d3.scaleLinear().domain([W, E]).range([pad, w - pad]);
+      const y = d3.scaleLinear().domain([S, N]).range([h - pad, pad]);
+      return ([lon, lat]) => [x(lon), y(lat)];
+    }
     if (kind === "conic") {
       const p1 = S + (N - S) / 6, p2 = N - (N - S) / 6;
       proj = d3.geoConicConformal().parallels([p1, p2]).rotate([-(W + E) / 2, 0]);
@@ -176,15 +182,19 @@
     const geo = d3.geoPath(proj);
     const clipId = `frame-${fi}`, landClip = `land-${fi}`;
     defs.append("clipPath").attr("id", clipId).append("rect").attr("width", w).attr("height", h);
-    defs.append("clipPath").attr("id", landClip).append("path").attr("d", geo(LANDF));
+    const base = fig.base || {};
+    const landDef = defs.append("clipPath").attr("id", landClip);
+    if (base.map === false) landDef.append("rect").attr("width", w).attr("height", h);
+    else landDef.append("path").attr("d", geo(LANDF));
     const blur = defs.append("filter").attr("id", `soft-${fi}`).attr("x", "-10%").attr("y", "-10%").attr("width", "120%").attr("height", "120%");
     blur.append("feGaussianBlur").attr("stdDeviation", 3);
 
     const root = svg.append("g").attr("clip-path", `url(#${clipId})`);
-    const base = fig.base || {};
     root.append("rect").attr("width", w).attr("height", h).attr("fill", base.sea || SEA);
-    root.append("path").attr("d", geo(LANDF)).attr("fill", "none").attr("stroke", base.seaEdge || SEA_EDGE).attr("stroke-width", 9).attr("filter", `url(#soft-${fi})`);
-    root.append("path").attr("d", geo(LANDF)).attr("fill", base.land || LAND).attr("stroke", "#7fa9c4").attr("stroke-width", 0.6);
+    if (base.map !== false) {
+      root.append("path").attr("d", geo(LANDF)).attr("fill", "none").attr("stroke", base.seaEdge || SEA_EDGE).attr("stroke-width", 9).attr("filter", `url(#soft-${fi})`);
+      root.append("path").attr("d", geo(LANDF)).attr("fill", base.land || LAND).attr("stroke", "#7fa9c4").attr("stroke-width", 0.6);
+    }
 
     const L_AREA = root.append("g").attr("class", "areas");
     const L_WATER = root.append("g").attr("class", "water");
@@ -192,7 +202,7 @@
     const L_POINTS = root.append("g").attr("class", "points");
     const L_LABELS = root.append("g").attr("class", "labels");
 
-    if (base.rivers !== false) {
+    if (base.map !== false && base.rivers !== false) {
       L_WATER.append("path").attr("d", geo(LAKES)).attr("fill", base.sea || SEA).attr("stroke", "#7fa9c4").attr("stroke-width", 0.4);
       for (const f of RIVERS.features) {
         const sr = f.properties.scalerank || 6;

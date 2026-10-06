@@ -352,3 +352,10 @@ What we built from it:
   Islam, Steppe/Rus and Asia.
 - Three plates: `barbarian-kingdoms`, `justinian-reconquest` and `carolingian-partition`.
 - First use of `boundary` `style: "partition"` on the Verdun plate.
+
+### Round 7: diagram figures for city plans
+
+Most atlas figures are geographic maps, but a few subjects are better explained as plans. A figure can now set `projection: "plan"` with `base: { map: false }` to keep the Penguin-Atlas frame, legend, labels and cross-reference machinery while suppressing the Natural Earth basemap. Use the same layer grammar inside the frame: `boundary` for walls, `route` for rivers and canals, `point` for gates and institutions, and `area` for suburbs or precincts.
+
+The Baghdad plate uses this sparingly: the Round City is a schematic plan with circular walls, four gates, canals, the Tigris, the palace, mosque and House of Wisdom. Its companion figure returns to a geographic map for knowledge flows. This keeps city form and world context on one spread without pretending the city plan is a surveyed modern map.
+
