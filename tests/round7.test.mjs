@@ -71,3 +71,9 @@ test("atlas renderer supports diagram figures with the basemap turned off", () =
   const src = fs.readFileSync(path.join(ROOT, "atlas", "js", "plate.js"), "utf8");
   assert.match(src, /base\.map === false/);
 });
+
+test("atlas area polygons default to softened edges", () => {
+  const src = fs.readFileSync(path.join(ROOT, "atlas", "js", "plate.js"), "utf8");
+  assert.match(src, /L\.smooth == null \? true/);
+  assert.match(src, /curveCatmullRomClosed/);
+});

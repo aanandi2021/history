@@ -4,8 +4,8 @@
   const BAG=[44.37,33.31], DAM=[36.31,33.51], CORD=[-4.78,37.88], KAI=[10.10,35.68], CAI=[31.23,30.04], SAM=[66.98,39.65], TAL=[71.9,42.52], ZAB=[43.45,35.75], JER=[35.21,31.77];
   window.PLATES["abbasid-caliphate"] = { id:"abbasid-caliphate", title:"From Umayyad empire to Abbasid world", head:"Early Middle Ages / Islam", folio:"17", viewer:"medieval/0750/ch-abbasid-caliphate", figures:[
     { caption:"The caliphate at the Abbasid revolution", share:0.5, extent:[[-12,15],[82,46]], projection:"conic", layers:[
-      {id:"umayyad-reach",type:"area",clipToLand:true,tier:"conquest",colour:UM,legend:"Umayyad reach by 750",polygon:[[-10,35],[-3,39],[9,37],[25,34],[36,36],[47,37],[62,38],[75,34],[73,27],[57,25],[44,24],[30,28],[15,31],[2,33]],smooth:false},
-      {id:"abbasid-core",type:"area",clipToLand:true,tier:"core",colour:ABB,legend:"Abbasid power base",polygon:[[35,31],[42,37],[51,36],[54,31],[47,27],[38,27]],smooth:false},
+      {id:"umayyad-reach",type:"area",clipToLand:true,tier:"conquest",colour:UM,legend:"Umayyad reach by 750",polygon:[[-10,36],[-8,42],[-2,43],[3,39],[13,37],[27,33],[36,36],[47,37],[62,39],[75,36],[79,30],[70,24],[64,22],[55,24],[44,26],[30,28],[14,31],[2,34]],smooth:"basis"},
+      {id:"abbasid-core",type:"area",clipToLand:true,tier:"core",colour:ABB,legend:"Abbasid power base",polygon:[[37,30],[41,36],[46,36.5],[51,34],[52,30],[48,27.5],[42,28]],smooth:"basis"},
       {id:"revolution",type:"arrow",colour:ABB,width:4,legend:"Abbasid revolution",path:[[58,36],SAM,[50,36],ZAB,BAG],label:"Abbasids"},
       {id:"talas",type:"point",symbol:"battle",at:TAL,name:"Talas",tag:{text:"751",colour:"#f1c75b"}},
       {id:"zab",type:"point",symbol:"battle",at:ZAB,name:"Great Zab",labelPos:"n",tag:{text:"750",colour:"#e8806a"}},
@@ -22,7 +22,7 @@
     ], legend:{position:"bottom-left",columns:1} }
   ], text:{ intro:"After 750 the Islamic world is still connected by religion, Arabic and trade, but political control breaks into regional dynasties.", sections:[
     {heading:"Abbasid turn", entries:[
-      {date:"750", text:"The Abbasids overthrow the Umayyads at the Great Zab and shift the caliphate's centre from Syria toward Iraq and Iran.", refs:["umayyad-reach","abbasid-core","revolution","zab","damascus"]},
+      {date:"750", text:"The Abbasids overthrow the Umayyads at the Great Zab. The inherited Umayyad reach ran from al-Andalus through North Africa and Syria to Transoxiana and Sindh, but the new centre shifted toward Iraq and Iran.", refs:["umayyad-reach","abbasid-core","revolution","zab","damascus"]},
       {date:"751-762", text:"Talas marks contact with Tang Central Asia; Baghdad then becomes the Abbasid capital, better placed for Persian, Iraqi and Silk Road networks.", refs:["talas","baghdad"]}
     ]},
     {heading:"Several centres", entries:[

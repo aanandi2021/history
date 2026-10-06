@@ -359,3 +359,7 @@ Most atlas figures are geographic maps, but a few subjects are better explained 
 
 The Baghdad plate uses this sparingly: the Round City is a schematic plan with circular walls, four gates, canals, the Tigris, the palace, mosque and House of Wisdom. Its companion figure returns to a geographic map for knowledge flows. This keeps city form and world context on one spread without pretending the city plan is a surveyed modern map.
 
+### Soft hand-drawn region edges
+
+Area polygons default to softened closed curves (`smooth: true`). This is intentional: the atlas should read as historical fields and soft frontiers, not straight-edged GIS hexagons. Use `smooth: false` only when the line must be exact, such as the shared Verdun partition edges; otherwise let the renderer curve the hand-placed vertices and use `clipToLand: true` for coastlines. `smooth: "basis"` is available for very broad cultural or imperial washes where an even softer edge is better.
+

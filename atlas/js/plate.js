@@ -95,7 +95,9 @@
   function zonePath(L, proj) {
     if (L.polygon) {
       const pts = L.polygon.map(proj);
-      return d3.line().curve(L.smooth === false ? d3.curveLinearClosed : d3.curveCatmullRomClosed.alpha(0.5))(pts);
+      const smooth = L.smooth == null ? true : L.smooth;
+      const curve = smooth === false ? d3.curveLinearClosed : smooth === "basis" ? d3.curveBasisClosed : d3.curveCatmullRomClosed.alpha(0.5);
+      return d3.line().curve(curve)(pts);
     }
     const padDeg = L.pad != null ? L.pad : 1.2;
     const pts = [];
