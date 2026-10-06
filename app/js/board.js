@@ -157,6 +157,12 @@
   // ---- side panel
   function msg(text, cls) { const m = $("#b-msg"); m.textContent = text; m.className = cls || ""; }
   function renderSide() {
+    const kindColours = { background:"#6b7f99", crisis:"#a07a3a", trigger:"#8c3b3b", july:"#b8653a", war:"#4b4642" };
+    const legend = board.legend || [
+      { kind:"background", label:"Background" }, { kind:"crisis", label:"Crisis" },
+      { kind:"trigger", label:"Trigger" }, { kind:"july", label:"July 1914" }, { kind:"war", label:"War" }
+    ];
+    $(".legend").innerHTML = legend.map((x) => `<span><i style="background:${esc(x.colour || kindColours[x.kind] || "#9a9488")}"></i>${esc(x.label)}</span>`).join("");
     $("#b-score").textContent = game.score;
     const found = board.links.filter((l) => game.confirmed.has(BM.key(l.from, l.to))).length;
     $("#b-found").textContent = `${found} / ${board.links.length}`;

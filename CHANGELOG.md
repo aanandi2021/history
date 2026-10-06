@@ -13,6 +13,9 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 - New period dataset, **The Middle Ages** (AD 500–1500), with lanes for Canada and the Americas, Western Europe, Byzantium, Islam, Steppe/Rus and Asia.
 - Three new plates: the barbarian kingdoms around 500, Justinian's reconquest, and Charlemagne's empire plus the Treaty of Verdun.
 - New atlas boundary style for partition lines, used for Verdun-style divisions that are not modern state borders.
+- Atlas area layers can opt into land clipping with `clipToLand: true`; the Roman frontier, Augustus and late-antique migration plates now keep empire washes off the Mediterranean, Black Sea and Atlantic water.
+- Added a second cause-and-effect board, "From Mongols to Mughals", connecting Genghis Khan, the khanates, Timur, Babur, Panipat, Mughal India, Russia and maritime Asia.
+- Added Golden Road aha links: datasets can tag events or chapters with a registered book/heading, and viewer cards open Ford's canonical Obsidian note without copying note text into the repo.
 
 ## 0.6.0 (5 Oct 2026)
 

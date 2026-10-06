@@ -51,7 +51,9 @@
     // ---- Bengal & India
     E("india", "0750", "Gopala chosen king of Bengal", BEN, { section: S.pala, wiki: "Gopala", text: "Local chiefs pick him to end a long stretch of disorder, the 'law of the fish'. The start of the Pala dynasty." }),
     E("india", "0756", "Kailasa temple at Ellora begun", [75.18, 20.02], { section: S.pala, wiki: "Kailasa temple, Ellora", text: "The Rashtrakutas carve a whole temple down into the rock, from the top. The Palas' great rivals in the Deccan." }),
-    E("india", "0750", "Nalanda at its height", NAL, { end: "0865", section: S.pala, wiki: "Nalanda mahavihara", fic: LOC("2. NALANDA (Bihar, Northeast India)"), text: "The great Buddhist university, with thousands of monks and students from China, Tibet, Korea and Southeast Asia." }),
+    E("india", "0750", "Nalanda at its height", NAL, { end: "0865", section: S.pala, wiki: "Nalanda mahavihara", fic: LOC("2. NALANDA (Bihar, Northeast India)"),
+      aha: [{ book: "golden-road", heading: "Nalanda" }],
+      text: "The great Buddhist university, with thousands of monks and students from China, Tibet, Korea and Southeast Asia." }),
     E("india", "0750", "Tamralipta, the old port of Bengal", TAM, { end: "0865", section: S.pala, wiki: "Tamralipta", fic: LOC("1. TAMRALIPTA (Modern Tamluk, West Bengal)"), text: "The protagonist's home port. Its river channels were silting up, and its trade was slowly moving elsewhere." }),
     E("india", "0783", "Dharmapala founds Vikramashila", [87.28, 25.32], { approx: true, section: S.pala, wiki: "Vikramashila", text: "A second great Buddhist university on the Ganges. Dated anywhere from the 780s to about 810." }),
     E("india", "0790", "Somapura Mahavihara built", [88.98, 25.03], { section: S.pala, wiki: "Somapura Mahavihara", text: "Dharmapala's vast monastery at Paharpur, now in Bangladesh. Its stepped plan may have influenced Javanese temples." }),
@@ -67,7 +69,9 @@
     E("sea", "0780", "Borobudur rises", BOR, { end: "0833", section: S.java, wiki: "Borobudur", fic: LOC("4. CENTRAL JAVA - BOROBUDUR REGION"), text: "About fifty years of building. A stone mountain of terraces, 2,672 relief panels and 504 Buddhas. Exact dates unknown." }),
     E("sea", "0787", "Javanese raid on Champa (Phan Rang)", [108.99, 11.56], { section: S.java, wiki: "Champa" }),
     E("sea", "0792", "Candi Sewu (Manjusrigrha) completed", [110.49, -7.74], { section: S.java, wiki: "Sewu", text: "The second-largest Buddhist temple complex in Java, near Prambanan." }),
-    E("sea", "0802", "Jayavarman II declares Cambodia free of 'Java'", [104.1, 13.56], { section: S.java, wiki: "Jayavarman II", text: "On Phnom Kulen he is consecrated universal king. The traditional start of the Angkor empire." }),
+    E("sea", "0802", "Jayavarman II declares Cambodia free of 'Java'", [104.1, 13.56], { section: S.java, wiki: "Jayavarman II",
+      aha: [{ book: "golden-road", heading: "Indianised kingdoms of Southeast Asia and Angkor" }],
+      text: "On Phnom Kulen he is consecrated universal king. The traditional start of the Angkor empire." }),
     E("sea", "0824", "Karangtengah inscription", [110.25, -7.45], { section: S.java, wiki: "Samaratungga", fic: MR.figures, text: "Samaratungga's daughter Pramodhawardhani dedicates a Buddhist sanctuary." }),
     E("sea", "0830", "The Belitung wreck", [107.6, -2.6], { section: S.ships, wiki: "Belitung shipwreck", fic: SHIP("THE BOROBUDUR CARVING - WHAT IT SHOWS"), text: "An Arab-style sewn ship sinks off Belitung carrying about 60,000 pieces of Chinese pottery, plus gold and silver. Found in 1998." }),
     E("sea", "0856", "Prambanan dedicated", [110.49, -7.75], { section: S.java, wiki: "Prambanan", text: "The Shivagrha inscription marks the great Hindu temple near Borobudur, and the Sanjaya line's ascendancy in Central Java." }),
@@ -95,7 +99,9 @@
     E("west", "0793-06-08", "Vikings raid Lindisfarne", [-1.8, 55.67], { section: S.west, wiki: "Lindisfarne" }),
     E("west", "0800-12-25", "Charlemagne crowned emperor", [12.45, 41.9], { section: S.west, wiki: "Charlemagne" }),
     E("west", "0802", "Harun's elephant reaches Aachen", AAC, { section: S.west, wiki: "Abul-Abbas", text: "Abul-Abbas, a gift from Harun al-Rashid to Charlemagne." }),
-    E("west", "0820", "Al-Khwarizmi writes on algebra", BAG, { section: S.west, wiki: "Muhammad ibn Musa al-Khwarizmi", text: "In Baghdad. His book on Indian numerals carried them to the West. 'Algorithm' comes from his name." }),
+    E("west", "0820", "Al-Khwarizmi writes on algebra", BAG, { section: S.west, wiki: "Muhammad ibn Musa al-Khwarizmi",
+      aha: [{ book: "golden-road", heading: "Indian numerals reaching Baghdad" }],
+      text: "In Baghdad. His book on Indian numerals carried them to the West. 'Algorithm' comes from his name." }),
     E("west", "0843-08", "Treaty of Verdun", [5.38, 49.16], { section: S.west, wiki: "Treaty of Verdun", text: "Charlemagne's grandsons split his empire, roughly into France and Germany." }),
 
     // ---- The Unseen Tomorrow (FICTION — Amit's novel, from the master reference timeline)
@@ -147,7 +153,9 @@
   ];
 
   const chapters = [
-    { title: "The monsoon road", start: "0745", end: "0865", bbox: [[40, -12], [125, 35]], section: S.ships, fic: MR.trade, text: "Ships sail from the Persian Gulf to Canton and back, riding the southwest monsoon out in summer and the northeast monsoon home in winter. A round trip takes about two years, with long waits in port for the wind to turn. Arab, Persian, Indian, Malay and Chinese merchants all share the route." },
+    { title: "The monsoon road", start: "0745", end: "0865", bbox: [[40, -12], [125, 35]], section: S.ships, fic: MR.trade,
+      aha: [{ book: "golden-road", heading: "Indian Ocean monsoon trade and Muziris" }],
+      text: "Ships sail from the Persian Gulf to Canton and back, riding the southwest monsoon out in summer and the northeast monsoon home in winter. A round trip takes about two years, with long waits in port for the wind to turn. Arab, Persian, Indian, Malay and Chinese merchants all share the route." },
     { title: "The An Lushan rebellion", parent: "ch-the-monsoon-road", start: "0755-12-16", end: "0763-02-17", bbox: [[100, 28], [122, 42]], section: S.tang, text: "In 755 the general An Lushan rebels against the Tang emperor and takes both capitals. The war lasts until 763 and may kill millions. The Tang survive, but they are weaker, the Tibetans briefly take Chang'an, and the court comes to depend more on southern ports and sea trade." },
     { title: "Pala Bengal and Nalanda", parent: "ch-the-monsoon-road", start: "0750", end: "0850", bbox: [[78, 19], [93, 28.5]], section: S.pala, fic: LOC("2. NALANDA (Bihar, Northeast India)"), text: "Around 750 the nobles of Bengal choose Gopala as king, ending decades of chaos, and his Pala dynasty rules for four centuries. The Palas are Buddhist patrons: Nalanda is at its height and Dharmapala founds Vikramashila. Monks and pilgrims travel from Bengal to Java, Tibet and China." },
     { title: "The Strait of Malacca", parent: "ch-the-monsoon-road", start: "0745", end: "0865", bbox: [[94, -7], [110, 9]], section: S.sri, text: "Srivijaya, based at Palembang on Sumatra, controls the Strait of Malacca and the Sunda Strait. Every ship between India and China passes its ports and pays. It is a sea empire of harbours and alliances more than of land." },

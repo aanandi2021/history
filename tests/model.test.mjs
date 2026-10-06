@@ -101,6 +101,17 @@ test("Amit's Fiction: novel events link into the novel's notes; history in its y
   assert.ok(HM.validate(broken).some((m) => /fiction lane need a fic/.test(m)));
 });
 
+test("Golden Road aha links open the registered vault note heading", () => {
+  const ancient = HM.normalise(D.ancient);
+  const ashoka = ancient.events.find((e) => e.title === "Ashoka's edicts");
+  const links = HM.ahaLinks(ashoka);
+  assert.equal(links[0].label, "Golden Road aha");
+  assert.ok(links[0].href.includes(encodeURIComponent("Golden Road - aha notes#Ashoka's edicts")));
+  const bad = structuredClone(D.ancient);
+  bad.events.find((e) => e.title === "Ashoka's edicts").aha = [{ book: "missing-book", heading: "x" }];
+  assert.ok(HM.validate(bad).some((m) => /unknown aha book/.test(m)));
+});
+
 test("hash: parse, clamp and fall back (US4)", () => {
   const p = HM.parseHash("#russia/1812-09-14/moscow-burns-1812", D, "ww2");
   assert.equal(p.dataset, "russia");

@@ -6,10 +6,10 @@
     id:"roman-frontiers", title:"The Roman empire and its frontiers, A.D. 96-235", head:"Antiquity / The high empire and the Severi", folio:"10", viewer:"ancient/0117/ch-high-empire-frontiers",
     figures:[
       { caption:"The empire at its widest extent", share:0.58, extent:[[-12,24],[47,56]], projection:"mercator", layers:[
-        { id:"empire-100", type:"area", colour:R, opacity:0.36, pad:1.3, legend:"Roman Empire about AD 100", around:[[-5,37],[1,43],[7,49],[12,45],[18,46],[25,45],[31,40],[36,36],[35,30],[25,31],[16,33],[10,36],[0,35]] },
-        { id:"trajan-east", type:"area", colour:T, pattern:"stripe", pad:1.0, legend:"Trajan's eastern conquests, 114-117", around:[[32,39],[37,39.5],[42,37.5],[45,33.5],[42,31.5],[36,34]] },
-        { id:"dacia", type:"area", colour:T, pattern:"stripe", pad:0.85, legend:"Dacia after 106", around:[[22.5,44],[24.8,46.5],[27.5,47],[28.0,44.5],[25.2,43.7]] },
-        { id:"arabia", type:"area", colour:T, pattern:"stripe", pad:0.85, legend:"Arabia after 106", around:[[34,30],[36,31],[38,29],[38,26.5],[35,26.5]] },
+        { id:"empire-100", type:"area", clipToLand:true, colour:R, opacity:0.36, pad:1.3, legend:"Roman Empire about AD 100", around:[[-5,37],[1,43],[7,49],[12,45],[18,46],[25,45],[31,40],[36,36],[35,30],[25,31],[16,33],[10,36],[0,35]] },
+        { id:"trajan-east", type:"area", clipToLand:true, colour:T, pattern:"stripe", pad:1.0, legend:"Trajan's eastern conquests, 114-117", around:[[32,39],[37,39.5],[42,37.5],[45,33.5],[42,31.5],[36,34]] },
+        { id:"dacia", type:"area", clipToLand:true, colour:T, pattern:"stripe", pad:0.85, legend:"Dacia after 106", around:[[22.5,44],[24.8,46.5],[27.5,47],[28.0,44.5],[25.2,43.7]] },
+        { id:"arabia", type:"area", clipToLand:true, colour:T, pattern:"stripe", pad:0.85, legend:"Arabia after 106", around:[[34,30],[36,31],[38,29],[38,26.5],[35,26.5]] },
         { id:"parthia", type:"area", tier:"influence", colour:P, pad:1.4, legend:"Parthian kingdom", around:[[43,35],[47,37],[50,34],[48,31],[43,31]] },
         { id:"britain-front", type:"boundary", style:"wall", colour:F, side:"right", legend:"Northern British walls", path:[[-4.6,55.9],[-3.1,55.9],[-1.7,55.2],[-0.8,54.9]] },
         { id:"rhine-danube", type:"boundary", style:"wall", colour:F, side:"right", legend:"Rhine-Danube frontier", path:[[6,50.8],MAINZ,[10.5,49.4],REGEN,[16.4,48.2],[20.3,46.2],[25.5,45.0],[28.9,44.2]] },

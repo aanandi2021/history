@@ -210,10 +210,11 @@
       const d = zonePath(L, proj);
       if (!d) continue;
       const g = layerG(L_AREA, L);
-      if (L.clip !== "none") g.attr("clip-path", `url(#${landClip})`);
+      const clipToLand = L.clipToLand || (L.clip !== "none" && L.clip !== false);
+      if (clipToLand) g.attr("clip-path", `url(#${landClip})`);
       const { fill, op } = areaFill(defs, L);
       g.append("path").attr("d", d).attr("fill", fill).attr("fill-opacity", op)
-        .attr("stroke", L.edge === false ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", L.edge === "strong" ? 1.6 : 0.8)
+        .attr("stroke", L.edge === false || L.clipToLand ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", L.edge === "strong" ? 1.6 : 0.8)
         .attr("stroke-dasharray", L.edge === "dashed" ? "5 3" : null);
     }
 

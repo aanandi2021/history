@@ -23,6 +23,15 @@
   // stale OneDrive copy is registered under the same name and Obsidian would open that one instead.
   const VAULT_ID = "333bfdd695459a48";
   const CALIBRE_LIBRARY = "CalibreLibrary";
+  const BOOKS = {
+    "golden-road": {
+      id: "golden-road",
+      label: "Golden Road aha",
+      title: "The Golden Road",
+      author: "William Dalrymple",
+      note: "Golden Road - aha notes"
+    }
+  };
 
   function utc(y, m, d) {
     const t = new Date(Date.UTC(2000, m, d));
@@ -262,6 +271,14 @@
     return `obsidian://open?vault=${encodeURIComponent(vault)}&file=${encodeURIComponent(file)}`;
   }
 
+  function ahaLinks(item) {
+    return (item.aha || []).map((a) => {
+      const book = BOOKS[a.book];
+      if (!book) return null;
+      return { kind: "aha", book: book.id, label: book.label, heading: a.heading, href: obsidianUrl(book.note, a.heading) };
+    }).filter(Boolean);
+  }
+
   function wikiUrl(topic) {
     if (!topic) return null;
     return `https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(topic)}&title=Special%3ASearch&go=Go`;
@@ -426,6 +443,10 @@
       if (fictionLanes.has(it.lane) && !it.fic) bad(`${w}: events in a fiction lane need a fic heading`);
       if (it.fic && !works.length) bad(`${w}: has fic but the dataset lists none of Amit's works`);
       if (it.fic && typeof it.fic !== "string" && !(it.fic && typeof it.fic.note === "string")) bad(`${w}: fic must be a heading or {note, heading}`);
+      for (const a of it.aha || []) {
+        if (!BOOKS[a.book]) bad(`${w}: unknown aha book ${a.book}`);
+        if (!a.heading) bad(`${w}: aha needs a heading`);
+      }
     }
     for (const p of raw.plates || []) {
       const w = `plate "${p.id}"`;
@@ -699,6 +720,6 @@
     linkChapters, ancestors, within, openChapters, focusChapter,
     DAY, VAULT, VAULT_ID, parseDate, isPartial, isoDate, fmtDate, fmtYear, fmtRange, slug, normalise, nearWindow,
     nearbyEvents, activeLeaders, activeChapters, activeChapter, mapStateAt, booksFor, fictionFor, ficTarget,
-    obsidianUrl, wikiUrl, calibreUrl, plateUrl, libraryUrl, linksFor, parseHash, formatHash, search, stepEvent, validate
+    BOOKS, obsidianUrl, wikiUrl, calibreUrl, plateUrl, libraryUrl, ahaLinks, linksFor, parseHash, formatHash, search, stepEvent, validate
   };
 });
