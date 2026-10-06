@@ -9,7 +9,9 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 
 ## 0.8.0 (Unreleased / 0.8.0-dev)
 
-- Atlas round 12 (PDF pp. 234–253): in progress.
+- Atlas round 12 (PDF pp. 234–253): added four Age of Religious Discord plates for the German Reformation, Charles V and Habsburg-Valois Europe, confessional Europe, and the Dutch revolt plus maritime empires.
+- Transition data now has Reformation, Catholic renewal, Huguenot wars, Dutch revolt, Baltic conflict and Thirty Years War chapters/scenes, so the master timeline and plate links resolve.
+- Added confessional hatching guidance for Reformation-era maps: solid colour for dominant confessions, hatching/crosshatching for mixed or contested religious geography.
 
 ## 0.7.0 (6 Oct 2026)
 

@@ -139,6 +139,7 @@ Sea `#b9dff5`, land `#f3ebcb`–`#f7f7fb`, desert `#efd96d`, cultivation `#72ad4
 3. **Small multiples on a constant base**: for successions.
 4. **Core over extent**: same hue, two values.
 5. **Rival hatching**: a second power hatched over the first.
+6. **Confessional hatching**: for Reformation-era maps, solid washes show dominant confessions while hatch or crosshatch marks mixed, contested or legally unsettled religious geography. Do not draw belief as a clean state border.
 6. **Banner arrows**: the people's name inside the arrow.
 7. **Soft culture washes**: feathered fields, no borders.
 8. **Labels as borders**: names curved across a zone.
@@ -148,7 +149,8 @@ Sea `#b9dff5`, land `#f3ebcb`–`#f7f7fb`, desert `#efd96d`, cultivation `#72ad4
 12. **Environment as explanation**: draw the river, desert or steppe that caused the history.
 13. **Legend in empty terrain**: unboxed, local, minimal.
 14. **Insets for dense cores**.
-15. **Neighbours named around the edge**: the balance of power shown by labelling the realms around the main one.
+15. **Confessional hatching** for religious pluralism and contested settlement belts.
+16. **Neighbours named around the edge**: the balance of power shown by labelling the realms around the main one.
 
 ## 11. What we implement and what we don't yet
 

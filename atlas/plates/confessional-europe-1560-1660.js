@@ -1,0 +1,29 @@
+// Confessional Europe and wars of religion, round 12.
+(function () {
+  const CATH="#d8a84f", LUTH="#7a5a8c", CALV="#5b8c7a", ANGL="#b36b2e", ORTH="#9c8bb8", ISL="#6b8c3f", WAR="#8c3b3b";
+  const ROM=[12.5,41.9], GEN=[6.14,46.20], WIT=[12.65,51.87], LON=[-0.13,51.51], PAR=[2.35,48.86], ANT=[4.40,51.22], NTE=[-1.55,47.22], PRG=[14.42,50.08], MUN=[7.63,51.96], SAL=[13.05,47.80], POT=[13.06,52.40];
+  window.PLATES["confessional-europe-1560-1660"] = { id:"confessional-europe-1560-1660", title:"Confessional Europe, 1560-1660", head:"Age of Religious Discord / Europe", folio:"33", viewer:"transition/1560/ch-confessional-europe", figures:[
+    {caption:"Religious schisms in Europe, c. 1560", share:0.50, extent:[[-11,36],[32,61]], projection:"conic", layers:[
+      {id:"catholic-1560",type:"area",clipToLand:true,tier:"core",colour:CATH,legend:"Catholic",polygon:[[-10,36],[-9,44],[-5,49],[2,51],[7,49],[10,47],[17,49],[21,45],[22,40],[15,37],[5,37]],smooth:false},
+      {id:"lutheran-1560",type:"area",clipToLand:true,tier:"core",colour:LUTH,legend:"Lutheran",polygon:[[5,50],[8,58],[14,60],[23,59],[27,56],[22,53],[15,52],[11,51]],smooth:false},
+      {id:"calvinist-1560",type:"area",clipToLand:true,tier:"core",colour:CALV,legend:"Calvinist / Reformed",polygon:[[-4,45],[1,48],[6,50],[9,48],[7,45],[2,44]],smooth:false},
+      {id:"anglican-1560",type:"area",clipToLand:true,tier:"core",colour:ANGL,legend:"Anglican",polygon:[[-6,50],[-5,56],[1,56],[2,51],[-2,49]],smooth:false},
+      {id:"mixed-1560",type:"area",clipToLand:true,pattern:"crosshatch",colour:CALV,legend:"Mixed confessional areas",polygon:[[12,45],[18,49],[25,50],[25,46],[20,44]],smooth:false},
+      {id:"orthodox-1560",type:"area",clipToLand:true,tier:"influence",colour:ORTH,legend:"Orthodox east",polygon:[[20,45],[31,55],[32,61],[24,60],[20,53]],smooth:false},
+      {id:"rome",type:"point",symbol:"bishopric",at:ROM,name:"Rome"}, {id:"geneva",type:"point",symbol:"university",at:GEN,name:"Geneva",tag:{text:"1559",colour:"#f1c75b"}}, {id:"wittenberg",type:"point",symbol:"university",at:WIT,name:"Wittenberg"}, {id:"london",type:"point",symbol:"capital",at:LON,name:"London"}, {id:"paris",type:"point",symbol:"capital",at:PAR,name:"Paris"}, {id:"trent",type:"point",symbol:"conference",at:[11.12,46.07],name:"Trent",tag:{text:"1545-63",colour:"#f1c75b"}}
+    ], legend:{x:6,y:6,columns:1}},
+    {caption:"Wars, expulsions and hardening frontiers, c. 1660", share:0.50, extent:[[-11,36],[32,61]], projection:"conic", layers:[
+      {id:"catholic-1660",type:"area",clipToLand:true,tier:"core",colour:CATH,legend:"Catholic restored or retained",polygon:[[-10,36],[-9,44],[-4,49],[2,51],[8,49],[12,48],[17,49],[22,47],[24,43],[16,38],[5,37]],smooth:false},
+      {id:"lutheran-1660",type:"area",clipToLand:true,tier:"core",colour:LUTH,legend:"Lutheran north",polygon:[[5,50.5],[8,58],[14,60],[23,60],[27,56],[22,54],[16,53],[11,52]],smooth:false},
+      {id:"calvinist-1660",type:"area",clipToLand:true,tier:"core",colour:CALV,legend:"Calvinist cores",polygon:[[3.0,46.0],[6.5,47.7],[7.8,46.0],[6.3,44.5],[3.0,44.5]],smooth:false},
+      {id:"dutch-reformed",type:"area",clipToLand:true,tier:"core",colour:CALV,legend:"Dutch Reformed republic",polygon:[[3.2,51.0],[4.0,53.3],[7.1,53.0],[6.5,51.0]],smooth:false},
+      {id:"mixed-east",type:"area",clipToLand:true,pattern:"hatch",colour:CATH,legend:"Mixed / contested confessional belts",polygon:[[13.0,46.0],[20.5,50.5],[29.0,51.0],[28.0,46.0],[20.0,44.5]],smooth:false},
+      {id:"huguenot-exile",type:"arrow",colour:WAR,width:3.2,legend:"Huguenot and Protestant expulsions",path:[[1.0,46.5],[4.4,51.2],[7.6,52.5],[13.4,52.5]],label:"after 1685"},
+      {id:"war-corridor",type:"arrow",colour:WAR,width:4.0,legend:"Thirty Years' War corridor",path:[PRG,[12.0,49.8],[8.4,50.0],[6.2,49.8]],label:"1618-48",opacity:0.75},
+      {id:"nantes",type:"point",symbol:"treaty",at:NTE,name:"Nantes",tag:{text:"1598",colour:"#f1c75b"}}, {id:"westphalia",type:"point",symbol:"treaty",at:MUN,name:"Westphalia",tag:{text:"1648",colour:"#f1c75b"}}, {id:"prague",type:"point",symbol:"insurrection",at:PRG,name:"Prague",tag:{text:"1618",colour:"#e8806a"}}, {id:"potsdam",type:"point",symbol:"treaty",at:POT,name:"Potsdam",tag:{text:"1685",colour:"#f1c75b"}}, {id:"salzburg",type:"point",symbol:"insurrection",at:SAL,name:"Salzburg",tag:{text:"1732",colour:"#e8806a"}}
+    ], legend:{x:6,y:6,columns:1}}
+  ], text:{intro:"This plate uses confessional hatching: solid colour marks dominant confessions; hatched belts mark mixed or contested religious geography where borders and belief did not line up cleanly.", sections:[
+    {heading:"A divided map", entries:[{date:"c. 1560",text:"Germany and Scandinavia are largely Lutheran; Geneva, parts of France, Scotland, the Low Countries and Switzerland carry Reformed currents; England's settlement creates an Anglican realm.",refs:["lutheran-1560","calvinist-1560","anglican-1560","geneva","wittenberg","london"]},{date:"1545-1563",text:"Trent, Rome and Catholic renewal hold southern Europe while eastern Christianity and Islam sit beside the western schism.",refs:["catholic-1560","orthodox-1560","rome","trent","mixed-1560"]}]},
+    {heading:"War and expulsion", entries:[{date:"1598-1648",text:"Nantes and Westphalia are settlements after war, not the end of religious politics: France limits Huguenot war, and the Empire survives as a confessional patchwork.",refs:["nantes","westphalia","war-corridor","mixed-east"]},{date:"after 1685",text:"The late map hardens through exile and pressure: Huguenots and other Protestants move toward the Dutch Republic, Brandenburg and other refuges.",refs:["huguenot-exile","dutch-reformed","potsdam","salzburg"]}]}
+  ]}, sources:["Penguin Atlas Vol. 1 pp. 239-242, 251-253", "Approximate confessional fields; hatching marks mixed or contested areas; coastlines and rivers: Natural Earth 1:50m"] };
+})();

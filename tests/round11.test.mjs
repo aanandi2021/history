@@ -44,7 +44,7 @@ test("round 11 viewer links resolve to two-way transition chapters", () => {
 });
 
 test("transition dataset gives Ford early Canada and connected-world breadth", () => {
-  assert.ok(DS.transition.events.length >= 30 && DS.transition.events.length <= 60);
+  assert.ok(DS.transition.events.length >= 50 && DS.transition.events.length <= 90);
   assert.ok(DS.transition.events.filter((e) => e.lane === "canada").length >= 10);
   const text = JSON.stringify(DS.transition);
   for (const phrase of ["Cabot", "Cartier", "Stadacona", "Hochelaga", "Champlain", "Basque whalers", "Wendat", "Haudenosaunee", "Tordesillas", "Babur", "Kazan"]) assert.ok(text.includes(phrase), `missing ${phrase}`);
