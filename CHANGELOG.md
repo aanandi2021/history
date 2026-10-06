@@ -7,7 +7,7 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
-## 0.9.0 (Unreleased / 0.9.0-dev)
+## 0.9.0 (6 Oct 2026)
 
 - Added Natural Earth Europe region building blocks for atlas area layers, with `regions` / `minus` support and rebuilt round 13 plates from administrative shapes.
 - Atlas round 13 (PDF pp. 254–273): opened the **Age of Reason** / early-modern period (1600–1789) with Canada-first context for Acadia, Quebec, Montreal, Hudson Bay and Utrecht.
