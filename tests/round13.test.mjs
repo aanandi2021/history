@@ -25,7 +25,7 @@ const PLATES = loadPlates();
 test("round 13 opens the early-modern Age of Reason period", () => {
   assert.ok(DS["early-modern"]);
   assert.equal(DS["early-modern"].range[0], "1600-01-01");
-  assert.equal(DS["early-modern"].range[1], "1790-01-01");
+  assert.equal(DS["early-modern"].range[1], "1800-01-01");
   assert.ok(DS["early-modern"].events.filter((e) => e.lane === "canada").length >= 10);
 });
 

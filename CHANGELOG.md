@@ -9,7 +9,8 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 
 ## 1.0.0 (Unreleased / 1.0.0-dev)
 
-- Atlas round 14 in progress: closing the atlas proper with eighteenth-century balance of power, global war, Enlightenment and the world on the eve of revolution.
+- Atlas round 14 (PDF pp. 274-289): closes the atlas proper with Qing China, Mughal/Company India, Atlantic America and New France, the Seven Years' War, Prussia, the partitions of Poland and enlightened despotism.
+- Expanded Natural Earth region building blocks beyond Europe for North America, Atlantic America, India and China, while keeping dissolved admin-0/admin-1 arcs in one compact file.
 
 ## 0.9.0 (6 Oct 2026)
 

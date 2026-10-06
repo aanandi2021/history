@@ -1,8 +1,8 @@
 // Chapter scenes for the Age of Reason / early modern period.
 window.SCENES = window.SCENES || {};
 (function () {
-  const CAN="#b22d2d", EUR="#7a5a8c", IDEAS="#6b6b6b", FRA="#d8a84f", EMP="#6b8c3f", OTT="#8c6d3f", BRIT="#2f7f86", NORTH="#b36b2e", ROAD="#7b6848";
-  (window.SCENE_ACTORS = window.SCENE_ACTORS || {})["early-modern"] = { [CAN]:"Canada and Atlantic North America", [EUR]:"Central Europe", [IDEAS]:"Ideas and science", [FRA]:"France", [EMP]:"German princes", [OTT]:"Austria and Ottomans", [BRIT]:"Britain and maritime powers", [NORTH]:"Sweden, Russia and Baltic", [ROAD]:"Routes and campaigns" };
+  const CAN="#b22d2d", EUR="#7a5a8c", IDEAS="#6b6b6b", FRA="#d8a84f", EMP="#6b8c3f", OTT="#8c6d3f", BRIT="#2f7f86", NORTH="#b36b2e", ASIA="#8c6d3f", ROAD="#7b6848";
+  (window.SCENE_ACTORS = window.SCENE_ACTORS || {})["early-modern"] = { [CAN]:"Canada and Atlantic North America", [EUR]:"Central Europe", [IDEAS]:"Ideas and science", [FRA]:"France", [EMP]:"German princes", [OTT]:"Austria and Ottomans", [BRIT]:"Britain and maritime powers", [NORTH]:"Sweden, Russia and Baltic", [ASIA]:"China, India and Asia", [ROAD]:"Routes and campaigns" };
   window.SCENES["early-modern"] = {
     "ch-early-canada-atlantic": { caption:"New France and Hudson Bay sit inside Indigenous diplomacy and Atlantic rivalry.", bbox:[[-96,29],[-52,58]], layers:[
       {type:"route",style:"dotted",colour:ROAD,name:"St Lawrence corridor",path:[[-65.52,44.71],[-71.21,46.81],[-72.54,46.34],[-73.56,45.50]]},
@@ -52,6 +52,33 @@ window.SCENES = window.SCENES || {};
       {type:"area",name:"Russia",tier:"influence",colour:EMP,around:[[28,55],[32,59],[41,60],[42,56],[36,52],[30,52]],labelAt:[36,56]},
       {type:"route",style:"dashed",colour:ROAD,name:"Charles XII campaign",path:[[28.19,59.38],[21.01,52.23],[30.52,50.45],[34.55,49.59],[29.48,46.83]]},
       {type:"point",symbol:"battle",name:"Narva",at:[28.19,59.38]}, {type:"point",symbol:"capital",name:"St Petersburg",at:[30.31,59.94]}, {type:"point",symbol:"battle",name:"Poltava",at:[34.55,49.59]}, {type:"point",symbol:"treaty",name:"Nystad",at:[23.42,60.80]}
-    ], terms:[{t:"Sweden",wiki:"Swedish Empire"},{t:"Peter the Great",wiki:"Peter the Great"},{t:"Narva",wiki:"Battle of Narva (1700)"},{t:"Poltava",wiki:"Battle of Poltava"},{t:"Nystad",wiki:"Treaty of Nystad"}]}
+    ], terms:[{t:"Sweden",wiki:"Swedish Empire"},{t:"Peter the Great",wiki:"Peter the Great"},{t:"Narva",wiki:"Battle of Narva (1700)"},{t:"Poltava",wiki:"Battle of Poltava"},{t:"Nystad",wiki:"Treaty of Nystad"}]},
+    "ch-china-india-asia": { caption:"Qing expansion and India's company bridgeheads sit on opposite sides of Asia's eighteenth century.", bbox:[[66,6],[135,54]], layers:[
+      {type:"area",name:"Qing China",tier:"core",colour:ASIA,around:[[100,22],[116,20],[124,30],[123,42],[110,47],[96,40]],labelAt:[112,35]},
+      {type:"area",name:"Mughal and successor India",tier:"influence",colour:FRA,around:[[70,9],[78,8],[88,22],[77,31],[68,26]],labelAt:[78,20]},
+      {type:"route",style:"dashed",colour:ROAD,name:"Dzungar campaigns",path:[[116.41,39.90],[106.2,50.35],[87.62,43.82]]},
+      {type:"route",style:"dotted",colour:BRIT,name:"Company Bengal",path:[[88.36,22.57],[88.25,23.80],[84.05,25.56]]},
+      {type:"point",symbol:"capital",name:"Peking",at:[116.41,39.90]}, {type:"point",symbol:"battle",name:"Plassey",at:[88.25,23.80]}, {type:"point",symbol:"port",name:"Canton",at:[113.26,23.13]}, {type:"point",symbol:"port",name:"Calcutta",at:[88.36,22.57]}
+    ], terms:[{t:"Qing",wiki:"Qing dynasty"},{t:"Dzungaria",wiki:"Dzungar-Qing Wars"},{t:"Aurangzeb",wiki:"Aurangzeb"},{t:"Plassey",wiki:"Battle of Plassey"}]},
+    "ch-atlantic-america-new-france": { caption:"New France, Hudson Bay, Louisiana and the British colonies make North America central to the final round.", bbox:[[-98,24],[-50,58]], layers:[
+      {type:"area",name:"New France",tier:"core",colour:CAN,around:[[-84,42],[-78,47],[-72,50],[-61,48],[-63,44],[-75,43]],labelAt:[-73,47]},
+      {type:"area",name:"British colonies",tier:"core",colour:BRIT,around:[[-82,31],[-74,40],[-70,45],[-67,44],[-72,36],[-80,32]],labelAt:[-75,39]},
+      {type:"route",style:"dotted",colour:ROAD,name:"St Lawrence and Great Lakes",path:[[-59.96,45.90],[-71.21,46.81],[-73.56,45.50],[-79.06,43.15],[-83.05,42.33]]},
+      {type:"boundary",style:"dashdot",colour:BRIT,name:"Proclamation line",path:[[-82,34],[-80,38],[-78,42],[-76,45]]},
+      {type:"point",symbol:"battle",name:"Quebec",at:[-71.21,46.81]}, {type:"point",symbol:"fortress",name:"Louisbourg",at:[-59.96,45.90]}, {type:"point",symbol:"fortress",name:"Fort Duquesne",at:[-79.99,40.44]}, {type:"point",symbol:"port",name:"New Orleans",at:[-90.07,29.95]}
+    ], terms:[{t:"Quebec",wiki:"Battle of the Plains of Abraham"},{t:"Louisbourg",wiki:"Siege of Louisbourg (1758)"},{t:"Royal Proclamation",wiki:"Royal Proclamation of 1763"},{t:"Hudson's Bay Company",wiki:"Hudson's Bay Company"}]},
+    "ch-seven-years-war-global": { caption:"Silesia, Canada and Bengal are one war once Britain's navy and subsidies are on the table.", bbox:[[-90,6],[91,61]], layers:[
+      {type:"route",style:"dashed",colour:BRIT,name:"British global arc",path:[[-0.13,51.51],[-59.96,45.90],[-71.21,46.81],[-79.99,40.44]]},
+      {type:"route",style:"dotted",colour:BRIT,name:"Company Bengal",path:[[88.36,22.57],[88.25,23.80],[84.05,25.56]]},
+      {type:"route",style:"road",colour:EMP,name:"Frederick's Silesian war",path:[[13.40,52.52],[14.42,50.08],[11.88,51.25],[16.16,51.05]]},
+      {type:"point",symbol:"battle",name:"Rossbach",at:[11.88,51.25]}, {type:"point",symbol:"battle",name:"Quebec",at:[-71.21,46.81]}, {type:"point",symbol:"battle",name:"Plassey",at:[88.25,23.80]}, {type:"point",symbol:"treaty",name:"Paris",at:[2.35,48.86]}
+    ], terms:[{t:"Seven Years' War",wiki:"Seven Years' War"},{t:"Quebec",wiki:"Battle of the Plains of Abraham"},{t:"Plassey",wiki:"Battle of Plassey"},{t:"Hubertusburg",wiki:"Treaty of Hubertusburg"}]},
+    "ch-prussia-poland-enlightened": { caption:"Reform from above and partition from outside close the Age of Reason.", bbox:[[12,47],[33,57]], layers:[
+      {type:"area",name:"Poland-Lithuania",tier:"influence",colour:FRA,around:[[15,50],[18,54],[25,56],[31,53],[30,49],[22,48]],labelAt:[23,52]},
+      {type:"route",style:"dashed",colour:EMP,name:"Partition pressure",path:[[30.31,59.94],[25.28,54.69],[21.01,52.23],[16.93,52.41],[13.40,52.52]]},
+      {type:"route",style:"dotted",colour:ROAD,name:"Kosciuszko rising",path:[[19.94,50.06],[21.01,52.23],[23.83,53.67]]},
+      {type:"point",symbol:"capital",name:"Berlin",at:[13.40,52.52]}, {type:"point",symbol:"capital",name:"Warsaw",at:[21.01,52.23]}, {type:"point",symbol:"capital",name:"Vienna",at:[16.37,48.21]}, {type:"point",symbol:"large-city",name:"Vilna",at:[25.28,54.69]}
+    ], terms:[{t:"Frederick II",wiki:"Frederick the Great"},{t:"Catherine II",wiki:"Catherine the Great"},{t:"May Constitution",wiki:"Constitution of 3 May 1791"},{t:"Kosciuszko",wiki:"Tadeusz Kościuszko"}]}
+
   };
 })();
