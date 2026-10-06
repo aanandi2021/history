@@ -28,9 +28,9 @@
           { id: "army", label: "Army and\nprovinces", x: 0.51, y: 0.86, w: 0.24, h: 0.10, colour: ARMY, strong: true, note: "the dangerous seam" }
         ],
         arrows: [
-          { id: "elect-praetors", from: "tribal", to: "praetors", label: "elect", via: [[0.16,0.29],[0.16,0.42]], labelAt: [0.16,0.31] },
+          { id: "elect-praetors", from: "tribal", to: "praetors", label: "elect", via: [[0.28,0.29],[0.28,0.42],[0.16,0.42]], labelAt: [0.28,0.37] },
           { id: "elect-tribunes", from: "plebeian", to: "tribunes", label: "elect", colour: TR, via: [[0.40,0.29],[0.45,0.42]], labelAt: [0.41,0.31] },
-          { id: "elect-consuls", from: "centuriate", to: "consuls", label: "elect", via: [[0.61,0.29],[0.62,0.42]], labelAt: [0.61,0.31] },
+          { id: "elect-consuls", from: "centuriate", to: "consuls", label: "elect", via: [[0.69,0.29],[0.73,0.40],[0.68,0.42]], labelAt: [0.72,0.37] },
           { id: "senate-advises", from: "senate", to: "consuls", label: "advises", colour: SEN, labelAt: [0.74,0.41] },
           { id: "veto-consuls", from: "tribunes", to: "consuls", label: "veto", colour: TR, dashed: true, end: "bar", labelAt: [0.54,0.55] },
           { id: "veto-senate", from: "tribunes", to: "senate", label: "veto", colour: TR, dashed: true, end: "bar", via: [[0.55,0.63],[0.82,0.63]], labelAt: [0.68,0.63] },

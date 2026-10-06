@@ -117,7 +117,7 @@ window.SCENES = window.SCENES || {};
     ], terms:[{t:"Capetian",wiki:"House of Capet"},{t:"Bouvines",wiki:"Battle of Bouvines"},{t:"Albigensian Crusade",wiki:"Albigensian Crusade"},{t:"Louis IX",wiki:"Louis IX of France"}]},
     "ch-angevin-england": { caption:"Angevin England is an island kingdom joined to French fiefs until John loses most of them.", bbox:[[-9,42],[5,57]], layers:[
       {type:"area",name:"England",tier:"core",colour:ENG,around:[[-3,52],[-1,54],[0,51]],labelAt:[-1.5,52.5]},
-      {type:"area",name:"Angevin lands",tier:"conquest",colour:NORM,around:[[1.1,49.4],[-0.55,47.47],[0.34,46.58],[-0.58,44.84]],labelAt:[0,47]},
+      {type:"area",name:"Angevin lands",tier:"conquest",colour:NORM,around:[[-1.2,49.5],[1.2,49.5],[2.5,47.5],[2.4,45.0],[0.8,43.4],[-0.8,43.2],[-1.2,45.0],[-0.6,47.2]],labelAt:[0,46.8]},
       {type:"arrow",name:"Norman invasion",colour:NORM,path:[[1.1,49.44],[0.49,50.91]],labelAt:[0.9,50.2]},
       {type:"boundary",style:"partition",colour:"#5f4b8b",name:"Losses to France",from:"1204",path:[[0,50],[0,48.5],[0.4,47]]},
       {type:"point",symbol:"battle",name:"Hastings",year:"1066",at:[0.49,50.91]}, {type:"point",symbol:"treaty",name:"Runnymede",year:"1215",at:[-0.57,51.44]}, {type:"point",symbol:"battle",name:"Bouvines",year:"1214",at:[2.34,50.58]}

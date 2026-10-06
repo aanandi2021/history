@@ -11,8 +11,8 @@
     ], legend:{position:"bottom-left",columns:1} },
     { caption:"The Angevin realm and its crisis", share:0.52, extent:[[-9,42],[5,57]], projection:"mercator", layers:[
       {id:"england2",type:"area",tier:"core",colour:ENG,legend:"England (not Wales)",polygon:[[-5.7,50.0],[-4.4,50.3],[-2.6,50.5],[-0.5,50.7],[1.4,51.0],[1.3,52.3],[0.4,53.3],[-1.1,54.3],[-2.1,55.0],[-2.9,55.5],[-3.3,54.9],[-2.8,54.1],[-3.0,53.1],[-2.7,52.3],[-3.3,51.9],[-4.4,51.8],[-5.2,51.2]],smooth:false},
-      {id:"angevin",type:"area",tier:"conquest",colour:ANJ,legend:"Angevin lands in France",polygon:[[-2.2,43.0],[-1.7,44.2],[-1.2,45.4],[-1.3,46.5],[-2.2,47.3],[-2.0,48.3],[-1.2,49.5],[0.2,50.2],[1.8,50.1],[3.2,49.2],[3.0,47.8],[2.5,46.5],[2.4,45.2],[1.8,44.1],[0.6,43.4],[-0.8,42.9]],smooth:true},
-      {id:"brittany",type:"area",opacity:0.5,colour:ANJ,legend:"Brittany dependent",polygon:[[-4.9,47.6],[-4.2,48.5],[-3.1,48.9],[-1.6,49.5],[-1.9,48.3],[-2.7,47.8],[-3.9,47.4]],smooth:true},
+      {id:"angevin",type:"area",clipToLand:true,tier:"conquest",colour:ANJ,legend:"Angevin lands in France",polygon:[[-1.9,49.8],[-0.4,50.2],[1.6,50.1],[2.5,49.3],[2.3,48.2],[1.4,47.5],[2.0,46.5],[2.7,45.2],[2.6,44.1],[1.2,43.2],[-0.3,42.8],[-1.3,43.1],[-1.2,44.6],[-0.7,45.4],[-0.4,46.3],[-0.7,47.2],[-1.4,48.1],[-1.2,49.0]],smooth:false},
+      {id:"brittany",type:"area",clipToLand:true,opacity:0.5,colour:ANJ,legend:"Brittany dependent",polygon:[[-4.9,47.5],[-4.1,48.5],[-3.1,48.9],[-1.6,48.9],[-1.4,48.0],[-2.4,47.4],[-3.8,47.3]],smooth:false},
       {id:"ireland",type:"area",tier:"influence",colour:IR,legend:"English foothold in Ireland",polygon:[[-8,51.5],[-6.5,54.2],[-5.5,53.0],[-5.8,51.8]],smooth:true},
       {id:"capetian",type:"area",tier:"influence",colour:FR,legend:"Capetian pressure",polygon:[[0.8,47.5],[2.3,49.7],[4.2,49.2],[4.0,47.2],[2.1,46.8]],smooth:"basis"},
       {id:"loss",type:"boundary",style:"partition",colour:LINE,width:2.6,legend:"Losses to Philip II",path:[[0.0,50.0],[0.0,48.8],[0.6,47.5],[0.3,46.5]]},
