@@ -7,6 +7,10 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
+## 0.9.0 (Unreleased / 0.9.0-dev)
+
+- Started atlas round 13 (PDF pp. 254–273).
+
 ## 0.8.0 (6 Oct 2026)
 
 - Atlas round 12 (PDF pp. 234–253): added four Age of Religious Discord plates for the German Reformation, Charles V and Habsburg-Valois Europe, confessional Europe, and the Dutch revolt plus maritime empires.
