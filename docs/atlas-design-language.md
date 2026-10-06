@@ -368,3 +368,20 @@ The Baghdad plate uses this sparingly: the Round City is a schematic plan with c
 
 Area polygons default to softened closed curves (`smooth: true`) that interpolate through the hand-placed vertices with Catmull-Rom corners. This is intentional: the atlas should read as historical fields and soft frontiers, but the vertices remain the territory you drew. Use `smooth: false` only when the line must be exact, such as the shared Verdun partition edges. Area layers clip to land by default; set `clipToLand: false` only for deliberate sea zones or diagrammatic areas.
 
+The clipping implementation is deliberately defensive. A land-clipped area now uses the area itself as the clip and paints the basemap land through it, so a broad realm field cannot bleed into the sea even when Natural Earth polygons, SVG clip-path fill rules or smoothed rings behave differently in Chrome. Polygon rings are normalised before drawing; a ring that D3 would read as the complement of the globe is reversed.
+
+## 18. Round 9: late-medieval networks and two-state war maps (PDF pp. 174–193)
+
+This batch covers Byzantium under Basil II and after Manzikert, the Mongol and Chinese context pages, late-medieval towns and trade, England, France, the Hundred Years War, Switzerland and Burgundy. Analyses are in `study/analysis/spread-p174…p192.json` and `round9-findings.md`.
+
+New moves:
+
+- **Trade-network routes.** A `route` can carry `weight`, which scales the dotted or dashed line without changing its semantic style. Use it for relative route importance, not measured tonnage.
+- **Hub symbols.** A `point` can carry `hub` and `hubColour`, drawing a ring around a port or trading centre. This lets a trade plate distinguish Lubeck, Bruges, Novgorod, Venice, Genoa or Alexandria from ordinary ports.
+- **Two-map war comparison.** The Hundred Years War plate uses the same extent twice: first the treaty map after Crecy, Poitiers and Bretigny, then the 1429–1453 recovery. The reader compares the political field without learning a new base map.
+
+What we built from it:
+
+- Three plates: `byzantium-basil-crisis`, `medieval-trade-networks` and `hundred-years-war`.
+- The medieval period now carries late Byzantine crisis, Hansa/Venice/Genoa trade, Black Death transmission context, Joan of Arc and the French recovery to 1453.
+- The Hansa/Italian trade plate is the fidelity target for weighted trade routes and hub rings.

@@ -140,7 +140,25 @@ window.SCENES = window.SCENES || {};
       {type:"area",name:"Rus principalities",tier:"influence",colour:RUS,around:[[30.52,50.45],[31.28,58.52],[37,55]],labelAt:[33,53]},
       {type:"arrow",name:"Mongol campaigns",colour:STEP,path:[[50,48],[38.5,47.1],[30.52,50.45],[20.8,48.1]],labelAt:[36,49]},
       {type:"point",symbol:"battle",name:"Kalka",year:"1223",at:[38.5,47.1]}, {type:"point",symbol:"capital",name:"Kiev",year:"1240",at:[30.52,50.45]}, {type:"point",symbol:"battle",name:"Legnica",year:"1241",at:[16.16,51.21]}, {type:"point",symbol:"battle",name:"Sajo",year:"1241",at:[20.8,48.1]}
-    ], terms:[{t:"Kievan Rus",wiki:"Kievan Rus'"},{t:"Mongol",wiki:"Mongol invasion of Europe"},{t:"Golden Horde",wiki:"Golden Horde"},{t:"Russia",wiki:"History of Russia"}]}
+    ], terms:[{t:"Kievan Rus",wiki:"Kievan Rus'"},{t:"Mongol",wiki:"Mongol invasion of Europe"},{t:"Golden Horde",wiki:"Golden Horde"},{t:"Russia",wiki:"History of Russia"}]},
+    "ch-byzantium-basil-crisis": { caption:"Byzantium reaches a high point under Basil II, then loses Anatolia and survives as a smaller empire.", bbox:[[10,31],[46,49]], layers:[
+      {type:"area",name:"Basil II's empire",tier:"core",colour:BYZ,around:[[21,40],[28.98,41.01],[36.16,36.2],[39,39],[24,37]],labelAt:[29,39]},
+      {type:"area",name:"Turkish Anatolia",tier:"conquest",from:"1071",colour:IS,around:[[30,37],[36,39],[42,38],[39,35],[33,35]],labelAt:[36,37]},
+      {type:"arrow",name:"Fourth Crusade",colour:NORM,from:"1204",path:[[12.33,45.44],[20,40],[28.98,41.01]],labelAt:[20,40]},
+      {type:"point",symbol:"capital",name:"Constantinople",at:[28.98,41.01]}, {type:"point",symbol:"battle",name:"Manzikert",year:"1071",at:[42.53,39.15]}, {type:"point",symbol:"large-city",name:"Ohrid",year:"1018",at:[20.8,41.1]}
+    ], terms:[{t:"Basil II",wiki:"Basil II"},{t:"Manzikert",wiki:"Battle of Manzikert"},{t:"Fourth Crusade",wiki:"Fourth Crusade"},{t:"Constantinople",wiki:"Constantinople"}]},
+    "ch-medieval-trade-networks": { caption:"The Hansa, Venice and Genoa join northern towns, Rus, the Black Sea and the spice routes.", bbox:[[-6,29],[43,61]], layers:[
+      {type:"route",style:"dotted",colour:ROAD,name:"Hanseatic route",path:[[31.28,58.52],[24.11,56.95],[10.69,53.87],[3.22,51.21],[-0.13,51.51]]},
+      {type:"route",style:"dotted",colour:NORM,name:"Italian sea routes",path:[[12.33,45.44],[28.98,41.01],[34.1,45.03],[39.7,47.2]]},
+      {type:"route",style:"dotted",colour:ASIA,name:"Spice route into Alexandria",path:[[35.5,33.89],[29.92,31.2],[12.33,45.44]]},
+      {type:"point",symbol:"port",name:"Lubeck",at:[10.69,53.87]}, {type:"point",symbol:"large-city",name:"Novgorod",at:[31.28,58.52]}, {type:"point",symbol:"port",name:"Venice",at:[12.33,45.44]}, {type:"point",symbol:"port",name:"Genoa",at:[8.93,44.41]}, {type:"point",symbol:"port",name:"Alexandria",at:[29.92,31.2]}, {type:"point",symbol:"port",name:"Caffa",year:"1347",at:[34.1,45.03]}
+    ], terms:[{t:"Hansa",wiki:"Hanseatic League"},{t:"Venice",wiki:"Republic of Venice"},{t:"Genoa",wiki:"Republic of Genoa"},{t:"Novgorod",wiki:"Novgorod Republic"},{t:"Black Death",wiki:"Black Death"}]},
+    "ch-hundred-years-war": { caption:"English victories create a treaty map; Joan of Arc and French recovery reverse it.", bbox:[[-6,42],[8,52]], layers:[
+      {type:"area",name:"English lands after Bretigny",tier:"conquest",colour:ENG,around:[[-1,45],[0.34,46.58],[-0.58,44.84]],labelAt:[-0.3,45.5]},
+      {type:"area",name:"Burgundy",tier:"influence",colour:IS,around:[[3,47],[5,49],[6,48]],labelAt:[5,48]},
+      {type:"arrow",name:"French recovery",colour:FR,path:[[1.91,47.9],[4.03,49.26],[1.1,49.44],[-0.04,44.85]],labelAt:[2,48]},
+      {type:"point",symbol:"battle",name:"Crecy",year:"1346",at:[1.88,50.26]}, {type:"point",symbol:"battle",name:"Poitiers",year:"1356",at:[0.34,46.58]}, {type:"point",symbol:"fortress",name:"Orleans",year:"1429",at:[1.91,47.9]}, {type:"point",symbol:"battle",name:"Castillon",year:"1453",at:[-0.04,44.85]}
+    ], terms:[{t:"Hundred Years War",wiki:"Hundred Years' War"},{t:"Crecy",wiki:"Battle of Crecy"},{t:"Joan of Arc",wiki:"Joan of Arc"},{t:"Castillon",wiki:"Battle of Castillon"}]}
 
   };
 })();

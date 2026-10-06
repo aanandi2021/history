@@ -106,6 +106,10 @@
     return `M0,0H${w}V${h}H0Z${geo(LANDF) || ""}`;
   }
 
+  function weightedWidth(L, fallback) {
+    return L.width || (L.weight ? Math.max(1.4, Math.min(7, 1.2 + L.weight * 0.9)) : fallback);
+  }
+
   function areaFill(defs, L) {
     L = areaLook(L);
     const c = L.colour || AREA_DEFAULT, pat = L.pattern || "solid";
@@ -458,13 +462,14 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
       const g = layerG(L_LINES, L);
       const d = d3.line().curve(d3.curveCatmullRom.alpha(0.5))(L.path.map(proj));
       const c = L.colour || "#b0753a";
+      const rw = weightedWidth(L, L.style === "road" ? 2.4 : L.style === "dashed" ? 2 : 3);
       if (L.style === "road") {
         // a built road (the Persian royal road, the Roman roads): pale bed with dark dashes, never confused with a campaign
-        g.append("path").attr("d", d).attr("fill", "none").attr("stroke", L.bed || "#f0d27a").attr("stroke-width", (L.width || 2.4) + 1.6).attr("stroke-linecap", "round");
-        g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", L.width || 2.4).attr("stroke-dasharray", "6 4");
-      } else if (L.style === "dashed") g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", L.width || 2).attr("stroke-dasharray", "7 4");
-      else g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", L.width || 3).attr("stroke-linecap", "round").attr("stroke-dasharray", "0.1 5.5");
-      if (L.head) arrowHead(svg, g, d, L.width || 3, c, 6);
+        g.append("path").attr("d", d).attr("fill", "none").attr("stroke", L.bed || "#f0d27a").attr("stroke-width", rw + 1.6).attr("stroke-linecap", "round");
+        g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", rw).attr("stroke-dasharray", "6 4");
+      } else if (L.style === "dashed") g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", rw).attr("stroke-dasharray", "7 4");
+      else g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", rw).attr("stroke-linecap", "round").attr("stroke-dasharray", "0.1 5.5");
+      if (L.head) arrowHead(svg, g, d, rw, c, 6);
       if (L.label) alongLabel(g, svg, readable(L.path, proj), L.label, { size: 8.5, fill: shade(c, -1.2), dy: -5, italic: true });
       lineDates(g, svg, L, proj, c);
     }
@@ -502,6 +507,7 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
       g.append("circle").attr("class", "hit").attr("r", size + 2).attr("fill", "transparent");
       // origin halo: who founded it (colony maps colour each settlement by its mother city)
       if (L.halo) g.append("circle").attr("r", size * 0.9).attr("fill", L.halo).attr("fill-opacity", 0.7);
+      if (L.hub) g.append("circle").attr("class", "hub-ring").attr("r", size + 2 + Math.min(10, L.hub * 1.5)).attr("fill", "none").attr("stroke", L.hubColour || L.colour || "#b0753a").attr("stroke-opacity", 0.72).attr("stroke-width", Math.max(1.1, Math.min(3.2, 0.8 + L.hub * 0.35)));
       drawSymbol(g, L.symbol || "city", size, L.colour);
       if (L.name) {
         const pos = L.labelPos || "e", off = 6 + size * 0.25;

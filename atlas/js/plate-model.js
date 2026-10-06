@@ -86,6 +86,7 @@
           if (!Array.isArray(L.path) || L.path.length < 2 || !L.path.every(isLonLat)) bad(`${lw}: needs path of at least two [lon,lat]`);
           if (L.type === "boundary" && L.style && !BOUNDARY_STYLES.includes(L.style)) bad(`${lw}: unknown boundary style ${L.style}`);
           if (L.type === "route" && L.style && !ROUTE_STYLES.includes(L.style)) bad(`${lw}: unknown route style ${L.style}`);
+          if (L.type === "route" && L.weight != null && (!Number.isFinite(L.weight) || L.weight <= 0)) bad(`${lw}: route weight must be a positive number`);
           for (const dt of L.dates || []) {
             if (!Array.isArray(dt) || typeof dt[0] !== "number" || dt[0] < 0 || dt[0] > 1 || !dt[1]) bad(`${lw}: dates must be [[0..1, "text"], ...]`);
           }
@@ -94,6 +95,7 @@
           if (!isLonLat(L.at)) bad(`${lw}: needs at:[lon,lat]`);
           if (!SYMBOLS[L.symbol || "city"]) bad(`${lw}: unknown symbol ${L.symbol}`);
           if (L.halo && !isColour(L.halo)) bad(`${lw}: bad halo colour ${L.halo}`);
+          if (L.hub != null && (!Number.isFinite(L.hub) || L.hub <= 0)) bad(`${lw}: hub must be a positive number`);
         }
         if (L.type === "label") {
           if (!L.text) bad(`${lw}: label needs text`);

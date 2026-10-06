@@ -70,8 +70,10 @@ test("validate catches the mistakes a generator is likely to make", () => {
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "zigzag", path: [[1, 1], [2, 2]] }); }), /unknown boundary style/);
   assert.doesNotMatch(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "partition", path: [[1, 1], [2, 2]] }); }), /unknown boundary style/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "route", style: "highway", path: [[1, 1], [2, 2]] }); }), /unknown route style/);
+  assert.match(bad((s) => { s.figures[0].layers.push({ type: "route", weight: 0, path: [[1, 1], [2, 2]] }); }), /route weight/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "wall", path: [[1, 1], [2, 2]], dates: [[1.5, "214"]] }); }), /dates must be/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "point", at: [1, 1], halo: "not a colour!" }); }), /bad halo/);
+  assert.match(bad((s) => { s.figures[0].layers.push({ type: "point", at: [1, 1], hub: -1 }); }), /hub/);
 });
 
 let browser;
@@ -217,5 +219,17 @@ test("round 2 grammar draws: wall battlements, dates on lines, tiers, roads and 
   assert.equal(st.road, 2, "a road is a pale bed plus dark dashes");
   assert.ok(st.halos >= 1, "commandery seats carry an origin halo");
   assert.ok(st.influenceOpacity < 0.3, "influence reads paler than the core");
+  await page.close();
+});
+
+test("trade-network grammar draws weighted routes and hub rings", async () => {
+  const { page, errors } = await open("#medieval-trade-networks");
+  const st = await page.evaluate(() => ({
+    wideRoute: Math.max(...[...document.querySelectorAll('[data-layer="lubeck-bruges"] path')].map((p) => +(p.getAttribute("stroke-width") || 0))),
+    hubRings: document.querySelectorAll(".hub-ring").length
+  }));
+  assert.deepEqual(errors, []);
+  assert.ok(st.wideRoute > 4, `weighted route too thin: ${st.wideRoute}`);
+  assert.ok(st.hubRings >= 4, "hub rings were not drawn");
   await page.close();
 });

@@ -23,6 +23,10 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 - Three new plates: Capetian France, England and the Angevin empire, and Poland/Hungary/Rus under the Mongol shock.
 - Added institution diagrams to the atlas renderer and a Roman Republic constitution plate, linked from the end-of-the-Republic chapter.
 - Added small-multiple atlas figures and a four-panel Rome growth plate from 264 BC to AD 117.
+- Fixed atlas land clipping: clipped areas now paint through land instead of relying on a broad realm path over water, and polygon winding is normalised before drawing.
+- Atlas round 9 (PDF pp. 174–193): added Byzantium under Basil II and after Manzikert, late-medieval trade networks, the Black Death route context, and France/England through the Hundred Years War.
+- Three new plates: Byzantium from Basil II to the Fourth Crusade, Hanseatic plus Venetian/Genoese trade networks, and the Hundred Years War from Bretigny to Castillon.
+- Added trade-network styling to the atlas renderer: weighted dotted routes and hub rings for ports and kontors.
 
 ## 0.6.0 (5 Oct 2026)
 
