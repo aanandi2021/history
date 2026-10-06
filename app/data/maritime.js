@@ -203,8 +203,9 @@
   window.DATASETS = window.DATASETS || {};
   window.DATASETS.maritime = {
     id: "maritime",
+    kind: "thread",
     title: "Maritime Asia: Bengal, Srivijaya and Java",
-    subtitle: "745–865 · The Unseen Tomorrow",
+    subtitle: "Thread · 745–865 · The Unseen Tomorrow",
     range: ["0745-01-01", "0865-01-01"],
     startAt: "0755",
     precision: "year",

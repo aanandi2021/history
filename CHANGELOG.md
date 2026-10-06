@@ -7,6 +7,14 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
+## 1.1.0 (Unreleased / 1.1.0-dev)
+
+- Reframed the top spine as eras only: Russia and Maritime Asia are now threads in the period dropdown, while preserving their existing datasets. Switching eras or threads carries the current year and clamps to the nearest edge.
+- Marked the 1800-1939 Penguin Vol. 2 gap on the master strip.
+- Added a subtle "World at this date" political underlay built from Natural Earth region blocks, with dated snapshots from 1500 BC to 1939 and a map toggle.
+- Added guided tours, URL-deep-linked tour state, keyboard stop navigation and two pilot tours: Jewish persecution history and Rome's rise/fall.
+- Documented how to write tours and world snapshots, with tests for tour references, spine behaviour and snapshot region codes.
+
 ## 1.0.0 (6 Oct 2026)
 
 - Atlas round 14 (PDF pp. 274-289): closes the atlas proper with Qing China, Mughal/Company India, Atlantic America and New France, the Seven Years' War, Prussia, the partitions of Poland and enlightened despotism.

@@ -324,10 +324,52 @@
     return out;
   }
 
+
+  function parseQuery(q) {
+    const out = {};
+    String(q || "").replace(/^\?/, "").split("&").filter(Boolean).forEach((pair) => {
+      const i = pair.indexOf("=");
+      const k = decodeURIComponent(i < 0 ? pair : pair.slice(0, i));
+      out[k] = decodeURIComponent(i < 0 ? "" : pair.slice(i + 1));
+    });
+    return out;
+  }
+  function queryString(params) {
+    const pairs = Object.entries(params || {}).filter(([, v]) => v != null && v !== "");
+    return pairs.length ? "?" + pairs.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join("&") : "";
+  }
+
+  function snapshotAt(snapshots, t) {
+    const y = t instanceof Date ? yearOf(t) : Number(t);
+    let best = null;
+    for (const s of (snapshots || []).slice().sort((a, b) => a.year - b.year)) {
+      if (s.year <= y) best = s; else break;
+    }
+    return best || (snapshots || []).slice().sort((a, b) => a.year - b.year)[0] || null;
+  }
+
+  function validateWorldSnapshots(snapshots, regionsTopo) {
+    const errs = [];
+    const geoms = regionsTopo && regionsTopo.objects && regionsTopo.objects.regions && regionsTopo.objects.regions.geometries || [];
+    const codes = new Set(geoms.map((g) => g.properties && g.properties.code).filter(Boolean));
+    for (const snap of snapshots || []) {
+      if (typeof snap.year !== "number") errs.push(`snapshot ${snap.year}: year must be a number`);
+      for (const p of snap.polities || []) {
+        if (!p.id || !p.name || !p.colour) errs.push(`snapshot ${snap.year}: polity needs id, name and colour`);
+        for (const code of [...(p.regions || []), ...(p.minus || [])]) if (!codes.has(code)) errs.push(`snapshot ${snap.year}: ${p.id}: unknown region ${code}`);
+        if ((!p.regions || !p.regions.length) && !p.polygon) errs.push(`snapshot ${snap.year}: ${p.id}: needs regions or polygon`);
+      }
+    }
+    return errs;
+  }
+
   // ---- address -----------------------------------------------------------
 
   function parseHash(hash, datasets, defaultId) {
-    const parts = String(hash || "").replace(/^#/, "").split("/").map(decodeURIComponent);
+    const rawHash = String(hash || "").replace(/^#/, "");
+    const [pathPart, queryPart] = rawHash.split("?");
+    const query = parseQuery(queryPart);
+    const parts = pathPart.split("/").map(decodeURIComponent);
     const id = parts[0] && datasets[parts[0]] ? parts[0] : defaultId;
     const fellBack = id !== parts[0];
     const raw = datasets[id];
@@ -336,11 +378,11 @@
     if (!t) t = parseDate(raw.startAt) || lo;
     if (t < lo) t = lo;
     if (t > hi) t = hi;
-    return { dataset: id, date: t, item: fellBack ? null : (parts[2] || null) };
+    return { dataset: id, date: t, item: fellBack ? null : (parts[2] || null), query };
   }
 
-  function formatHash(id, t, itemId) {
-    return `#${id}/${isoDate(t)}${itemId ? "/" + encodeURIComponent(itemId) : ""}`;
+  function formatHash(id, t, itemId, params) {
+    return `#${id}/${isoDate(t)}${itemId ? "/" + encodeURIComponent(itemId) : ""}${queryString(params)}`;
   }
 
   // ---- search ------------------------------------------------------------
@@ -675,7 +717,7 @@
    * share of the strip, so 1800 BC-500 BC takes the same width as 1900-1950. Otherwise a six-year war would be a
    * hairline next to two thousand years of antiquity. Years are astronomical (fractional), as from yearOf().
    */
-  const MASTER_BREAKS = [-499, 500, 1000, 1500, 1800, 1900];
+  const MASTER_BREAKS = [-1499, -499, 500, 1000, 1500, 1800, 1939, 1946];
   /** Years on the master strip: "1800 BC", "AD 500", "1945". */
   const masterYear = (Y) => (Y <= 0 ? `${1 - Y} BC` : Y < 1000 ? `AD ${Y}` : String(Y));
   function yearOf(t) {
@@ -683,16 +725,16 @@
     return y + (t - a) / (b - a);
   }
   function masterLayout(datasets) {
-    const periods = Object.entries(datasets || {}).map(([id, d]) => {
+    const periods = Object.entries(datasets || {}).filter(([, d]) => d.kind !== "thread").map(([id, d]) => {
       const t0 = parseDate(d.range[0]), t1 = parseDate(d.range[1]);
       const ey = t1.getUTCFullYear(), jan1 = t1.getUTCMonth() === 0 && t1.getUTCDate() === 1;
       const endYear = jan1 && toHist(ey) % 5 !== 0 ? ey - 1 : ey;
       const extra = d.subtitle && d.subtitle.includes("·") ? d.subtitle.split("·").slice(1).join("·").trim() : "";
-      return { id, title: d.title, full: extra ? `${d.title} (with ${extra})` : d.title, short: d.title.split(":")[0], from: masterYear(t0.getUTCFullYear()), to: masterYear(endYear), y0: yearOf(t0), y1: yearOf(t1) };
+      return { id, title: d.title, full: extra ? `${d.title} (with ${extra})` : d.title, short: d.masterTitle || d.title.split(":")[0], from: masterYear(t0.getUTCFullYear()), to: masterYear(endYear), y0: yearOf(t0), y1: yearOf(t1), gapAfter: d.gapAfter || null };
     }).sort((a, b) => a.y0 - b.y0 || b.y1 - a.y1);
     if (!periods.length) return { periods, breaks: [], y0: 0, y1: 1 };
     const y0 = Math.min(...periods.map((p) => p.y0)), y1 = Math.max(...periods.map((p) => p.y1));
-    const breaks = [y0, ...MASTER_BREAKS.filter((b) => b > y0 + 50 && b < y1 - 20), y1];
+    const breaks = [y0, ...MASTER_BREAKS.filter((b) => b > y0 + 50 && b < y1 - 1), y1];
     const rows = [];
     for (const p of periods) {
       let r = rows.findIndex((end) => end <= p.y0);
@@ -713,7 +755,7 @@
   }
 
   return {
-    yearOf, masterLayout, masterX, masterYear,
+    yearOf, masterLayout, masterX, masterYear, snapshotAt, validateWorldSnapshots,
     plateContext,
     sceneKey,
     sceneFor, visibleAt, liveAt, itineraryAt, stopLabel, sceneLadder, dateStart, dateEnd, linkTerms, termUrl, validateScene, SCENE_SYMBOLS,

@@ -21,6 +21,7 @@
       <ul id="results" role="listbox" hidden></ul>
     </div>
     <a id="board-link" class="ctl" href="board.html#ww1-origins" title="Cause-and-effect board: draw what led to what">⇄ Board</a>
+    <button id="tour-btn" class="ctl" title="Guided tours">Tour</button><div id="tour-menu" hidden></div>
     <button id="help-btn" class="ctl" title="Keys and tips">?</button>
   </header>
   <nav id="master" aria-label="Master timeline: every period on one strip. Click a period to open it.">
@@ -37,6 +38,7 @@
         <div id="map-legend"></div>
         <div id="map-note"></div>
         <button id="world" class="map-btn" title="Whole-world map">🌍 World</button>
+        <label id="world-toggle" class="map-toggle"><input id="world-underlay" type="checkbox" checked> World at this date <span id="world-date-label"></span></label>
       </div>
       <div id="tl-bar">
         <button id="play" title="Play / pause (space)">▶ Play</button>
@@ -52,6 +54,7 @@
       </div>
     </section>
     <aside id="panel" aria-live="polite">
+      <div id="tour-card" hidden></div>
       <div id="card" hidden></div>
       <div id="meanwhile"></div>
     </aside>
@@ -73,6 +76,8 @@
   <script src="vendor/d3.min.js"></script>
   <script src="vendor/topojson-client.min.js"></script>
   <script src="data/world-110m.js"></script>
+  <script src="../atlas/data/regions-eu.js"></script>
+  <script src="data/world-snapshots.js"></script>
   <script src="data/ww2.js"></script>
   <script src="data/russia.js"></script>
   <script src="data/maritime.js"></script>
@@ -87,6 +92,8 @@
   <script src="scenes/medieval.js"></script>
   <script src="scenes/transition.js"></script>
   <script src="scenes/early-modern.js"></script>
+  <script src="tours/jewish-history.js"></script>
+  <script src="tours/rome-rise-fall.js"></script>
   <script src="js/model.js"></script>
   <script src="js/viewer.js"></script>
 </body>

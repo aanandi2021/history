@@ -10,7 +10,7 @@ const DS = loadDatasets();
 
 test("masterLayout: every period, in order, with readable from/to years and no overlaps within a row", () => {
   const L = HM.masterLayout(DS);
-  assert.equal(L.periods.length, Object.keys(DS).length);
+  assert.equal(L.periods.length, Object.values(DS).filter((d) => d.kind !== "thread").length);
   const anc = L.periods.find((p) => p.id === "ancient");
   assert.equal(anc.from, "1800 BC");
   assert.equal(anc.to, "AD 700");
@@ -53,18 +53,18 @@ test("e2e: the strip highlights the open period, follows the dropdown, and opens
   let s = await on();
   assert.deepEqual(s.on, ["ancient"]);
   assert.deepEqual(s.years, ["1800 BC", "AD 700"]);
-  await page.select("#dataset", "russia");
+  await page.select("#dataset", "medieval");
   s = await on();
-  assert.deepEqual(s.on, ["russia"], "dropdown → strip");
+  assert.deepEqual(s.on, ["medieval"], "dropdown → strip");
   await page.click('#master .m-period[data-id="ww2"] rect');
   s = await on();
   assert.equal(s.dropdown, "ww2", "strip → dropdown");
   assert.deepEqual(s.on, ["ww2"]);
-  assert.deepEqual(s.years, ["1937 – 1945"]);
+  assert.deepEqual(s.years, ["1937", "1945"]);
   await page.waitForFunction(() => location.hash.startsWith("#ww2/"), { timeout: 3000 });
   const before = s.cursor;
-  await page.evaluate(() => APP.setCursor(new Date(Date.UTC(1937, 1, 1))));
-  assert.ok((await on()).cursor < before, "the cursor tick follows the date");
+  await page.evaluate(() => APP.setCursor(new Date(Date.UTC(1945, 0, 1))));
+  assert.ok((await on()).cursor > before, "the cursor tick follows the date");
   assert.deepEqual(errors, []);
   await page.close();
 });

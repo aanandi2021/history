@@ -102,7 +102,7 @@
   const books = [];
   window.DATASETS = window.DATASETS || {};
   window.DATASETS["early-modern"] = {
-    id:"early-modern", title:"Age of Reason", subtitle:"1600-1800", range:["1600-01-01","1800-01-01"], startAt:"1763", precision:"year",
+    id:"early-modern", title:"Age of Reason", subtitle:"1600-1800", range:["1600-01-01","1800-01-01"], gapAfter:"1800-1939 not yet built (Penguin Vol. 2)", startAt:"1763", precision:"year",
     mapNote:"The map layers are schematic story fields. They keep Canada first while showing Europe, the Ottoman-Danube frontier, Britain, Sweden and Russia as overlapping early-modern systems.",
     lanes:[{id:"canada",label:"Canada & Atlantic North America",colour:"#b22d2d",pinned:true},{id:"europe",label:"Central Europe",colour:"#7a5a8c"},{id:"ideas",label:"Ideas, science and culture",colour:"#6b6b6b"},{id:"france",label:"France",colour:"#d8a84f"},{id:"empire",label:"German Empire and princes",colour:"#6b8c3f"},{id:"ottoman",label:"Austria and Ottomans",colour:"#8c6d3f"},{id:"britain",label:"Britain and balance of power",colour:"#2f7f86"},{id:"north",label:"Sweden, Russia and Baltic",colour:"#b36b2e"},{id:"asia",label:"China, India and discoveries",colour:"#8c6d3f"},{id:"america",label:"Atlantic America and global war",colour:"#2f7f86"},{id:"prussia",label:"Prussia, Poland and enlightened states",colour:"#6b8c3f"}],
     events, leaders, chapters, books,

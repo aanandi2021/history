@@ -271,3 +271,21 @@ ul.terms .copy-ask { margin-left: 6px; font-size: 11px; padding: 1px 6px; }
 #master .m-gap { font-size: 9px; fill: #b5a88f; font-style: italic; }
 #master .m-scale { font-size: 9px; fill: #a39780; font-style: italic; cursor: help; }
 #master .m-note { font-size: 9px; fill: #a39780; font-style: italic; }
+
+#tour-btn { color: var(--accent); }
+#tour-menu { position: absolute; top: 62px; right: 54px; z-index: 35; width: 280px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 22px rgba(0,0,0,.14); padding: 6px; }
+#tour-menu button { display: block; width: 100%; text-align: left; border: 0; background: transparent; padding: 6px 8px; }
+#tour-menu button:hover { background: #f1ece2; }
+.map-toggle { position: absolute; left: 10px; top: 68px; display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--muted); background: rgba(255,253,248,.92); border: 1px solid var(--line); border-radius: 12px; padding: 2px 8px; }
+#world-date-label { font-style: italic; }
+#map .world-underlay .polity { fill-opacity: .16; stroke-opacity: .35; stroke-width: .75; vector-effect: non-scaling-stroke; }
+#map .world-underlay .polity-label { font: italic 10.5px var(--serif); fill: #5f5a52; stroke: rgba(255,253,248,.86); stroke-width: 3px; paint-order: stroke; text-anchor: middle; pointer-events: none; }
+#master .m-gap-band { fill: url(#gap-hatch); stroke: #c3b8a2; stroke-dasharray: 3 2; opacity: .55; }
+#tour-card { border: 1px solid #d4bea0; border-left: 4px solid #7a5a8c; border-radius: 8px; padding: 9px 10px; margin-bottom: 10px; background: #fbf6ea; }
+#tour-card h2 { font-size: 16px; margin: 0 22px 2px 0; }
+#tour-card .meta { color: var(--muted); font-size: 11.5px; }
+#tour-card .tour-title { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #7a5a8c; }
+#tour-card p { margin: 6px 0; }
+#tour-card .meanwhile { color: var(--muted); font-style: italic; }
+#tour-card .tour-actions { display: flex; gap: 6px; margin-top: 8px; }
+#tour-card .exit { float: right; border: 0; background: none; padding: 0 2px; font-size: 16px; color: var(--muted); }

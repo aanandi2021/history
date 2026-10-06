@@ -305,8 +305,9 @@
   window.DATASETS = window.DATASETS || {};
   window.DATASETS.russia = {
     id: "russia",
+    kind: "thread",
     title: "Russia: Muscovy to Stalin",
-    subtitle: "1450–1946",
+    subtitle: "Thread · 1450–1946",
     range: ["1450-01-01", "1946-01-01"],
     startAt: "1480-11",
     note: "Amit's Notes of the History of the World/Russia — Muscovy to Stalin (1480–1941)",

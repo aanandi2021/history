@@ -17,7 +17,8 @@
     dsId: null, ds: null,
     cursor: null, pinned: false, selected: null,
     playing: false, follow: true, followed: undefined,
-    mapK: 1, flying: false
+    mapK: 1, flying: false,
+    showWorld: true, tour: null, tourStop: 0
   };
 
   // ---------------------------------------------------------------- helpers
@@ -57,6 +58,7 @@
   mapRoot.append("path").attr("class", "grat").attr("d", geoPath(d3.geoGraticule10()));
   const countryPaths = mapRoot.append("g").selectAll("path").data(countries).join("path")
     .attr("class", "country").attr("d", geoPath);
+  const worldLayer = mapRoot.append("g").attr("class", "world-underlay");
   const chapterBox = mapRoot.append("path").attr("class", "chapter-box");
   const sceneLayer = mapRoot.insert("g", ".chapter-box").attr("class", "scene");
   const sceneDefs = mapSvg.append("defs");
@@ -101,6 +103,48 @@
     const k = Math.max(cur.k, 3);
     const t = d3.zoomIdentity.translate(MAP_W / 2 - k * p[0], MAP_H / 2 - k * p[1]).scale(k);
     mapSvg.transition("fly").duration(700).call(mapZoom.transform, t);
+  }
+
+
+
+  // ---------------------------------------------------------------- political underlay
+  const REGIONS = window.ATLAS_REGIONS;
+  let REGION_INDEX = null;
+  function regionIndex() {
+    if (REGION_INDEX) return REGION_INDEX;
+    REGION_INDEX = new Map();
+    const geoms = REGIONS && REGIONS.objects && REGIONS.objects.regions && REGIONS.objects.regions.geometries || [];
+    for (const g of geoms) if (g.properties && g.properties.code) REGION_INDEX.set(g.properties.code, g);
+    return REGION_INDEX;
+  }
+  function polityFeature(P) {
+    if (P.polygon) return { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [[...P.polygon, P.polygon[0]]] } };
+    const idx = regionIndex();
+    const geoms = (P.regions || []).map((c) => idx.get(c)).filter(Boolean);
+    if (!geoms.length) return null;
+    return { type: "Feature", properties: {}, geometry: topojson.merge(REGIONS, geoms) };
+  }
+  function polityPath(P) {
+    const f = polityFeature(P);
+    return f ? geoPath(f) : "";
+  }
+  function drawWorldUnderlay(t) {
+    const snap = M.snapshotAt(window.WORLD_SNAPSHOTS || [], t);
+    const on = !!(state.showWorld && snap);
+    worldLayer.attr("display", on ? null : "none");
+    if (!on) { worldLayer.selectAll("*").remove(); return; }
+    worldLayer.selectAll("path.polity").data(snap.polities, (d) => d.id).join(
+      (e) => e.append("path").attr("class", "polity"),
+      (u) => u,
+      (x) => x.remove()
+    ).attr("d", polityPath).attr("fill", (d) => d.colour).attr("stroke", (d) => d.colour);
+    worldLayer.selectAll("text.polity-label").data(snap.polities.filter((d) => d.label || d.at), (d) => d.id).join(
+      (e) => e.append("text").attr("class", "polity-label"),
+      (u) => u,
+      (x) => x.remove()
+    ).attr("x", (d) => projection(d.label || d.at)[0]).attr("y", (d) => projection(d.label || d.at)[1]).text((d) => d.name + (d.approx ? " (approx.)" : ""));
+    const el = $("#world-date-label");
+    if (el) el.textContent = `World at this date: ${M.masterYear(snap.year)}`;
   }
 
   // ---------------------------------------------------------------- chapter scenes (atlas grammar on the viewer map)
@@ -1003,6 +1047,7 @@
     updateCursorVisual();
     updateMasterCursor();
     colourMap(t);
+    drawWorldUnderlay(t);
     drawScene(t);
     renderPins(t);
     renderPanel();
@@ -1064,7 +1109,7 @@
   }
   function writeHash() {
     if (!state.cursor) return;
-    const h = M.formatHash(state.dsId, state.cursor, state.selected);
+    const h = M.formatHash(state.dsId, state.cursor, state.selected, state.tour ? { tour: state.tour.id, stop: state.tourStop } : null);
     if (location.hash !== h) {
       writingHash = true;
       history.replaceState(null, "", h);
@@ -1082,6 +1127,8 @@
     tlSvg.selectAll("g.item").classed("sel", (d) => d && d.id === state.selected);
     setCursor(p.date);
     renderCard();
+    if (p.query && p.query.tour && window.TOURS && window.TOURS[p.query.tour]) { state.tour = window.TOURS[p.query.tour]; state.tourStop = Math.max(0, Math.min(+p.query.stop || 0, state.tour.stops.length)); renderTourCard(); }
+    else if (!state.tour) renderTourCard();
     if (item && item.kind === "event" && item.at) panToPoint(item.at);
   }
   window.addEventListener("hashchange", () => { if (!writingHash) applyHash(); });
@@ -1141,11 +1188,69 @@
     if (ev.target.matches("input, select, textarea")) return;
     if (ev.key === "/") { ev.preventDefault(); searchEl.focus(); searchEl.select(); }
     else if (ev.key === "Escape") { if (!$("#help").hidden) $("#help").hidden = true; else clearSelection(); }
+    else if ((ev.key === "ArrowRight" || ev.key === "ArrowLeft") && state.tour) { ev.preventDefault(); moveTour(ev.key === "ArrowRight" ? 1 : -1); }
     else if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") {
       const e = M.stepEvent(state.ds, state.cursor, ev.key === "ArrowRight" ? 1 : -1);
       if (e) { ev.preventDefault(); select(e.id); }
     } else if (ev.key === " ") { ev.preventDefault(); setPlaying(!state.playing); }
   });
+
+
+
+  // ---------------------------------------------------------------- tours
+  function renderTourMenu() {
+    const menu = $("#tour-menu");
+    if (!menu) return;
+    const tours = Object.values(window.TOURS || {});
+    menu.innerHTML = tours.map((t) => `<button data-tour="${esc(t.id)}"><b>${esc(t.title)}</b><br><span>${esc(t.question || t.intro || "")}</span></button>`).join("");
+  }
+  function tourYearDate(y) { return y < 0 ? `-${String(Math.abs(y)).padStart(4, "0")}` : String(y).padStart(4, "0"); }
+  function startTour(id, stop = 0) {
+    const tour = window.TOURS && window.TOURS[id];
+    if (!tour) return;
+    state.tour = tour;
+    state.tourStop = Math.max(0, Math.min(stop, tour.stops.length));
+    applyTourStop();
+  }
+  function exitTour() {
+    state.tour = null; state.tourStop = 0; renderTourCard(); scheduleHash();
+  }
+  function moveTour(dir) {
+    if (!state.tour) return;
+    state.tourStop = Math.max(0, Math.min(state.tour.stops.length, state.tourStop + dir));
+    applyTourStop();
+  }
+  function applyTourStop() {
+    if (!state.tour) return;
+    const stop = state.tour.stops[state.tourStop];
+    if (stop) {
+      const t = M.parseDate(tourYearDate(stop.year));
+      if (stop.era !== state.dsId) loadDataset(stop.era, { cursor: t, quiet: true });
+      else setCursor(t);
+      if (stop.focus) flyToBBox(stop.focus);
+    }
+    renderTourCard();
+    scheduleHash();
+  }
+  function renderTourCard() {
+    const el = $("#tour-card");
+    if (!el) return;
+    if (!state.tour) { el.hidden = true; el.innerHTML = ""; return; }
+    const t = state.tour, atEnd = state.tourStop >= t.stops.length, stop = t.stops[state.tourStop];
+    let h = `<button class="exit" data-tour-exit title="Exit tour">×</button><div class="tour-title">${esc(t.title)}</div>`;
+    if (atEnd) {
+      h += `<h2>Answer</h2><p>${esc(t.answer.pattern)}</p>`;
+      if (t.answer.openQuestions && t.answer.openQuestions.length) h += `<h3>Open questions</h3><ul>${t.answer.openQuestions.map((q) => `<li>${esc(q)}</li>`).join("")}</ul>`;
+      if (t.answer.reading && t.answer.reading.length) h += `<h3>Reading</h3><ul>${t.answer.reading.map((r) => `<li><b>${esc(r.title)}</b>, ${esc(r.author)} <span class="d">${esc(r.note || "")}</span></li>`).join("")}</ul>`;
+    } else {
+      const y = stop.year <= 0 ? `${1 - stop.year} BC` : String(stop.year);
+      h += `<div class="meta">Stop ${state.tourStop + 1} of ${t.stops.length} · ${esc(y)}</div><h2>${esc(stop.title)}</h2><p>${esc(stop.text)}</p>`;
+      if (stop.plate) h += `<p><a class="it" href="../atlas/index.html#${esc(stop.plate)}" target="_blank">Plate: ${esc(stop.plate)}</a></p>`;
+      if (stop.meanwhile) h += `<p class="meanwhile">Meanwhile: ${esc(stop.meanwhile)}</p>`;
+    }
+    h += `<div class="tour-actions"><button data-tour-prev ${state.tourStop <= 0 ? "disabled" : ""}>‹ Prev</button><button data-tour-next ${state.tourStop >= t.stops.length ? "disabled" : ""}>Next ›</button></div>`;
+    el.innerHTML = h; el.hidden = false;
+  }
 
   // ---------------------------------------------------------------- master timeline
   // Every period on one strip (HM.masterLayout). The open period is red with its from/to years; a black bracket under
@@ -1161,6 +1266,10 @@
     master.x = x; master.top = top; master.rowH = rowH; master.axisY = axisY;
     svg.attr("height", axisY + 14);
     svg.selectAll("*").remove();
+    const defs = svg.append("defs");
+    const pat = defs.append("pattern").attr("id", "gap-hatch").attr("patternUnits", "userSpaceOnUse").attr("width", 8).attr("height", 8).attr("patternTransform", "rotate(45)");
+    pat.append("rect").attr("width", 8).attr("height", 8).attr("fill", "#e8dfcf");
+    pat.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 8).attr("stroke", "#b9ad96").attr("stroke-width", 2);
     const ax = svg.append("g").attr("class", "m-axis");
     ax.append("line").attr("x1", x(L.y0)).attr("x2", x(L.y1)).attr("y1", axisY).attr("y2", axisY);
     L.breaks.forEach((b, i) => {
@@ -1169,13 +1278,13 @@
       ax.append("line").attr("class", "m-break").attr("x1", x(b)).attr("x2", x(b)).attr("y1", top - 2).attr("y2", axisY + 3);
       ax.append("text").attr("x", x(b)).attr("y", axisY + 11).attr("text-anchor", i === 0 ? "start" : last ? "end" : "middle").text(label);
     });
-    // Say what the empty stretches are, where there's room.
-    const spans = L.periods.map((q) => [q.y0, q.y1]).sort((a, b) => a[0] - b[0]);
-    let reach = spans.length ? spans[0][1] : 0;
-    for (const [a, b] of spans.slice(1)) {
-      if (a > reach && x(a) - x(reach) > 150) svg.append("text").attr("class", "m-gap").attr("x", x(a) - 8).attr("y", top + rowH - 5).attr("text-anchor", "end").text("not yet covered");
-      reach = Math.max(reach, b);
-    }
+    // Label the deliberate Vol. 2 gap after the early-modern strip.
+    L.periods.filter((q) => q.gapAfter).forEach((q) => {
+      const nx = Math.min(x(L.y1), x(q.y1 + 139));
+      const gx0 = x(q.y1), gw = Math.max(20, nx - gx0);
+      svg.append("rect").attr("class", "m-gap-band").attr("x", gx0).attr("y", top + q.row * rowH).attr("width", gw).attr("height", rowH - 3);
+      svg.append("text").attr("class", "m-gap").attr("x", gx0 + gw / 2).attr("y", top + q.row * rowH + rowH - 6).attr("text-anchor", "middle").text(q.gapAfter);
+    });
     const n = L.breaks.length - 1;
     if (n > 1) svg.append("text").attr("class", "m-scale").attr("x", x(L.breaks[n - 1]) - 4).attr("y", top - 4).attr("text-anchor", "end")
       .text("scale stretches toward the present ›").append("title").text("Each stretch between the marked years gets the same width, so short modern periods stay visible.");
@@ -1183,7 +1292,7 @@
     const g = svg.selectAll("g.m-period").data(L.periods).join("g")
       .attr("class", (q) => `m-period${q.id === state.dsId ? " on" : ""}`)
       .attr("data-id", (q) => q.id)
-      .on("click", (ev, q) => { if (q.id !== state.dsId) { setPlaying(false); loadDataset(q.id); scheduleHash(); } });
+      .on("click", (ev, q) => { if (q.id !== state.dsId) { setPlaying(false); loadDataset(q.id, { preserveYear: true }); scheduleHash(); } });
     g.append("title").text((q) => `${q.full}, ${q.from} – ${q.to}`);
     g.append("rect").attr("x", (q) => x(q.y0)).attr("y", (q) => top + q.row * rowH).attr("height", rowH - 3).attr("rx", 2)
       .attr("width", (q) => Math.max(4, x(q.y1) - x(q.y0)));
@@ -1293,20 +1402,34 @@
     renderCard();
     setupTimeline();
     renderMaster();
-    setCursor(opts.cursor || M.parseDate(state.ds.startAt) || state.ds.t0, { hover: !!opts.quiet });
+    const carry = opts.cursor || (opts.preserveYear && state.cursor) || null;
+    setCursor(carry || M.parseDate(state.ds.startAt) || state.ds.t0, { hover: !!opts.quiet });
   }
 
   // ---------------------------------------------------------------- controls
   const dsSel = $("#dataset");
+  const eraGroup = document.createElement("optgroup"); eraGroup.label = "Eras";
   for (const q of master.layout.periods) {
     const o = document.createElement("option");
     o.value = q.id; o.textContent = `${q.title}  (${q.from} – ${q.to})`;
-    dsSel.appendChild(o);
+    eraGroup.appendChild(o);
   }
-  dsSel.addEventListener("change", () => { setPlaying(false); loadDataset(dsSel.value); scheduleHash(); });
+  dsSel.appendChild(eraGroup);
+  const threads = Object.entries(window.DATASETS).filter(([, d]) => d.kind === "thread");
+  if (threads.length) {
+    const tg = document.createElement("optgroup"); tg.label = "Threads";
+    for (const [id, d] of threads) { const o = document.createElement("option"); o.value = id; o.textContent = `${d.title}  (${d.subtitle || "thread"})`; tg.appendChild(o); }
+    dsSel.appendChild(tg);
+  }
+  dsSel.addEventListener("change", () => { setPlaying(false); loadDataset(dsSel.value, { preserveYear: true }); scheduleHash(); });
+  renderTourMenu();
+  $("#tour-btn").addEventListener("click", () => { const m = $("#tour-menu"); m.hidden = !m.hidden; });
+  $("#tour-menu").addEventListener("click", (ev) => { const b = ev.target.closest("[data-tour]"); if (!b) return; $("#tour-menu").hidden = true; startTour(b.dataset.tour, 0); });
+  $("#tour-card").addEventListener("click", (ev) => { if (ev.target.closest("[data-tour-exit]")) exitTour(); else if (ev.target.closest("[data-tour-prev]")) moveTour(-1); else if (ev.target.closest("[data-tour-next]")) moveTour(1); });
   $("#play").addEventListener("click", () => setPlaying(!state.playing));
   $("#follow").addEventListener("change", (ev) => { state.follow = ev.target.checked; state.followed = undefined; });
   $("#world").addEventListener("click", () => { drawChapterBox(null); state.followed = null; flyWorld(); });
+  $("#world-underlay").addEventListener("change", (ev) => { state.showWorld = ev.target.checked; drawWorldUnderlay(state.cursor); });
   $("#fit").addEventListener("click", () => zoomToDomain(state.ds.t0, state.ds.t1));
   $("#help-btn").addEventListener("click", () => { $("#help").hidden = !$("#help").hidden; });
   $("#help-close").addEventListener("click", () => { $("#help").hidden = true; });
@@ -1320,10 +1443,11 @@
   const p = M.parseHash(location.hash, window.DATASETS, DEFAULT_DS);
   loadDataset(p.dataset, { cursor: location.hash ? p.date : null, quiet: true });
   if (location.hash) applyHash();
+  if (p.query && p.query.tour) startTour(p.query.tour, +p.query.stop || 0);
 
   // Hooks for tests and the console.
   window.APP = {
-    state, select, setCursor, zoomChapter, clearSelection, loadDataset, setPlaying,
+    state, select, setCursor, zoomChapter, clearSelection, loadDataset, setPlaying, startTour, moveTour, exitTour,
     domain: () => tlDomain().map((d) => M.isoDate(d)),
     flyTo: (bb, ms = 0) => flyToBBox(bb, ms),
     sceneLayers: () => [...document.querySelectorAll("#map .scene .focus .s-L")].filter((n) => n.getAttribute("display") !== "none").map((n) => { const L = d3.select(n).datum(); return L.name || L.text || L.type; }),
