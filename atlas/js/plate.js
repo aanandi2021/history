@@ -39,7 +39,9 @@
       const pad = 6;
       const x = d3.scaleLinear().domain([W, E]).range([pad, w - pad]);
       const y = d3.scaleLinear().domain([S, N]).range([h - pad, pad]);
-      return ([lon, lat]) => [x(lon), y(lat)];
+      const flat = ([lon, lat]) => [x(lon), y(lat)];
+      flat.stream = (stream) => d3.geoTransform({ point(lon, lat) { const p = flat([lon, lat]); stream.point(p[0], p[1]); } }).stream(stream);
+      return flat;
     }
     if (kind === "conic") {
       const p1 = S + (N - S) / 6, p2 = N - (N - S) / 6;
@@ -402,9 +404,6 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
         if (sr > (base.riverRank || 6)) continue;
         L_WATER.append("path").attr("d", geo(f)).attr("fill", "none").attr("stroke", RIVER).attr("stroke-width", Math.max(0.5, 1.6 - sr * 0.18)).attr("stroke-linecap", "round");
       }
-
-
-
     }
 
     const layerG = (parent, L) => parent.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null);
@@ -475,17 +474,21 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
 
     for (const L of layers.filter((l) => l.type === "route")) {
       const g = layerG(L_LINES, L);
-      const d = d3.line().curve(d3.curveCatmullRom.alpha(0.5))(L.path.map(proj));
       const c = L.colour || "#b0753a";
       const rw = weightedWidth(L, L.style === "road" ? 2.4 : L.style === "dashed" ? 2 : 3);
-      if (L.style === "road") {
-        // a built road (the Persian royal road, the Roman roads): pale bed with dark dashes, never confused with a campaign
-        g.append("path").attr("d", d).attr("fill", "none").attr("stroke", L.bed || "#f0d27a").attr("stroke-width", rw + 1.6).attr("stroke-linecap", "round");
-        g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", rw).attr("stroke-dasharray", "6 4");
-      } else if (L.style === "dashed") g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", rw).attr("stroke-dasharray", "7 4");
-      else g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", rw).attr("stroke-linecap", "round").attr("stroke-dasharray", "0.1 5.5");
-      if (L.head) arrowHead(svg, g, d, rw, c, 6);
-      if (L.label) alongLabel(g, svg, readable(L.path, proj), L.label, { size: 8.5, fill: shade(c, -1.2), dy: -5, italic: true });
+      const segs = L.segments || [L.path];
+      const ds = segs.map((seg) => d3.line().curve(d3.curveCatmullRom.alpha(0.5))(seg.map(proj)));
+      for (const d of ds) {
+        if (L.style === "road") {
+          // a built road (the Persian royal road, the Roman roads): pale bed with dark dashes, never confused with a campaign
+          g.append("path").attr("d", d).attr("fill", "none").attr("stroke", L.bed || "#f0d27a").attr("stroke-width", rw + 1.6).attr("stroke-linecap", "round");
+          g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", rw).attr("stroke-dasharray", "6 4");
+        } else if (L.style === "dashed") g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", rw).attr("stroke-dasharray", "7 4");
+        else g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", rw).attr("stroke-linecap", "round").attr("stroke-dasharray", "0.1 5.5");
+      }
+      if (L.head) arrowHead(svg, g, ds[ds.length - 1], rw, c, 6);
+      const labelSeg = L.labelSegment != null ? segs[L.labelSegment] : segs.reduce((best, seg) => (seg.length > best.length ? seg : best), segs[0]);
+      if (L.label && labelSeg) alongLabel(g, svg, readable(labelSeg, proj), L.label, { size: 8.5, fill: shade(c, -1.2), dy: -5, italic: true });
       lineDates(g, svg, L, proj, c);
     }
 

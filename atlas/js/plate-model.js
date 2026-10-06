@@ -85,7 +85,9 @@
           if (L.phaseAt != null && !isLonLat(L.phaseAt)) bad(`${lw}: phaseAt must be [lon,lat]`);
         }
         if (L.type === "arrow" || L.type === "route" || L.type === "boundary") {
-          if (!Array.isArray(L.path) || L.path.length < 2 || !L.path.every(isLonLat)) bad(`${lw}: needs path of at least two [lon,lat]`);
+          const paths = L.segments || (L.path ? [L.path] : []);
+          if (!Array.isArray(paths) || !paths.length || !paths.every((p) => Array.isArray(p) && p.length >= 2 && p.every(isLonLat))) bad(`${lw}: needs path of at least two [lon,lat]`);
+          if (L.segments && L.type !== "route") bad(`${lw}: segments are only supported for routes`);
           if (L.type === "boundary" && L.style && !BOUNDARY_STYLES.includes(L.style)) bad(`${lw}: unknown boundary style ${L.style}`);
           if (L.type === "route" && L.style && !ROUTE_STYLES.includes(L.style)) bad(`${lw}: unknown route style ${L.style}`);
           if (L.type === "route" && L.weight != null && (!Number.isFinite(L.weight) || L.weight <= 0)) bad(`${lw}: route weight must be a positive number`);

@@ -166,6 +166,8 @@ Sea `#b9dff5`, land `#f3ebcb`–`#f7f7fb`, desert `#efd96d`, cultivation `#72ad4
 | Fortified frontier (`boundary` style `wall`), dates printed on lines (`dates`) | done (round 2), with a run-off check |
 | Partition lines (`boundary` style `partition`) | done (round 6) for Verdun-style family or treaty divisions that cut one realm without pretending to be modern borders |
 | Treaty meridians (`boundary` style `meridian`) | done (round 11) for world-scale claim lines such as Tordesillas: a pale bed with a dotted purple stroke, visually separate from routes and state borders |
+| Multi-segment sea routes (`route.segments`) | done (round 11) for antimeridian crossings and broken ocean tracks such as Magellan-Elcano: one legend item, separate drawn segments, no false line across land |
+| Full-frame equirectangular plates (`projection:"plan"`) | improved (round 11) so the flat lon/lat projection can draw coastlines as well as overlays; useful when a world voyage map should crop to the stated latitude band instead of wasting the frame on polar water |
 | Built roads (`route` style `road`), fine stipple for fuzzy social zones | done (round 2) |
 | Origin halos on points (colony by founder) | done (round 2) |
 | Relief / environment tints | **not yet**: needs a hillshade or land-cover layer. Round 2 used terrain only faintly, so this stays low priority |
