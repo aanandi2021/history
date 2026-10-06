@@ -23,7 +23,8 @@
         "title": { "type": "string" }, "text": { "type": "string" },
         "at": { "$ref": "#/$defs/lonlat" },
         "section": { "type": "string" }, "wiki": { "type": "string" }, "approx": { "type": "boolean" },
-        "fic": { "$ref": "#/$defs/fic" }, "work": { "type": "string" } } } },
+        "fic": { "$ref": "#/$defs/fic" }, "work": { "type": "string" },
+        "aha": { "$ref": "#/$defs/aha" } } } },
     "leaders": { "type": "array", "items": {
       "type": "object", "required": ["name", "country", "side"],
       "properties": {
@@ -46,6 +47,7 @@
         "title": { "type": "string" }, "start": { "$ref": "#/$defs/date" }, "end": { "$ref": "#/$defs/date" },
         "bbox": { "type": "array", "items": { "$ref": "#/$defs/lonlat" }, "minItems": 2, "maxItems": 2 },
         "text": { "type": "string" }, "section": { "type": "string" }, "wiki": { "type": "string" }, "fic": { "$ref": "#/$defs/fic" },
+        "aha": { "$ref": "#/$defs/aha" },
         "id": { "type": "string" },
         "plate": { "type": "string", "description": "id of the atlas plate that maps this chapter" },
         "parent": { "type": "string", "description": "id of the chapter this one sits inside (e.g. ch-muscovy). Its dates must fall within the parent's." } } } },
@@ -64,6 +66,10 @@
     "lonlat": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
     "fic": { "oneOf": [
       { "type": "string", "description": "heading in the work's main note" },
-      { "type": "object", "required": ["note"], "properties": { "note": { "type": "string" }, "heading": { "type": "string" } } } ] }
+      { "type": "object", "required": ["note"], "properties": { "note": { "type": "string" }, "heading": { "type": "string" } } } ] },
+    "aha": { "type": "array", "items": {
+      "type": "object", "required": ["book", "heading"],
+      "properties": { "book": { "type": "string" }, "heading": { "type": "string" } }
+    } }
   }
 }

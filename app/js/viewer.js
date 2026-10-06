@@ -920,6 +920,8 @@
       h += `<p>${esc(it.author)}${it.amits ? '<span class="tag amits">Amit\'s fiction</span>' : ""}${it.owned ? '<span class="tag own">in Calibre</span>' : ""}${it.canadian ? '<span class="tag">Canadian</span>' : ""}${it.fiction && !it.amits ? '<span class="tag">fiction</span>' : ""}</p>`;
     }
     if (it.kind === "event" && ds.lanes.find((l) => l.id === it.lane)?.fiction) h += `<p><span class="tag amits">from Amit's novel, not history</span></p>`;
+    const aha = M.ahaLinks(it);
+    if (aha.length) h += `<p class="aha">${aha.map((a) => `<a data-link="aha" href="${esc(a.href)}"><span>✦</span> ${esc(a.label)}${a.heading ? ` · ${esc(a.heading)}` : ""}</a>`).join(" ")}</p>`;
     if (it.text) h += `<p>${richText(it)}</p>`;
     if (it.kind === "chapter" && it.children.length) {
       h += `<h3>Inside this part</h3><ul class="kids" id="card-kids">${it.children.map((k) => ds.byId.get(k)).map((k) =>

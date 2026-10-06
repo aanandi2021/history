@@ -61,6 +61,20 @@ const VAULT = "A:\\Obsidian External Vaults\\Fourth Vault July 2023";
 const vaultFile = (notePath) => path.join(VAULT, ...notePath.split("/")) + ".md";
 const headingsOf = (file) => new Set(fs.readFileSync(file, "utf8").split(/\r?\n/).filter((l) => /^#{2,3} /.test(l)).map((l) => l.replace(/^#+ /, "").trim()));
 
+test("Golden Road aha links point only to headings in the vault note", (t) => {
+  const note = vaultFile(HM.BOOKS["golden-road"].note);
+  if (!fs.existsSync(note)) { t.skip("Golden Road note not found"); return; }
+  const headings = headingsOf(note);
+  const bad = [];
+  for (const raw of Object.values(DATASETS)) {
+    const ds = HM.normalise(raw);
+    for (const it of ds.byId.values()) for (const a of it.aha || []) {
+      if (a.book === "golden-road" && !headings.has(a.heading)) bad.push([raw.id, it.title || it.name, a.heading]);
+    }
+  }
+  assert.deepEqual(bad, []);
+});
+
 for (const id of ids.filter((i) => DATASETS[i].note)) {
   test(`${id}: sections match headings in the vault note when the vault is mounted`, (t) => {
     const raw = DATASETS[id];
