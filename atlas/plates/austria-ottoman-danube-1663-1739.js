@@ -8,15 +8,15 @@
   const veniceMorea=[[20.4,36.4],[21.0,38.0],[22.6,38.4],[23.0,37.0],[22.0,36.2]];
   const passarowitz=[[19.4,44.6],[20.5,45.0],[22.0,45.3],[23.5,44.8],[24.0,43.8],[23.0,43.0],[21.4,43.0],[20.0,43.6]];
   const lost1739=[[20.0,43.6],[21.4,43.0],[23.0,43.0],[24.0,43.8],[23.8,44.6],[22.0,44.8],[20.5,44.5]];
-  const karlowitzLine=[[15.8,45.7],[17.2,45.6],KAR,[19.1,45.7],[19.2,46.1],[20.1,46.2],[20.1,45.4],ZEN,[21.2,45.7],[22.6,46.0],[24.2,45.4]];
+  const karlowitzLine=[[15.6,45.1],[16.4,45.2],[17.4,45.2],[18.6,45.1],[19.6,44.95],BEL,[20.15,45.3],[20.18,46.0],[20.55,46.15],[21.4,46.2],[22.5,46.1],[23.5,46.0]];
   window.PLATES["austria-ottoman-danube-1663-1739"] = { id:"austria-ottoman-danube-1663-1739", title:"Austria and the Ottoman Danube frontier", head:"Age of Reason / Austria and the Ottoman Empire", folio:"37", viewer:"early-modern/1683/ch-austria-ottoman-danube", figures:[
     {caption:"The Ottoman high-water mark and the liberation of Hungary, 1663-1699", share:0.56, extent:[[12.5,41.0],[30.5,50.2]], projection:"conic", layers:[
-      {id:"ottoman-frontier-1683",type:"area",tier:"core",colour:OTT,legend:"Ottoman Hungary and Balkans before 1683",regions:["BIH","SRB","BGR","GRC","MKD","ALB","MNE","HUN","ROU","HRV","MDA","TUR"],minus:["AT-3","AT-4","AT-5","AT-6","AT-7","AT-9"]},
+      {id:"ottoman-frontier-1683",type:"area",tier:"core",colour:OTT,legend:"Ottoman Hungary and Balkans before 1683",regions:["BIH","SRB","XKX","BGR","GRC","MKD","ALB","MNE","HUN","ROU","HRV","MDA","TUR"],minus:["AT-3","AT-4","AT-5","AT-6","AT-7","AT-9"]},
       {id:"habsburg-hungary-1699",type:"area",tier:"core",colour:HAB,legend:"Austria after Karlowitz, 1699",regions:["AUT","CZE","SVK","SVN","HRV","HUN","RO-SM","RO-AR","RO-BH","RO-CJ","RO-BN","RO-SJ","RO-HD","RO-CV","RO-BV","RO-SB","RO-MS","RO-HR","RO-AB","RO-MM"]},
       {id:"transylvania-gain",type:"area",pattern:"hatch",colour:HAB,legend:"Transylvania brought under Habsburg rule",regions:["RO-CJ","RO-BN","RO-SJ","RO-HD","RO-CV","RO-BV","RO-SB","RO-MS","RO-HR","RO-AB"]},
       {id:"vienna-campaign",type:"arrow",colour:WAR,width:3,legend:"Kara Mustafa's advance and relief",path:[[28.98,41.01],[24.5,44.5],BUDA,VIE],label:"1683"},
       {id:"holy-league",type:"route",style:"dashed",weight:2.4,colour:POL,legend:"Holy League counteroffensive",path:[[21.01,52.23],VIE,BUDA,BEL,ZEN]},
-      {id:"karlowitz-frontier",type:"boundary",style:"partition",colour:WAR,width:2,legend:"Karlowitz frontier",path:karlowitzLine},
+      {id:"karlowitz-frontier",type:"boundary",style:"dashed",colour:WAR,width:1.6,legend:"Karlowitz frontier",path:karlowitzLine},
       {id:"vienna",type:"point",symbol:"siege",at:VIE,name:"Vienna",labelPos:"nw",tag:{text:"1683",colour:"#e8806a"}}, {id:"st-gotthard",type:"point",symbol:"battle",at:STG,name:"St Gotthard",labelPos:"w",tag:{text:"1664",colour:"#f1c75b"}}, {id:"buda",type:"point",symbol:"fortress",at:BUDA,name:"Buda",labelPos:"ne",tag:{text:"1686",colour:"#f1c75b"}}, {id:"belgrade",type:"point",symbol:"fortress",at:BEL,name:"Belgrade",labelPos:"e",tag:{text:"1688",colour:"#f1c75b"}}, {id:"zenta",type:"point",symbol:"battle",at:ZEN,name:"Zenta",labelPos:"s",tag:{text:"1697",colour:"#f1c75b"}}, {id:"karlowitz",type:"point",symbol:"treaty",at:KAR,name:"Karlowitz",labelPos:"sw",tag:{text:"1699",colour:"#f1c75b"}}
     ], legend:{x:8,y:8,columns:1}},
     {caption:"Passarowitz and the unstable Habsburg-Ottoman border, 1716-1739", share:0.44, extent:[[12.5,36.0],[31.0,49.5]], projection:"conic", layers:[

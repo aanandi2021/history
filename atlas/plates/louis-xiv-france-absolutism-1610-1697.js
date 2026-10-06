@@ -19,16 +19,16 @@
       {id:"vauban-line",type:"boundary",style:"dashdot",colour:ADM,width:2.2,legend:"Vauban fortress belt",path:[[2.9,50.6],[4.0,50.4],LUX,METZ,STR,BES,ROUS]},
       {id:"paris",type:"point",symbol:"capital",at:PAR,name:"Paris"}, {id:"versailles",type:"point",symbol:"castle",at:VER,name:"Versailles",labelPos:"sw",tag:{text:"court",colour:"#f1c75b"}}, {id:"la-rochelle",type:"point",symbol:"siege",at:ROC,name:"La Rochelle",labelPos:"w",tag:{text:"1628",colour:"#e8806a"}}, {id:"aix",type:"point",symbol:"treaty",at:AIX,name:"Aix-la-Chapelle",labelPos:"e",tag:{text:"1668",colour:"#f1c75b"}}, {id:"nijmegen",type:"point",symbol:"treaty",at:NYM,name:"Nijmegen",labelPos:"ne",tag:{text:"1678",colour:"#f1c75b"}}, {id:"strasbourg",type:"point",symbol:"fortress",at:STR,name:"Strasbourg",labelPos:"e",tag:{text:"1681",colour:"#e8806a"}}, {id:"luxembourg",type:"point",symbol:"fortress",at:LUX,name:"Luxembourg",labelPos:"w",tag:{text:"1684",colour:"#e8806a"}}, {id:"rijswijk",type:"point",symbol:"treaty",at:[4.33,52.04],name:"Rijswijk",labelPos:"nw",tag:{text:"1697",colour:"#f1c75b"}}
     ], legend:{x:8,y:8,columns:1}},
-    {kind:"diagram",caption:"The absolutist machine: court, army, finance and faith", share:0.38, diagram:{height:0.50, compartments:[
-      {id:"state-frame",label:"One king, one faith, one law",x:0.05,y:0.05,w:0.90,h:0.43,colour:FRA,fill:"#f3e4be"},
-      {id:"economy-frame",label:"Mercantilist state economy",x:0.05,y:0.55,w:0.90,h:0.38,colour:ADM,fill:"#dce8cf"}
+    {kind:"diagram",caption:"The absolutist machine: court, army, finance and faith", share:0.38, diagram:{height:0.54, compartments:[
+      {id:"state-frame",label:"One king, one faith, one law",x:0.04,y:0.04,w:0.92,h:0.47,colour:FRA,fill:"#f3e4be"},
+      {id:"economy-frame",label:"Mercantilist state economy",x:0.04,y:0.57,w:0.92,h:0.37,colour:ADM,fill:"#dce8cf"}
     ], nodes:[
-      {id:"king",label:"Louis XIV\n1661-1715",x:0.50,y:0.18,w:0.24,h:0.14,colour:FRA,strong:true},
-      {id:"council",label:"Council\nand ministers",x:0.25,y:0.35,w:0.24,h:0.13,colour:FRA},
-      {id:"intendants",label:"Intendants\nprovinces",x:0.75,y:0.35,w:0.24,h:0.13,colour:FRA},
-      {id:"army",label:"Louvois\nstanding army",x:0.25,y:0.75,w:0.24,h:0.13,colour:WAR},
-      {id:"colbert",label:"Colbert\nfinance",x:0.50,y:0.75,w:0.24,h:0.13,colour:ADM,strong:true},
-      {id:"revocation",label:"Nantes revoked\n1685",x:0.75,y:0.75,w:0.24,h:0.13,colour:WAR}
+      {id:"king",label:"Louis XIV\n1661-1715",x:0.50,y:0.16,w:0.18,h:0.12,colour:FRA,strong:true},
+      {id:"council",label:"Council\nand ministers",x:0.18,y:0.39,w:0.20,h:0.12,colour:FRA},
+      {id:"intendants",label:"Intendants\nprovinces",x:0.82,y:0.39,w:0.20,h:0.12,colour:FRA},
+      {id:"army",label:"Louvois\nstanding army",x:0.18,y:0.78,w:0.20,h:0.12,colour:WAR},
+      {id:"colbert",label:"Colbert\nfinance",x:0.50,y:0.78,w:0.20,h:0.12,colour:ADM,strong:true},
+      {id:"revocation",label:"Nantes revoked\n1685",x:0.82,y:0.78,w:0.20,h:0.12,colour:WAR}
     ], arrows:[
       {id:"king-council",from:"king",to:"council",label:"decrees",colour:FRA}, {id:"king-intendants",from:"king",to:"intendants",label:"appoints",colour:FRA}, {id:"council-colbert",from:"council",to:"colbert",label:"budget",colour:ADM}, {id:"colbert-army",from:"colbert",to:"army",label:"taxes",colour:WAR}, {id:"intendants-revocation",from:"intendants",to:"revocation",label:"enforce",colour:WAR}, {id:"colbert-revocation",from:"colbert",to:"revocation",label:"cost",colour:WAR}
     ]}}

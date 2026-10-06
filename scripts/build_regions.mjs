@@ -41,18 +41,19 @@ await download(urls.admin0, files.admin0Zip);
 await download(urls.admin1, files.admin1Zip);
 if (!fs.existsSync(files.admin0Shp)) run("powershell", ["-NoProfile", "-Command", `Expand-Archive -Force ${JSON.stringify(files.admin0Zip)} ${JSON.stringify(path.dirname(files.admin0Shp))}`]);
 if (!fs.existsSync(files.admin1Shp)) run("powershell", ["-NoProfile", "-Command", `Expand-Archive -Force ${JSON.stringify(files.admin1Zip)} ${JSON.stringify(path.dirname(files.admin1Shp))}`]);
-const shp0 = path.relative(ROOT, files.admin0Shp);
 const shp1 = path.relative(ROOT, files.admin1Shp);
 const topoOut = path.relative(ROOT, files.topo);
 const mapshaper = path.join(ROOT, "node_modules", "mapshaper", "bin", "mapshaper");
 run(process.execPath, [mapshaper,
-  "-i", shp0, "name=admin0", "-clip", `bbox=${BBOX}`,
-  "-filter", "ADM0_A3 != '-99'",
-  "-each", "code=ADM0_A3, kind='admin0', name=NAME, adm0=ADM0_A3",
-  "-filter-fields", "code,kind,name,adm0",
   "-i", shp1, "name=admin1", "-clip", `bbox=${BBOX}`,
-  "-filter", "iso_3166_2 != '-99'",
-  "-each", "code=iso_3166_2, kind='admin1', name=name, adm0=adm0_a3",
+  "-filter", "adm0_a3 != '-99' && iso_3166_2 != '-99'",
+  "-each", "adm0=adm0_a3 == 'KOS' ? 'XKX' : adm0_a3",
+  "-dissolve", "adm0", "copy-fields=adm0", "+", "name=admin0",
+  "-target", "admin0",
+  "-each", "code=adm0, kind='admin0', name=adm0",
+  "-filter-fields", "code,kind,name,adm0",
+  "-target", "admin1",
+  "-each", "code=iso_3166_2, kind='admin1', name=name, adm0=adm0",
   "-filter-fields", "code,kind,name,adm0",
   "-target", "admin0,admin1", "-merge-layers", "name=regions",
   "-simplify", "weighted", "5%", "keep-shapes",

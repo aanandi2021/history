@@ -15,7 +15,7 @@
     {caption:"Bohemian, Danish, Swedish and Franco-Swedish phases, 1618-1648", share:0.58, extent:[[2.0,46.0],[20.5,55.0]], projection:"conic", layers:[
       {id:"imperial-catholic",type:"area",tier:"core",colour:HAB,legend:"Imperial and Catholic League base",regions:["AUT","CZE","DE-BY"]},
       {id:"bohemian-revolt",type:"area",pattern:"hatch",colour:SAX,legend:"Bohemian revolt and war zone",regions:["CZE"]},
-      {id:"swedish-allied",type:"area",tier:"influence",colour:SWE,legend:"Swedish allies and quarters after 1631",regions:["DE-NI","DE-ST","DE-BB","DE-MV","DE-SN","DE-TH"]},
+      {id:"swedish-allied",type:"area",tier:"influence",colour:SWE,legend:"Swedish allies and quarters after 1631",regions:["DE-NI","DE-ST","DE-BB","DE-BE","DE-HH","DE-HB","DE-MV","DE-SN","DE-TH"]},
       {id:"league-heilbronn",type:"area",pattern:"hatch",colour:SWE,legend:"League of Heilbronn / south-western allies",regions:["DE-BW","DE-HE","DE-RP"]},
       {id:"france-entry",type:"area",tier:"influence",colour:FRA,legend:"French entry against Habsburgs",regions:["FRA"]},
       {id:"gustavus-route",type:"route",style:"road",weight:2.5,colour:SWE,legend:"Gustavus Adolphus campaign",path:[USE,MAG,BREIT,MAINZ,RAI,LUT]},
@@ -26,8 +26,8 @@
     {caption:"The Peace of Westphalia and the Empire's losses, 1648", share:0.42, extent:[[1.5,46.8],[19.5,55.0]], projection:"conic", layers:[
       {id:"france-alsace",type:"area",tier:"core",colour:FRA,legend:"France: Alsace, Metz-Toul-Verdun sphere",regions:["FR-67","FR-68","FR-57","FR-54","FR-55"]},
       {id:"swedish-pomerania",type:"area",tier:"core",colour:SWE,legend:"Sweden: Hither Pomerania and Stettin",regions:["DE-MV"]},
-      {id:"swedish-bremen-verden",type:"area",tier:"core",colour:SWE,legend:"Sweden: Bremen and Verden",regions:["DE-HB","DE-NI"]},
-      {id:"brandenburg-gains",type:"area",tier:"core",colour:BRAN,legend:"Brandenburg: east-west gains",regions:["DE-BB","DE-ST"]},
+      {id:"swedish-bremen-verden",type:"area",tier:"core",colour:SWE,legend:"Sweden: Bremen and Verden",regions:["DE-HB","DE-HH","DE-NI"]},
+      {id:"brandenburg-gains",type:"area",tier:"core",colour:BRAN,legend:"Brandenburg: east-west gains",regions:["DE-BB","DE-BE","DE-ST"]},
       {id:"bavaria-upper-palatinate",type:"area",tier:"core",colour:BAV,legend:"Bavaria keeps Upper Palatinate",regions:["DE-BY"]},
       {id:"westphalia-talks",type:"route",style:"dotted",weight:2,colour:WAR,legend:"Muenster and Osnabrueck congress",path:[MUN,OSN]},
       {id:"rhine-frontier",type:"boundary",style:"dashdot",colour:FRA,width:2,legend:"French Rhine bridgeheads",path:[[6.1,49.0],[6.5,48.6],STR,BREIS]},
