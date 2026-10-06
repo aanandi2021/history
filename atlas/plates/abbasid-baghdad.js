@@ -2,21 +2,21 @@
 (function () {
   const IS="#6b8c3f", KNOW="#5b78a8", BYZ="#d66a4a", IND="#b36b2e", CHN="#8c5fb3", PER="#9a6a38", WATER="#5f9dc7", WALL="#7b6848";
   const BAG=[44.37,33.31], CON=[28.98,41.01], SAM=[66.98,39.65], GUN=[48.56,32.28], SINDH=[68.0,24.0], CHANG=[108.94,34.26], CORD=[-4.78,37.88], TOL=[-4.03,39.86];
-  const circle=(cx,cy,r,n=96)=>Array.from({length:n+1},(_,i)=>{const a=2*Math.PI*i/n; return [cx+r*Math.cos(a),cy+r*Math.sin(a)];});
+  const circle=(cx,cy,r,n=128)=>Array.from({length:n},(_,i)=>{const a=2*Math.PI*i/n; return [cx+r*Math.cos(a),cy+r*Math.sin(a)];});
   window.PLATES["abbasid-baghdad"] = { id:"abbasid-baghdad", title:"Abbasid Baghdad: the Round City and the House of Wisdom", head:"Early Middle Ages / Islam", folio:"18", viewer:"medieval/0762/ch-abbasid-baghdad", figures:[
     { caption:"The Round City founded by al-Mansur, 762", share:0.55, extent:[[10,8],[86,72]], projection:"plan", base:{map:false,sea:"#fbf8f0"}, layers:[
       {id:"tigris",type:"route",style:"dashed",colour:WATER,width:5,legend:"Tigris",path:[[74,72],[72,62],[73,50],[76,38],[74,25],[71,8]]},
       {id:"isa",type:"route",style:"road",colour:WATER,width:2.3,legend:"Isa canal, north of the city",path:[[18,67],[35,69],[54,69],[70,64],[73,58]]},
       {id:"sarat",type:"route",style:"road",colour:WATER,width:2.3,legend:"Sarat canal, south of the city",path:[[16,19],[31,15],[50,14],[67,18],[74,27]]},
-      {id:"outer-wall",type:"boundary",style:"wall",colour:WALL,width:2.8,legend:"Round City walls",path:circle(48,40,25)},
-      {id:"inner-wall",type:"boundary",style:"solid",colour:WALL,width:1.3,legend:"Inner palace ring",path:circle(48,40,10)},
+      {id:"outer-wall",type:"boundary",style:"wall",closed:true,colour:WALL,width:2.8,legend:"Round City walls",path:circle(48,40,25)},
+      {id:"inner-wall",type:"boundary",style:"solid",closed:true,colour:WALL,width:1.3,legend:"Inner palace ring",path:circle(48,40,10)},
       {id:"kufa-gate",type:"point",symbol:"fortress",at:[34,19],name:"Kufa Gate",legend:"Four gates",labelPos:"e"},
       {id:"basra-gate",type:"point",symbol:"fortress",at:[65,21],name:"Basra Gate",labelPos:"s"},
       {id:"khurasan-gate",type:"point",symbol:"fortress",at:[73,45],name:"Khurasan Gate"},
       {id:"syria-gate",type:"point",symbol:"fortress",at:[26,48],name:"Syria Gate"},
       {id:"palace",type:"point",symbol:"capital",at:[46,41.5],name:"Golden Gate palace",legend:"Palace and mosque",labelPos:"w"},
       {id:"mosque",type:"point",symbol:"temple",at:[51,35],name:"Great Mosque",labelPos:"s"},
-      {id:"karkh",type:"area",tier:"influence",colour:IS,legend:"Karkh market suburb",polygon:[[19,16],[33,14],[42,22],[34,31],[20,28]],smooth:"basis",clipToLand:false},
+      {id:"karkh",type:"area",tier:"influence",colour:IS,legend:"Karkh market suburb",polygon:[[22,9],[35,8],[46,12],[41,19],[27,19],[18,15]],smooth:true,clipToLand:false},
       {id:"wisdom",type:"point",symbol:"university",at:[54,44],name:"House of Wisdom?",legend:"Translation centre",labelPos:"ne",tag:{text:"site unknown",colour:"#f1c75b"}},
       {id:"round-city-label",type:"label",style:"realm",text:"MADINAT AL-SALAM",at:[48,60],size:11}
     ], legend:{position:"top-left",columns:2} },

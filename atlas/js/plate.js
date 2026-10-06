@@ -96,7 +96,7 @@
     if (L.polygon) {
       const pts = L.polygon.map(proj);
       const smooth = L.smooth == null ? true : L.smooth;
-      const curve = smooth === false ? d3.curveLinearClosed : smooth === "basis" ? d3.curveBasisClosed : d3.curveCatmullRomClosed.alpha(0.5);
+      const curve = smooth === false ? d3.curveLinearClosed : d3.curveCatmullRomClosed.alpha(0.5);
       return d3.line().curve(curve)(pts);
     }
     const padDeg = L.pad != null ? L.pad : 1.2;
@@ -272,14 +272,15 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
       const L = areaLook(L0), d = zonePath(L, proj);
       if (!d) continue;
       const lg = areaLayer.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null);
-      if (L.clipToLand || (L.clip !== "none" && L.clip !== false)) lg.attr("clip-path", `url(#${landClip})`).attr("mask", `url(#${landMask})`);
+      const clipToLand = L.clipToLand == null ? (L.clip !== "none" && L.clip !== false) : L.clipToLand;
+      if (clipToLand) lg.attr("clip-path", `url(#${landClip})`).attr("mask", `url(#${landMask})`);
       const fill = areaFill(defs, L);
       lg.append("path").attr("d", d).attr("fill", fill.fill).attr("fill-opacity", fill.op)
-        .attr("stroke", L.edge === false || L.clipToLand ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", 0.7)
+        .attr("stroke", L.edge === false || clipToLand ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", 0.7)
         .attr("stroke-dasharray", L.edge === "dashed" ? "5 3" : null);
     }
     for (const L of all.filter((l) => l.type === "boundary")) {
-      const d = d3.line().curve(d3.curveCatmullRom.alpha(0.5))(L.path.map(proj));
+      const d = d3.line().curve(L.closed ? d3.curveCatmullRomClosed.alpha(0.5) : d3.curveCatmullRom.alpha(0.5))(L.path.map(proj));
       lineLayer.append("path").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null)
         .attr("d", d).attr("fill", "none").attr("stroke", L.colour || INK).attr("stroke-width", L.width || 1.2)
         .attr("stroke-dasharray", L.style === "solid" ? null : "5 3");
@@ -370,18 +371,18 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
       const d = zonePath(L, proj);
       if (!d) continue;
       const g = layerG(L_AREA, L);
-      const clipToLand = L.clipToLand || (L.clip !== "none" && L.clip !== false);
+      const clipToLand = L.clipToLand == null ? (L.clip !== "none" && L.clip !== false) : L.clipToLand;
       if (clipToLand) g.attr("clip-path", `url(#${landClip})`);
       const { fill, op } = areaFill(defs, L);
       g.append("path").attr("d", d).attr("fill", fill).attr("fill-opacity", op)
-        .attr("stroke", L.edge === false || L.clipToLand ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", L.edge === "strong" ? 1.6 : 0.8)
+        .attr("stroke", L.edge === false || clipToLand ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", L.edge === "strong" ? 1.6 : 0.8)
         .attr("stroke-dasharray", L.edge === "dashed" ? "5 3" : null);
     }
 
     for (const L of layers.filter((l) => l.type === "boundary")) {
       const g = layerG(L_LINES, L);
       const c = L.colour || "#4a3f35";
-      const d = d3.line().curve(d3.curveCatmullRom.alpha(0.5))(L.path.map(proj));
+      const d = d3.line().curve(L.closed ? d3.curveCatmullRomClosed.alpha(0.5) : d3.curveCatmullRom.alpha(0.5))(L.path.map(proj));
       if (L.style === "partition") {
         g.append("path").attr("d", d).attr("fill", "none").attr("stroke", L.bed || "#f4e8b8").attr("stroke-width", (L.width || 2.8) + 3.4).attr("stroke-linecap", "round");
       }

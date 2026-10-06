@@ -4,11 +4,12 @@
   const CLER=[3.08,45.78], VEZ=[18.42,43.86], CON=[28.98,41.01], NIC=[29.72,40.43], DOR=[30.52,39.78], ANT=[36.16,36.20], JER=[35.21,31.77], EDE=[38.79,37.16], TRI=[35.84,34.43], ACR=[35.08,32.92], HAT=[35.46,32.8], DAM=[36.31,33.51], TYE=[35.19,33.27], JAF=[34.75,32.05], SAL=[33.45,36.5];
   window.PLATES["first-crusades"] = { id:"first-crusades", title:"The First, Second and Third Crusades", head:"High Middle Ages / The Crusades", folio:"19", viewer:"medieval/1099/ch-crusades", figures:[
     { caption:"Routes of the First Crusade, 1096-99", share:0.5, extent:[[-6,28],[42,50]], projection:"conic", layers:[
-      {id:"byzantium",type:"area",clipToLand:true,tier:"core",colour:BYZ,legend:"Byzantium",polygon:[[18,39],[21,44],[27,44],[31,41],[30,38],[26,37],[23,39]],smooth:"basis"},
-      {id:"seljuk",type:"area",clipToLand:true,tier:"core",colour:SEL,legend:"Seljuk Turks in Anatolia and Syria",polygon:[[29,37],[32,41],[38,40],[41,37],[39,34],[36,32],[32,33],[30,35]],smooth:"basis"},
-      {id:"fatimid",type:"area",clipToLand:true,tier:"core",colour:FAT,legend:"Fatimid Palestine and Egypt",polygon:[[30,30],[33,32.5],[36,32.5],[36,30],[34,28.5],[31,28.5]],smooth:"basis"},
-      {id:"danube-route",type:"arrow",colour:CR,width:3.2,legend:"Overland route via Rhine-Danube",path:[CLER,[7.5,49.8],[11.5,48.8],[16.4,48.2],[20.5,44.8],[23.3,42.7],[26,42.3],CON,NIC,DOR,ANT,JER],label:"First Crusade"},
+      {id:"byzantium",type:"area",tier:"core",colour:BYZ,legend:"Byzantium",polygon:[[18.5,39.2],[19.8,42.0],[22.5,44.1],[26.8,43.3],[29.8,41.4],[29.6,39.3],[27.0,37.8],[24.2,38.2],[22.0,39.6]],smooth:true},
+      {id:"seljuk",type:"area",tier:"core",colour:SEL,legend:"Seljuk Turks in Anatolia and Syria",polygon:[[29.2,38.0],[31.5,40.7],[35.6,40.5],[39.4,38.4],[40.8,36.3],[39.0,35.0],[36.6,34.2],[35.4,35.8],[33.4,36.7],[30.8,36.3]],smooth:true},
+      {id:"fatimid",type:"area",tier:"core",colour:FAT,legend:"Fatimid Palestine and Egypt",polygon:[[29.2,30.4],[31.5,31.8],[34.9,32.2],[36.1,31.3],[35.0,29.4],[32.2,28.8],[29.7,29.2]],smooth:true},
+      {id:"danube-route",type:"arrow",colour:CR,width:3.2,legend:"Overland route via Rhine-Danube",path:[CLER,[7.5,49.8],[11.5,48.8],[16.4,48.2],[20.5,44.8],[23.3,42.7],[26,42.3],CON,NIC,DOR,ANT,JER]},
       {id:"italy-sea",type:"arrow",colour:SEA,width:2.8,legend:"Italy-Durazzo and Via Egnatia",path:[[12.5,41.9],[16.87,41.12],[19.45,41.32],[22,41.0],[25,40.8],CON]},
+      {id:"first-label",type:"label",text:"FIRST CRUSADE",at:[17,46.2],size:10,colour:CR},
       {id:"nicaea",type:"point",symbol:"siege",at:NIC,name:"Nicaea",labelPos:"ne",tag:{text:"1097",colour:"#f1c75b"}}, {id:"dorylaeum",type:"point",symbol:"battle",at:DOR,name:"Dorylaeum",labelPos:"s",tag:{text:"1097",colour:"#e8806a"}}, {id:"antioch",type:"point",symbol:"siege",at:ANT,name:"Antioch",tag:{text:"1098",colour:"#f1c75b"}}, {id:"jerusalem",type:"point",symbol:"siege",at:JER,name:"Jerusalem",tag:{text:"1099",colour:"#f1c75b"}}, {id:"constantinople",type:"point",symbol:"capital",at:CON,name:"Constantinople",labelPos:"sw"}
     ], legend:{position:"bottom-left",columns:2} },
     { caption:"Crusader states, Saladin and the Third Crusade", share:0.5, extent:[[28,29],[40,38.5]], projection:"mercator", layers:[

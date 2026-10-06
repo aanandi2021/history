@@ -77,3 +77,9 @@ test("atlas area polygons default to softened edges", () => {
   assert.match(src, /L\.smooth == null \? true/);
   assert.match(src, /curveCatmullRomClosed/);
 });
+
+
+test("atlas area polygons clip to land by default", () => {
+  const src = fs.readFileSync(path.join(ROOT, "atlas", "js", "plate.js"), "utf8");
+  assert.match(src, /L\.clipToLand == null \? \(L\.clip !== "none" && L\.clip !== false\) : L\.clipToLand/);
+});
