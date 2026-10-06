@@ -173,6 +173,9 @@ function drawDiagramFigure(container, fig, fi, w, h) {
   defs.append("marker").attr("id", `diag-head-${fi}`).attr("viewBox", "0 0 10 10").attr("refX", 9).attr("refY", 5)
     .attr("markerWidth", 7).attr("markerHeight", 7).attr("orient", "auto-start-reverse")
     .append("path").attr("d", "M0,0L10,5L0,10Z").attr("fill", INK);
+  defs.append("marker").attr("id", `diag-bar-${fi}`).attr("viewBox", "0 0 10 10").attr("refX", 5).attr("refY", 5)
+    .attr("markerWidth", 8).attr("markerHeight", 8).attr("orient", "auto")
+    .append("path").attr("d", "M5,1L5,9").attr("stroke", INK).attr("stroke-width", 2);
   svg.append("rect").attr("width", w).attr("height", h).attr("fill", LAND);
   const d = fig.diagram || {};
   const sx = (x) => x * w, sy = (y) => y * h;
@@ -207,12 +210,18 @@ function drawDiagramFigure(container, fig, fi, w, h) {
   for (const a of d.arrows || []) {
     const A = byId.get(a.from), B = byId.get(a.to);
     if (!A || !B) continue;
-    const p = edge(A, B), q = edge(B, A), mid = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+    const route = (a.via || []).map((p) => ({ x: p[0], y: p[1] }));
+    const first = route[0] || B, last = route[route.length - 1] || A;
+    const p = edge(A, first), q = edge(B, last);
+    const pts = [p, ...route.map((v) => [sx(v.x), sy(v.y)]), q];
+    const mid = pts[Math.floor(pts.length / 2)];
     const g = layer.append("g").attr("class", "layer diagram-arrow").attr("data-layer", a.id || null);
-    g.append("path").attr("d", `M${p[0]},${p[1]}C${p[0]},${mid[1]} ${q[0]},${mid[1]} ${q[0]},${q[1]}`)
+    const dPath = route.length ? d3.line().curve(d3.curveLinear)(pts) : `M${p[0]},${p[1]}C${p[0]},${mid[1]} ${q[0]},${mid[1]} ${q[0]},${q[1]}`;
+    g.append("path").attr("d", dPath)
       .attr("fill", "none").attr("stroke", a.colour || INK).attr("stroke-width", a.width || 1.6)
-      .attr("stroke-dasharray", a.dashed ? "5 4" : null).attr("marker-end", `url(#diag-head-${fi})`);
-    if (a.label) haloText(g.append("text").attr("x", mid[0]).attr("y", mid[1] - 4).attr("text-anchor", "middle")
+      .attr("stroke-dasharray", a.dashed ? "5 4" : null).attr("marker-end", `url(#${a.end === "bar" ? "diag-bar" : "diag-head"}-${fi})`);
+    const labelAt = a.labelAt ? [sx(a.labelAt[0]), sy(a.labelAt[1])] : mid;
+    if (a.label) haloText(g.append("text").attr("x", labelAt[0]).attr("y", labelAt[1] - 4).attr("text-anchor", "middle")
       .attr("font-size", 10).attr("font-style", "italic").attr("fill", a.colour || INK).text(a.label), LAND, 4);
   }
   return svg.node();
