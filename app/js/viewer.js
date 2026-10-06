@@ -71,6 +71,7 @@
       state.mapK = ev.transform.k;
       scaleScene();
       scalePins();
+      scaleWorldLabels();
     });
   mapSvg.call(mapZoom).on("dblclick.zoom", null);
 
@@ -130,7 +131,8 @@
   }
   function drawWorldUnderlay(t) {
     const snap = M.snapshotAt(window.WORLD_SNAPSHOTS || [], t);
-    const on = !!(state.showWorld && snap);
+    const cb = $("#world-underlay");
+    const on = !!(state.dsId !== "ww2" && (!cb || cb.checked) && snap);
     worldLayer.attr("display", on ? null : "none");
     if (!on) { worldLayer.selectAll("*").remove(); return; }
     worldLayer.selectAll("path.polity").data(snap.polities, (d) => d.id).join(
@@ -138,13 +140,45 @@
       (u) => u,
       (x) => x.remove()
     ).attr("d", polityPath).attr("fill", (d) => d.colour).attr("stroke", (d) => d.colour);
-    worldLayer.selectAll("text.polity-label").data(snap.polities.filter((d) => d.label || d.at), (d) => d.id).join(
-      (e) => e.append("text").attr("class", "polity-label"),
+    worldLayer.selectAll("g.world-label").data(snap.polities.filter((d) => d.label || d.at), (d) => d.id).join(
+      (e) => {
+        const g = e.append("g").attr("class", "world-label sc");
+        g.append("text").attr("class", "polity-label");
+        return g;
+      },
       (u) => u,
       (x) => x.remove()
-    ).attr("x", (d) => projection(d.label || d.at)[0]).attr("y", (d) => projection(d.label || d.at)[1]).text((d) => d.name + (d.approx ? " (approx.)" : ""));
+    ).each(function (d) {
+      const p = projection(d.label || d.at);
+      d.x = p[0]; d.y = p[1];
+      const f = polityFeature(d), b = f ? geoPath.bounds(f) : [[0, 0], [0, 0]];
+      d.screenArea0 = Math.max(0, b[1][0] - b[0][0]) * Math.max(0, b[1][1] - b[0][1]);
+      d.priority = d.priority || d.regions && d.regions.length || 1;
+      d3.select(this).datum(d).select("text").text(d.name + (d.approx ? " (approx.)" : ""));
+    });
     const el = $("#world-date-label");
-    if (el) el.textContent = `World at this date: ${M.masterYear(snap.year)}`;
+    if (el) el.textContent = `(${M.masterYear(snap.year)})`;
+    scaleWorldLabels();
+  }
+  function overlapsRect(a, b, pad = 2) {
+    return !(a.right + pad < b.left || a.left - pad > b.right || a.bottom + pad < b.top || a.top - pad > b.bottom);
+  }
+  function scaleWorldLabels() {
+    const k = state.mapK || 1;
+    worldLayer.selectAll(".world-label.sc").attr("transform", (d) => `translate(${d.x},${d.y}) scale(${1 / k})`);
+    const occupied = [...sceneLayer.selectAll("text").nodes(), ...pinLayer.selectAll("text").nodes()]
+      .filter((n) => n.getAttribute("display") !== "none")
+      .map((n) => n.getBoundingClientRect()).filter((r) => r.width && r.height);
+    const kept = [];
+    const nodes = worldLayer.selectAll(".world-label").nodes().sort((a, b) => (d3.select(b).datum().priority || 0) - (d3.select(a).datum().priority || 0));
+    for (const n of nodes) {
+      const d = d3.select(n).datum();
+      n.style.display = null;
+      if ((d.screenArea0 || 0) * k * k < 950) { n.style.display = "none"; continue; }
+      const r = n.getBoundingClientRect();
+      if (occupied.some((o) => overlapsRect(r, o, 4)) || kept.some((o) => overlapsRect(r, o, 6))) n.style.display = "none";
+      else kept.push(r);
+    }
   }
 
   // ---------------------------------------------------------------- chapter scenes (atlas grammar on the viewer map)
@@ -427,6 +461,7 @@
     sceneLayer.selectAll(".sc").attr("transform", (d) => `translate(${d.x},${d.y}) scale(${1 / k})${d.rot != null ? ` rotate(${d.rot})` : ""}`);
     sceneDefs.selectAll("pattern").attr("width", 7 / k).attr("height", 7 / k)
       .call((p) => p.select("line").attr("y2", 7 / k).attr("stroke-width", 2.2 / k));
+    scaleWorldLabels();
   }
 
   /** Chapter text with its terms linked one move ahead: your note if it exists, else Wikipedia. ★ marks the ones worth asking about. */
@@ -1050,6 +1085,7 @@
     drawWorldUnderlay(t);
     drawScene(t);
     renderPins(t);
+    scaleWorldLabels();
     renderPanel();
     if (state.follow && (state.playing || opts.scrub)) followChapter(t);
     if (!opts.hover) scheduleHash();
@@ -1245,7 +1281,11 @@
     } else {
       const y = stop.year <= 0 ? `${1 - stop.year} BC` : String(stop.year);
       h += `<div class="meta">Stop ${state.tourStop + 1} of ${t.stops.length} · ${esc(y)}</div><h2>${esc(stop.title)}</h2><p>${esc(stop.text)}</p>`;
-      if (stop.plate) h += `<p><a class="it" href="../atlas/index.html#${esc(stop.plate)}" target="_blank">Plate: ${esc(stop.plate)}</a></p>`;
+      if (stop.plate) {
+        const raw = window.DATASETS[stop.era] || state.ds;
+        const p = (raw.plates || []).find((x) => x.id === stop.plate) || { id: stop.plate, title: stop.plate };
+        h += `<div class="plate-tiles tour-plate">${plateTile(p)}</div>`;
+      }
       if (stop.meanwhile) h += `<p class="meanwhile">Meanwhile: ${esc(stop.meanwhile)}</p>`;
     }
     h += `<div class="tour-actions"><button data-tour-prev ${state.tourStop <= 0 ? "disabled" : ""}>‹ Prev</button><button data-tour-next ${state.tourStop >= t.stops.length ? "disabled" : ""}>Next ›</button></div>`;
@@ -1264,7 +1304,7 @@
     const x = (y) => pad + M.masterX(L, y) * (W - 2 * pad);
     const rowH = 14, top = 15, axisY = top + L.rows * rowH + 3;
     master.x = x; master.top = top; master.rowH = rowH; master.axisY = axisY;
-    svg.attr("height", axisY + 14);
+    svg.attr("height", axisY + 28);
     svg.selectAll("*").remove();
     const defs = svg.append("defs");
     const pat = defs.append("pattern").attr("id", "gap-hatch").attr("patternUnits", "userSpaceOnUse").attr("width", 8).attr("height", 8).attr("patternTransform", "rotate(45)");
@@ -1283,7 +1323,7 @@
       const nx = Math.min(x(L.y1), x(q.y1 + 139));
       const gx0 = x(q.y1), gw = Math.max(20, nx - gx0);
       svg.append("rect").attr("class", "m-gap-band").attr("x", gx0).attr("y", top + q.row * rowH).attr("width", gw).attr("height", rowH - 3);
-      svg.append("text").attr("class", "m-gap").attr("x", gx0 + gw / 2).attr("y", top + q.row * rowH + rowH - 6).attr("text-anchor", "middle").text(q.gapAfter);
+      svg.append("text").attr("class", "m-gap m-gap-label").attr("x", gx0 + gw / 2).attr("y", axisY + 24).attr("text-anchor", "middle").text(q.gapAfter);
     });
     const n = L.breaks.length - 1;
     if (n > 1) svg.append("text").attr("class", "m-scale").attr("x", x(L.breaks[n - 1]) - 4).attr("y", top - 4).attr("text-anchor", "end")
@@ -1396,6 +1436,8 @@
     $("#ds-years").textContent = mp ? `${mp.from} – ${mp.to}` : "";
     $(".picker").title = `${mp ? mp.full : state.ds.title}. Click to choose another period, or click one on the strip below.`;
     document.title = `${state.ds.title} — Amit's World`;
+    const worldCb = $("#world-underlay");
+    if (worldCb) { worldCb.disabled = id === "ww2"; worldCb.checked = id !== "ww2"; }
     renderMapLegend();
     drawChapterBox(null);
     flyWorld(0);
@@ -1429,7 +1471,7 @@
   $("#play").addEventListener("click", () => setPlaying(!state.playing));
   $("#follow").addEventListener("change", (ev) => { state.follow = ev.target.checked; state.followed = undefined; });
   $("#world").addEventListener("click", () => { drawChapterBox(null); state.followed = null; flyWorld(); });
-  $("#world-underlay").addEventListener("change", (ev) => { state.showWorld = ev.target.checked; drawWorldUnderlay(state.cursor); });
+  $("#world-underlay").addEventListener("change", () => { drawWorldUnderlay(state.cursor); });
   $("#fit").addEventListener("click", () => zoomToDomain(state.ds.t0, state.ds.t1));
   $("#help-btn").addEventListener("click", () => { $("#help").hidden = !$("#help").hidden; });
   $("#help-close").addEventListener("click", () => { $("#help").hidden = true; });
