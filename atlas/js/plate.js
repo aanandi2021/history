@@ -166,6 +166,7 @@
 
   const haloText = (sel, colour = LAND, w = 2.6) => sel.attr("stroke", colour).attr("stroke-width", w).attr("stroke-linejoin", "round").attr("paint-order", "stroke");
 function drawDiagramFigure(container, fig, fi, w, h) {
+  h = fig.diagram && fig.diagram.height ? Math.round(w * fig.diagram.height) : h;
   const svg = d3.select(container).append("svg")
     .attr("xmlns", "http://www.w3.org/2000/svg").attr("viewBox", `0 0 ${w} ${h}`).attr("width", w).attr("height", h)
     .attr("class", "fig").attr("data-fig", fi).attr("font-family", SANS);
@@ -186,7 +187,7 @@ function drawDiagramFigure(container, fig, fi, w, h) {
     g.append("rect").attr("x", sx(c.x)).attr("y", sy(c.y)).attr("width", sx(c.w)).attr("height", sy(c.h))
       .attr("rx", 10).attr("fill", c.fill || "#efe2bd").attr("fill-opacity", c.opacity == null ? 0.45 : c.opacity)
       .attr("stroke", c.colour || "#8c6d3f").attr("stroke-width", 1.2);
-    g.append("text").attr("x", sx(c.x) + 10).attr("y", sy(c.y) + 18).attr("font-family", SERIF)
+    g.append("text").attr("x", sx(c.labelX != null ? c.labelX : c.x) + 10).attr("y", sy(c.labelY != null ? c.labelY : c.y) + 18).attr("font-family", SERIF)
       .attr("font-weight", 700).attr("font-size", 13).attr("fill", c.colour || INK).text(c.label);
   }
   for (const n of d.nodes || []) {
@@ -240,12 +241,13 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
   panels.forEach((panel, i) => {
     const x = gap + (i % cols) * (pw + gap), y = gap + Math.floor(i / cols) * (ph + 36);
     const g = svg.append("g").attr("transform", `translate(${x},${y})`);
+    const panelDefs = g.append("defs");
     const proj = projectionFor(fig, pw, ph);
     const geo = d3.geoPath(proj);
     const clipId = `sm-frame-${fi}-${i}`, landClip = `sm-land-${fi}-${i}`, landMask = `sm-land-mask-${fi}-${i}`;
-    defs.append("clipPath").attr("id", clipId).append("rect").attr("width", pw).attr("height", ph);
-    defs.append("clipPath").attr("id", landClip).append("path").attr("d", geo(LANDF));
-    const lm = defs.append("mask").attr("id", landMask).attr("maskUnits", "userSpaceOnUse");
+    panelDefs.append("clipPath").attr("id", clipId).attr("clipPathUnits", "userSpaceOnUse").append("rect").attr("width", pw).attr("height", ph);
+    panelDefs.append("clipPath").attr("id", landClip).attr("clipPathUnits", "userSpaceOnUse").append("path").attr("d", geo(LANDF));
+    const lm = panelDefs.append("mask").attr("id", landMask).attr("maskUnits", "userSpaceOnUse");
     lm.append("rect").attr("width", pw).attr("height", ph).attr("fill", "#000");
     lm.append("path").attr("d", geo(LANDF)).attr("fill", "#fff");
     const root = g.append("g").attr("clip-path", `url(#${clipId})`);
@@ -300,7 +302,9 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
   const items = P.legendItems(fig);
   if (items.length && !(fig.legend && fig.legend.hidden)) {
     const y = gap + rows * (ph + 36) - 4;
-    drawLegend(svg, defs, items, Object.assign({ x: gap, y }, fig.legend || {}), w, h, { land: LAND, sea: SEA });
+    const box = drawLegend(svg, defs, items, Object.assign({ x: gap, y }, fig.legend || {}), w, h, { land: LAND, sea: SEA });
+    const contentH = Math.min(h, Math.ceil(y + (box && box.height || 0) + 8));
+    svg.attr("viewBox", `0 0 ${w} ${contentH}`).attr("height", contentH);
   }
   return svg.node();
 }
@@ -571,6 +575,7 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
     const y = cfg.y != null ? cfg.y : /top/.test(pos) ? 6 : h - bh - 6;
     g.attr("transform", `translate(${x},${y})`);
     g.insert("rect", "g").attr("width", bw).attr("height", bh).attr("fill", PAPER).attr("fill-opacity", 0.88).attr("stroke", cfg.boxed ? INK : "none").attr("stroke-width", 0.6);
+    return { width: bw, height: bh };
   }
 
   function swatch(g, defs, L, sw) {

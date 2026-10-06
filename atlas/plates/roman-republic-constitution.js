@@ -9,34 +9,36 @@
     viewer: "ancient/-0133/ch-end-of-the-republic",
     figures: [
       { kind: "diagram", caption: "Offices, assemblies and vetoes in the middle Republic", share: 1, diagram: {
+        height: 1.18,
         compartments: [
-          { id: "people-frame", label: "The Roman people", x: 0.04, y: 0.06, w: 0.68, h: 0.21, colour: POP, fill: "#dbe7ef" },
-          { id: "magistrate-frame", label: "Elected annual offices", x: 0.04, y: 0.36, w: 0.68, h: 0.23, colour: MAG, fill: "#e9dfef" },
-          { id: "senate-frame", label: "Senate", x: 0.77, y: 0.17, w: 0.19, h: 0.42, colour: SEN, fill: "#f0dccb" },
-          { id: "province-frame", label: "War, money and provinces", x: 0.30, y: 0.76, w: 0.43, h: 0.15, colour: ARMY, fill: "#e6e0d6" }
+          { id: "people-frame", label: "The Roman people", x: 0.03, y: 0.02, w: 0.66, h: 0.23, colour: POP, fill: "#dbe7ef" },
+          { id: "magistrate-frame", label: "Elected annual offices", x: 0.03, y: 0.34, w: 0.66, h: 0.23, colour: MAG, fill: "#e9dfef", labelX: 0.03, labelY: 0.31 },
+          { id: "senate-frame", label: "Senate", x: 0.75, y: 0.12, w: 0.21, h: 0.43, colour: SEN, fill: "#f0dccb" },
+          { id: "province-frame", label: " ", x: 0.32, y: 0.76, w: 0.38, h: 0.17, colour: ARMY, fill: "#e6e0d6" }
         ],
         nodes: [
-          { id: "tribal", label: "Tribal\nassembly", x: 0.18, y: 0.18, w: 0.17, h: 0.10, colour: POP, note: "laws and offices" },
-          { id: "plebeian", label: "Plebeian\ncouncil", x: 0.46, y: 0.18, w: 0.17, h: 0.10, colour: TR, note: "plebeians only" },
-          { id: "centuriate", label: "Centuriate\nassembly", x: 0.63, y: 0.18, w: 0.17, h: 0.10, colour: POP, note: "elects consuls" },
-          { id: "praetors", label: "Praetors", x: 0.18, y: 0.49, w: 0.15, h: 0.09, colour: MAG, note: "courts" },
-          { id: "censors", label: "Censors", x: 0.32, y: 0.49, w: 0.14, h: 0.09, colour: MAG, note: "census" },
-          { id: "tribunes", label: "Tribunes\nof the plebs", x: 0.47, y: 0.49, w: 0.17, h: 0.10, colour: TR, strong: true, note: "veto" },
-          { id: "consuls", label: "Two\nconsuls", x: 0.64, y: 0.49, w: 0.16, h: 0.10, colour: MAG, strong: true, note: "annual command" },
-          { id: "senate", label: "Senate", x: 0.865, y: 0.36, w: 0.15, h: 0.12, colour: SEN, strong: true, serif: true, note: "advice, money" },
-          { id: "army", label: "Army and\nprovinces", x: 0.52, y: 0.855, w: 0.24, h: 0.10, colour: ARMY, strong: true, note: "the dangerous seam" }
+          { id: "tribal", label: "Tribal\nassembly", x: 0.16, y: 0.15, w: 0.17, h: 0.10, colour: POP, note: "laws and offices" },
+          { id: "plebeian", label: "Plebeian\ncouncil", x: 0.40, y: 0.15, w: 0.17, h: 0.10, colour: TR, note: "plebeians only" },
+          { id: "centuriate", label: "Centuriate\nassembly", x: 0.61, y: 0.15, w: 0.17, h: 0.10, colour: POP, note: "elects consuls" },
+          { id: "praetors", label: "Praetors", x: 0.16, y: 0.49, w: 0.15, h: 0.09, colour: MAG, note: "courts" },
+          { id: "censors", label: "Censors", x: 0.30, y: 0.49, w: 0.14, h: 0.09, colour: MAG, note: "census" },
+          { id: "tribunes", label: "Tribunes\nof the plebs", x: 0.45, y: 0.49, w: 0.17, h: 0.10, colour: TR, strong: true, note: "veto" },
+          { id: "consuls", label: "Two\nconsuls", x: 0.62, y: 0.49, w: 0.16, h: 0.10, colour: MAG, strong: true, note: "annual command" },
+          { id: "senate", label: "Senate", x: 0.855, y: 0.34, w: 0.15, h: 0.12, colour: SEN, strong: true, serif: true, note: "advice, money" },
+          { id: "army", label: "Army and\nprovinces", x: 0.51, y: 0.86, w: 0.24, h: 0.10, colour: ARMY, strong: true, note: "the dangerous seam" }
         ],
         arrows: [
-          { id: "elect-praetors", from: "tribal", to: "praetors", label: "elect", via: [[0.18,0.31]], labelAt: [0.18,0.32] },
-          { id: "elect-tribunes", from: "plebeian", to: "tribunes", label: "elect", colour: TR, via: [[0.46,0.31]], labelAt: [0.46,0.32] },
-          { id: "elect-consuls", from: "centuriate", to: "consuls", label: "elect", via: [[0.63,0.31]], labelAt: [0.63,0.32] },
-          { id: "senate-advises", from: "senate", to: "consuls", label: "advises", colour: SEN, labelAt: [0.76,0.42] },
-          { id: "veto-consuls", from: "tribunes", to: "consuls", label: "veto", colour: TR, dashed: true, end: "bar", labelAt: [0.55,0.55] },
-          { id: "veto-senate", from: "tribunes", to: "senate", label: "veto", colour: TR, dashed: true, end: "bar", via: [[0.56,0.61],[0.82,0.61]], labelAt: [0.68,0.61] },
-          { id: "censors-senate", from: "censors", to: "senate", label: "enrol members", colour: MAG, via: [[0.32,0.66],[0.86,0.66]], labelAt: [0.58,0.66] },
-          { id: "commands-army", from: "consuls", to: "army", label: "command", colour: ARMY, via: [[0.64,0.71],[0.52,0.71]], labelAt: [0.58,0.71] },
-          { id: "money-war", from: "senate", to: "army", label: "assigns, funds", colour: SEN, via: [[0.86,0.71],[0.60,0.75]], labelAt: [0.76,0.71] }
+          { id: "elect-praetors", from: "tribal", to: "praetors", label: "elect", via: [[0.16,0.29],[0.16,0.42]], labelAt: [0.16,0.31] },
+          { id: "elect-tribunes", from: "plebeian", to: "tribunes", label: "elect", colour: TR, via: [[0.40,0.29],[0.45,0.42]], labelAt: [0.41,0.31] },
+          { id: "elect-consuls", from: "centuriate", to: "consuls", label: "elect", via: [[0.61,0.29],[0.62,0.42]], labelAt: [0.61,0.31] },
+          { id: "senate-advises", from: "senate", to: "consuls", label: "advises", colour: SEN, labelAt: [0.74,0.41] },
+          { id: "veto-consuls", from: "tribunes", to: "consuls", label: "veto", colour: TR, dashed: true, end: "bar", labelAt: [0.54,0.55] },
+          { id: "veto-senate", from: "tribunes", to: "senate", label: "veto", colour: TR, dashed: true, end: "bar", via: [[0.55,0.63],[0.82,0.63]], labelAt: [0.68,0.63] },
+          { id: "censors-senate", from: "censors", to: "senate", label: "enrol members", colour: MAG, via: [[0.30,0.67],[0.83,0.67]], labelAt: [0.56,0.67] },
+          { id: "commands-army", from: "consuls", to: "army", label: "command", colour: ARMY, via: [[0.62,0.70],[0.51,0.70]], labelAt: [0.56,0.70] },
+          { id: "money-war", from: "senate", to: "army", label: "assigns, funds", colour: SEN, via: [[0.855,0.69],[0.61,0.74]], labelAt: [0.76,0.70] }
         ]
+
 
       } }
     ],
