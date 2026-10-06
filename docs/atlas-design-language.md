@@ -385,3 +385,17 @@ What we built from it:
 - Three plates: `byzantium-basil-crisis`, `medieval-trade-networks` and `hundred-years-war`.
 - The medieval period now carries late Byzantine crisis, Hansa/Venice/Genoa trade, Black Death transmission context, Joan of Arc and the French recovery to 1453.
 - The Hansa/Italian trade plate is the fidelity target for weighted trade routes and hub rings.
+
+## 19. Round 10: closing the medieval period (PDF pp. 194–213)
+
+This batch covers the Baltic and Teutonic Knights, late-medieval Germany and Poland-Lithuania, Muscovy and the successor khanates, the Balkans, Byzantium after 1204, Ottoman expansion to and beyond 1453, Yuan China, the Delhi Sultanate and the humanist/Atlantic turn. Analyses are in `study/analysis/spread-p194…p212.json` and `round10-findings.md`.
+
+New move:
+
+- **Phase labels on areas.** An `area` can carry `phaseLabel` and optional `phaseAt`. The renderer draws a small boxed date directly on the zone. Use this for dated expansion fields where the legend alone is too far away from the map: Ottoman `1326`, `1362`, `1451`; Muscovy `1462`, `1505`. It is not a general label replacement; keep proper labels and text refs for named places.
+
+What we built from it:
+
+- Three plates: `baltic-orders-kalmar`, `muscovy-lithuania-steppe` and `ottoman-rise-1453`.
+- The medieval period now hands off explicitly to Russia through Ivan III and the Ugra, to Maritime Asia through Dias and Vasco da Gama, and to the Mongols-to-Mughals board through Timur and Babur.
+- The Ottoman plate is the fidelity target for dated phase labels on expansion zones.

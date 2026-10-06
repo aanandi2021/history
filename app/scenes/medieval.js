@@ -75,7 +75,7 @@ window.SCENES = window.SCENES || {};
       {type:"area",name:"Japan",tier:"influence",colour:ASIA,around:[[130,31],[139,39],[143,35],[136,31]],labelAt:[137,35]},
       {type:"route",style:"dotted",colour:ROAD,name:"Central Asian routes",path:[[108.94,34.26],[96,40],[82,42],[71.9,42.52],[44.37,33.31]]},
       {type:"point",symbol:"capital",name:"Chang'an",at:[108.94,34.26]}, {type:"point",symbol:"battle",name:"Talas",year:"751",at:[71.9,42.52]}, {type:"point",symbol:"capital",name:"Nara",at:[135.8,34.68]}, {type:"point",symbol:"capital",name:"Heian-kyo",at:[135.76,35.01]}
-    ], terms:[{t:"China",wiki:"History of China"},{t:"Sui",wiki:"Sui dynasty"},{t:"Tang",wiki:"Tang dynasty"},{t:"Japan",wiki:"History of Japan"},{t:"Central Asia",wiki:"History of Central Asia"},{t:"Mongols",wiki:"Mongol Empire"}]},
+    ], terms:[{t:"China",wiki:"History of China"},{t:"Sui",wiki:"Sui dynasty"},{t:"Tang",wiki:"Tang dynasty"},{t:"Japan",wiki:"History of Japan"},{t:"Central Asia",wiki:"History of Central Asia"},{t:"Mongol",wiki:"Mongol Empire"}]},
     "ch-abbasid-caliphate": { caption:"The Abbasid turn shifts the Islamic centre from Syria toward Iraq, then regional dynasties grow around it.", bbox:[[-12,15],[82,46]], layers:[
       {type:"area",name:"Abbasid heartland",tier:"core",colour:IS,around:[[38,31],[44,34],[50,32],[47,27],[40,27]],labelAt:[44,31]},
       {type:"area",name:"al-Andalus",tier:"core",colour:IS,around:[[-8,37],[-4,42],[1,40],[-2,36]],labelAt:[-4,39]},
@@ -159,6 +159,34 @@ window.SCENES = window.SCENES || {};
       {type:"arrow",name:"French recovery",colour:FR,path:[[1.91,47.9],[4.03,49.26],[1.1,49.44],[-0.04,44.85]],labelAt:[2,48]},
       {type:"point",symbol:"battle",name:"Crecy",year:"1346",at:[1.88,50.26]}, {type:"point",symbol:"battle",name:"Poitiers",year:"1356",at:[0.34,46.58]}, {type:"point",symbol:"fortress",name:"Orleans",year:"1429",at:[1.91,47.9]}, {type:"point",symbol:"battle",name:"Castillon",year:"1453",at:[-0.04,44.85]}
     ], terms:[{t:"Hundred Years War",wiki:"Hundred Years' War"},{t:"Crecy",wiki:"Battle of Crecy"},{t:"Joan of Arc",wiki:"Joan of Arc"},{t:"Castillon",wiki:"Battle of Castillon"}]}
+,
+    "ch-baltic-orders-kalmar": { caption:"Scandinavian union, Hanseatic ports and the Teutonic frontier all meet around the Baltic.", bbox:[[4,50],[32,62]], layers:[
+      {type:"area",name:"Kalmar crowns",tier:"influence",colour:NORM,around:[[8,55],[13,60],[20,61],[22,57],[16,55]],labelAt:[15,58]},
+      {type:"area",name:"Teutonic-Livonian orders",tier:"core",colour:ASIA,around:[[15,53],[19,54.5],[24,57],[28,58],[28,56],[21,54]],labelAt:[23,55.5]},
+      {type:"area",name:"Poland-Lithuania",tier:"conquest",colour:RUS,around:[[17,51],[22,54],[29,55],[30,52],[22,50]],labelAt:[24,52.5]},
+      {type:"route",style:"dotted",colour:ROAD,name:"Hanseatic Baltic road",path:[[10.69,53.87],[18.65,54.35],[24.11,56.95],[24.75,59.44],[31.28,58.52]]},
+      {type:"point",symbol:"treaty",name:"Kalmar",year:"1397",at:[16.36,56.66]}, {type:"point",symbol:"fortress",name:"Marienburg",at:[19.03,54.04]}, {type:"point",symbol:"battle",name:"Grunwald",year:"1410",at:[18.75,53.49]}, {type:"point",symbol:"port",name:"Riga",at:[24.11,56.95]}, {type:"point",symbol:"large-city",name:"Novgorod",at:[31.28,58.52]}
+    ], terms:[{t:"Kalmar Union",wiki:"Kalmar Union"},{t:"Teutonic Order",wiki:"Teutonic Order"},{t:"Hanseatic",wiki:"Hanseatic League"},{t:"Grunwald",wiki:"Battle of Grunwald"}]},
+    "ch-muscovy-lithuania-steppe": { caption:"Moscow grows inside the Horde tribute world, then takes Novgorod and faces down the Horde at the Ugra.", bbox:[[20,43],[56,61]], layers:[
+      {type:"area",name:"Lithuania and Rus lands",tier:"influence",colour:RUS,around:[[23,54],[28,56],[35,53],[33,49],[27,49]],labelAt:[29,52]},
+      {type:"area",name:"Muscovy",tier:"core",colour:ASIA,around:[[35,54],[38,58],[45,57],[45,53],[38,52.5]],labelAt:[40,55]},
+      {type:"area",name:"Successor khanates",tier:"influence",colour:STEP,around:[[43,52],[50,56],[55,54],[51,49]],labelAt:[50,53]},
+      {type:"arrow",name:"Kulikovo and Ugra",colour:ROAD,path:[[37.62,55.75],[38.7,53.65],[35,54.8],[37.62,55.75]],labelAt:[37,54]},
+      {type:"point",symbol:"capital",name:"Moscow",at:[37.62,55.75]}, {type:"point",symbol:"large-city",name:"Novgorod",year:"1478",at:[31.28,58.52]}, {type:"point",symbol:"battle",name:"Kulikovo",year:"1380",at:[38.7,53.65]}, {type:"point",symbol:"battle",name:"Ugra",year:"1480",at:[35,54.8]}, {type:"point",symbol:"capital",name:"Kazan",at:[49.12,55.79]}
+    ], terms:[{t:"Muscovy",wiki:"Grand Duchy of Moscow"},{t:"Golden Horde",wiki:"Golden Horde"},{t:"Novgorod",wiki:"Novgorod Republic"},{t:"Tatar yoke",wiki:"Mongol-Tatar yoke"},{t:"Russia",wiki:"History of Russia"}]},
+    "ch-ottoman-rise-1453": { caption:"Ottoman power grows from Bursa to Edirne while Byzantium shrinks to Constantinople.", bbox:[[16,34],[43,46]], layers:[
+      {type:"area",name:"Byzantine fragments",tier:"influence",colour:BYZ,around:[[20,38],[24,40],[29,41],[33,40],[31,37]],labelAt:[27,39]},
+      {type:"area",name:"Ottoman core",tier:"core",colour:NORM,around:[[28,39.5],[30,41],[32,40],[31,38.5]],labelAt:[30,40]},
+      {type:"area",name:"Ottoman expansion",tier:"conquest",colour:NORM,around:[[20,39],[24,43],[30,42],[36,40],[33,37],[25,37]],labelAt:[26,40]},
+      {type:"arrow",name:"Balkan advances",colour:ROAD,path:[[29.06,40.19],[26.67,40.42],[26.55,41.68],[24.0,43.7],[27.91,43.21]],labelAt:[26,42]},
+      {type:"point",symbol:"capital",name:"Bursa",year:"1326",at:[29.06,40.19]}, {type:"point",symbol:"capital",name:"Edirne",year:"1362",at:[26.55,41.68]}, {type:"point",symbol:"battle",name:"Kosovo",year:"1389",at:[20.93,42.57]}, {type:"point",symbol:"battle",name:"Varna",year:"1444",at:[27.91,43.21]}, {type:"point",symbol:"fortress",name:"Constantinople",year:"1453",at:[28.98,41.01]}
+    ], terms:[{t:"Ottoman",wiki:"Ottoman Empire"},{t:"Byzantium",wiki:"Byzantine Empire"},{t:"Constantinople",wiki:"Fall of Constantinople"},{t:"Mehmed II",wiki:"Mehmed II"}]},
+    "ch-medieval-transition": { caption:"The medieval period hands off to humanism, Portuguese sea routes and the Timurid-to-Mughal story.", bbox:[[-10,-35],[125,50]], layers:[
+      {type:"arrow",name:"Portuguese route to India",colour:ROAD,path:[[-9.14,38.72],[-17,28],[-5,0],[18.47,-34.36],[50,-20],[73.77,15.5]],labelAt:[25,-24]},
+      {type:"arrow",name:"Timurids toward Mughals",colour:RUS,path:[[66.98,39.65],[71.78,40.39],[69.2,34.5],[77.21,28.61]],labelAt:[70,37]},
+      {type:"arrow",name:"Greek learning west",colour:BYZ,path:[[28.98,41.01],[12.5,41.9],[8.27,50.0]],labelAt:[15,43]},
+      {type:"point",symbol:"large-city",name:"Mainz",year:"1450",at:[8.27,50]}, {type:"point",symbol:"capital",name:"Constantinople",year:"1453",at:[28.98,41.01]}, {type:"point",symbol:"port",name:"Calicut",year:"1498",at:[75.78,11.25]}, {type:"point",symbol:"capital",name:"Delhi",at:[77.21,28.61]}, {type:"point",symbol:"capital",name:"Samarkand",at:[66.98,39.65]}
+    ], terms:[{t:"humanism",wiki:"Renaissance humanism"},{t:"Vasco da Gama",wiki:"Vasco da Gama"},{t:"Timur",wiki:"Timur"},{t:"Babur",wiki:"Babur"},{t:"Mughals",wiki:"Mughal Empire"}]}
 
   };
 })();

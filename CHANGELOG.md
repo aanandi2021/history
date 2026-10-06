@@ -27,6 +27,9 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 - Atlas round 9 (PDF pp. 174–193): added Byzantium under Basil II and after Manzikert, late-medieval trade networks, the Black Death route context, and France/England through the Hundred Years War.
 - Three new plates: Byzantium from Basil II to the Fourth Crusade, Hanseatic plus Venetian/Genoese trade networks, and the Hundred Years War from Bretigny to Castillon.
 - Added trade-network styling to the atlas renderer: weighted dotted routes and hub rings for ports and kontors.
+- Atlas round 10 (PDF pp. 194–213): closed the medieval period with Baltic unions and the Teutonic Knights, Muscovy's bridge into the Russia period, the Ottoman rise to 1453, humanism, Portugal's turn toward India and the Timurid-to-Mughal prelude.
+- Three new plates: Baltic unions and the Teutonic frontier, Muscovy/Lithuania/steppe, and Byzantium's end plus Ottoman expansion.
+- Added phase labels for dated expansion zones, used on the Ottoman and Muscovy maps to mark 1326/1362/1451 and 1462/1505 fields directly on the area wash.
 
 ## 0.6.0 (5 Oct 2026)
 

@@ -71,6 +71,8 @@ test("validate catches the mistakes a generator is likely to make", () => {
   assert.doesNotMatch(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "partition", path: [[1, 1], [2, 2]] }); }), /unknown boundary style/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "route", style: "highway", path: [[1, 1], [2, 2]] }); }), /unknown route style/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "route", weight: 0, path: [[1, 1], [2, 2]] }); }), /route weight/);
+  assert.match(bad((s) => { s.figures[0].layers.push({ type: "area", around: [[1, 1]], phaseLabel: 1453 }); }), /phaseLabel/);
+  assert.match(bad((s) => { s.figures[0].layers.push({ type: "area", around: [[1, 1]], phaseLabel: "1453", phaseAt: [1, 95] }); }), /phaseAt/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "wall", path: [[1, 1], [2, 2]], dates: [[1.5, "214"]] }); }), /dates must be/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "point", at: [1, 1], halo: "not a colour!" }); }), /bad halo/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "point", at: [1, 1], hub: -1 }); }), /hub/);
@@ -231,5 +233,16 @@ test("trade-network grammar draws weighted routes and hub rings", async () => {
   assert.deepEqual(errors, []);
   assert.ok(st.wideRoute > 4, `weighted route too thin: ${st.wideRoute}`);
   assert.ok(st.hubRings >= 4, "hub rings were not drawn");
+  await page.close();
+});
+
+test("dated expansion zones draw phase labels", async () => {
+  const { page, errors } = await open("#ottoman-rise-1453");
+  const st = await page.evaluate(() => ({
+    labels: [...document.querySelectorAll("[data-phase-label]")].map((n) => n.getAttribute("data-phase-label"))
+  }));
+  assert.deepEqual(errors, []);
+  assert.ok(st.labels.includes("1326"));
+  assert.ok(st.labels.includes("1451"));
   await page.close();
 });

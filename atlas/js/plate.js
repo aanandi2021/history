@@ -444,6 +444,19 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
     }
     for (const L of areaLayers.filter((l) => !areaClipToLand(l))) drawArea(L);
 
+    for (const L0 of areaLayers.filter((l) => l.phaseLabel)) {
+      const L = areaLook(L0);
+      const anchor = L.phaseAt || L.labelAt || (L.polygon && L.polygon[Math.floor(L.polygon.length / 2)]) || (L.around && L.around[Math.floor(L.around.length / 2)]);
+      if (!anchor) continue;
+      const [x, y] = proj(anchor);
+      const g = layerG(L_LABELS, L).attr("data-phase-label", L.phaseLabel);
+      const t = g.append("text").attr("x", x).attr("y", y).attr("text-anchor", "middle").attr("font-size", L.phaseSize || 8.2).attr("font-weight", 700)
+        .attr("letter-spacing", "0.02em").attr("fill", isDark(L.phaseColour || L.colour || AREA_DEFAULT) ? "#fff" : INK).text(L.phaseLabel);
+      const bb = t.node().getBBox();
+      g.insert("rect", "text").attr("x", bb.x - 3).attr("y", bb.y - 1).attr("width", bb.width + 6).attr("height", bb.height + 2)
+        .attr("rx", 2).attr("fill", L.phaseColour || L.colour || AREA_DEFAULT).attr("fill-opacity", 0.84).attr("stroke", "#5a4a3a").attr("stroke-width", 0.5);
+    }
+
     for (const L of layers.filter((l) => l.type === "boundary")) {
       const g = layerG(L_LINES, L);
       const c = L.colour || "#4a3f35";
