@@ -69,6 +69,7 @@ test("validate catches the mistakes a generator is likely to make", () => {
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "area", around: [[1, 1]], tier: "vassal" }); }), /unknown tier vassal/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "zigzag", path: [[1, 1], [2, 2]] }); }), /unknown boundary style/);
   assert.doesNotMatch(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "partition", path: [[1, 1], [2, 2]] }); }), /unknown boundary style/);
+  assert.doesNotMatch(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "meridian", path: [[1, -5], [1, 5]] }); }), /unknown boundary style/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "route", style: "highway", path: [[1, 1], [2, 2]] }); }), /unknown route style/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "route", weight: 0, path: [[1, 1], [2, 2]] }); }), /route weight/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "area", around: [[1, 1]], phaseLabel: 1453 }); }), /phaseLabel/);

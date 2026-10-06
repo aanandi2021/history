@@ -30,6 +30,9 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 - Atlas round 10 (PDF pp. 194–213): closed the medieval period with Baltic unions and the Teutonic Knights, Muscovy's bridge into the Russia period, the Ottoman rise to 1453, humanism, Portugal's turn toward India and the Timurid-to-Mughal prelude.
 - Three new plates: Baltic unions and the Teutonic frontier, Muscovy/Lithuania/steppe, and Byzantium's end plus Ottoman expansion.
 - Added phase labels for dated expansion zones, used on the Ottoman and Muscovy maps to mark 1326/1362/1451 and 1462/1505 fields directly on the area wash.
+- Atlas round 11 (PDF pp. 214–233): opened **The age of transition** (1450–1650), with Canada-first coverage for Cabot, Cartier, Red Bay, Champlain, Wendat/Haudenosaunee context, plus Renaissance economy, voyages, American civilizations, Reformation, Ottomans, the Indian Ocean and Russia.
+- Three new plates: economic life around 1500, Portuguese/Spanish voyages and Tordesillas, and American civilizations on the eve of conquest.
+- Added a meridian boundary style for treaty claim lines such as Tordesillas, so a diplomatic line does not read like a modern border or a voyage route.
 
 ## 0.6.0 (5 Oct 2026)
 
