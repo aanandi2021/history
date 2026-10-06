@@ -7,6 +7,10 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
+## Unreleased
+
+- Atlas area layers can opt into land clipping with `clipToLand: true`; the Roman frontier, Augustus and late-antique migration plates now keep empire washes off the Mediterranean, Black Sea and Atlantic water.
+
 ## 0.6.0 (5 Oct 2026)
 
 - Master timeline across the very top: every period on one strip, the open one highlighted with its from/to years and the current date, in sync with the Period dropdown both ways.

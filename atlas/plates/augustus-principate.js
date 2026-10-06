@@ -10,8 +10,8 @@
     viewer: "ancient/-0027/ch-augustus-principate",
     figures: [
       { caption: "The settlement of the Roman world after Actium", share: 0.54, extent: [[-11,26],[43,52]], projection: "mercator", layers: [
-        { id:"imperial-provinces", type:"area", tier:"core", colour:R, pad:1.25, legend:"Imperial provinces and army frontiers", around:[[1,41],[4.8,45.8],[7.5,47],[11,46],[16,45],[20,42],[24,39],[30,37],[36,36],[37,32],[25,31],[14,33],[3,36],[-3,38]] },
-        { id:"senatorial-provinces", type:"area", colour:S, opacity:0.46, pad:0.95, legend:"Senatorial provinces", around:[[13,41.8],[14,37.6],[23.7,37.9],[29.9,31.2],[10.3,36.85],[-5,37.5]] },
+        { id:"imperial-provinces", type:"area", clipToLand:true, tier:"core", colour:R, pad:1.25, legend:"Imperial provinces and army frontiers", around:[[1,41],[4.8,45.8],[7.5,47],[11,46],[16,45],[20,42],[24,39],[30,37],[36,36],[37,32],[25,31],[14,33],[3,36],[-3,38]] },
+        { id:"senatorial-provinces", type:"area", clipToLand:true, colour:S, opacity:0.46, pad:0.95, legend:"Senatorial provinces", around:[[13,41.8],[14,37.6],[23.7,37.9],[29.9,31.2],[10.3,36.85],[-5,37.5]] },
         { id:"client-states", type:"area", tier:"influence", colour:C, pad:1.0, legend:"Client kingdoms and buffer states", around:[[32,39.9],[35,39],[39,40],[38,35],[31,31.5],[17,25.5],[-6,34]] },
         { id:"actium-route", type:"arrow", colour:"#111111", width:6, legend:"Octavian's decisive campaign, 31-30 BC", path:[ROME, BRUN, ACT, ALEX] },
         { id:"antony-east", type:"route", style:"dashed", colour:P, label:"Antony", legend:"Antony's eastern base", path:[PHIL, [28,38.5], ANK, [34,38], EUPH], head:true },
@@ -29,9 +29,9 @@
         { type:"label", style:"water", text:"Mediterranean", at:[9,34.6], size:9 }
       ], legend:{position:"bottom-left", columns:2} },
       { caption: "The Principate as a working compromise", share: 0.46, extent: [[-10,31],[35,47]], projection: "mercator", layers: [
-        { id:"senate-field", type:"area", colour:S, opacity:0.38, pad:1.5, legend:"Senate and old republican forms", around:[[8,36],[11,44],[14,45],[17,42],[18,36],[13,33]] },
-        { id:"princeps-field", type:"area", colour:R, opacity:0.38, pad:1.6, legend:"Princeps: army, treasury and imperial provinces", around:[[12,41.9],[16,45],[21,43],[27,39],[30,35],[18,33],[12,36]] },
-        { id:"imperial-provinces-2", type:"area", colour:R, pattern:"stripe", pad:1.0, legend:"Proconsular command where legions stood", around:[[3,43],[8,47],[17,46],[22,44],[26,40],[30,36],[34,35]] },
+        { id:"senate-field", type:"area", clipToLand:true, colour:S, opacity:0.38, pad:1.5, legend:"Senate and old republican forms", around:[[8,36],[11,44],[14,45],[17,42],[18,36],[13,33]] },
+        { id:"princeps-field", type:"area", clipToLand:true, colour:R, opacity:0.38, pad:1.6, legend:"Princeps: army, treasury and imperial provinces", around:[[12,41.9],[16,45],[21,43],[27,39],[30,35],[18,33],[12,36]] },
+        { id:"imperial-provinces-2", type:"area", clipToLand:true, colour:R, pattern:"stripe", pad:1.0, legend:"Proconsular command where legions stood", around:[[3,43],[8,47],[17,46],[22,44],[26,40],[30,36],[34,35]] },
         { id:"senatorial-ring", type:"boundary", style:"dashdot", colour:S, legend:"Pacified senatorial provinces", path:[[3,36],[7,38],[12,39],[17,38],[22,37],[27,35]] },
         { id:"grain", type:"arrow", colour:"#c58b32", width:5, label:"grain", legend:"Cura annonae: grain supply to Rome", path:[[29.92,31.2],[22,34],[15,38],ROME] },
         { id:"praetorian", type:"point", symbol:"fortress", at:ROME, name:"Praetorian Guard", labelPos:"w", halo:R },

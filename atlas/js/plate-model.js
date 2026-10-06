@@ -61,6 +61,7 @@
           if (!Array.isArray(pts) || !pts.length || !pts.every(isLonLat)) bad(`${lw}: needs around:[[lon,lat],...] or polygon`);
           if (L.pattern && !PATTERNS.includes(L.pattern)) bad(`${lw}: unknown pattern ${L.pattern}`);
           if (L.tier && !TIERS.includes(L.tier)) bad(`${lw}: unknown tier ${L.tier} (core, conquest or influence)`);
+          if (L.clipToLand != null && typeof L.clipToLand !== "boolean") bad(`${lw}: clipToLand must be true or false`);
         }
         if (L.type === "arrow" || L.type === "route" || L.type === "boundary") {
           if (!Array.isArray(L.path) || L.path.length < 2 || !L.path.every(isLonLat)) bad(`${lw}: needs path of at least two [lon,lat]`);

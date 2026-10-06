@@ -25,8 +25,8 @@
         { type:"label", style:"water", text:"Mediterranean", at:[11,34.0], size:9 }
       ], legend:{position:"bottom-left", columns:2} },
       { caption:"Peoples moving through the late Roman frontier", share:0.50, extent:[[-10,34],[35,57]], projection:"mercator", layers:[
-        { id:"western-empire", type:"area", colour:R, opacity:0.26, pad:1.25, legend:"Western Roman framework", around:[[-5,38],[2,44],[7,49],[12,45],[18,45],[20,41],[16,37],[8,36]] },
-        { id:"eastern-empire", type:"area", colour:"#e0a080", opacity:0.24, pad:1.25, legend:"Eastern Roman framework", around:[[18,40],[24,45],[30,43],[35,38],[32,34],[23,35]] },
+        { id:"western-empire", type:"area", clipToLand:true, colour:R, opacity:0.26, pad:1.25, legend:"Western Roman framework", around:[[-5,38],[2,44],[7,49],[12,45],[18,45],[20,41],[16,37],[8,36]] },
+        { id:"eastern-empire", type:"area", clipToLand:true, colour:"#e0a080", opacity:0.24, pad:1.25, legend:"Eastern Roman framework", around:[[18,40],[24,45],[30,43],[35,38],[32,34],[23,35]] },
         { id:"slavic-settlement", type:"area", tier:"influence", colour:SL, pad:1.5, legend:"Slavic settlement zones by about 700", around:[[14,50],[19,50],[24,49],[27,46],[23,43],[19,42],[16,45]] },
         { id:"franks", type:"area", tier:"influence", colour:FR, pad:1.0, legend:"Frankish kingdom", around:[[1,49],[4,50.5],[7,49.5],[8,47],[4,46],[1,47]] },
         { id:"huns", type:"arrow", colour:HUN, width:9, label:"Huns", date:"c. 375-451", legend:"Hun pressure", path:[[34,49],[29,47],[21,45],[11,48],[4.1,48.3]] },
