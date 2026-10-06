@@ -4,12 +4,12 @@
   const ROME=[12.5,41.9], RAV=[12.2,44.42], CAR=[10.31,36.85], TOUL=[1.44,43.6], SOIS=[3.32,49.38], CON=[28.98,41.01];
   window.PLATES["barbarian-kingdoms"] = { id:"barbarian-kingdoms", title:"The barbarian kingdoms, c. A.D. 500", head:"Early Middle Ages / Successor kingdoms", folio:"12", viewer:"medieval/0507/ch-barbarian-kingdoms", figures:[
     { caption:"Western successor kingdoms after the Roman West", share:0.62, extent:[[-10,30],[35,57]], projection:"mercator", layers:[
-      {id:"franks",type:"area",tier:"core",colour:FR,legend:"Franks",around:[[0,48],[4,51],[7,50],[6,47],[2,46]],labelAt:[4,49]},
-      {id:"visigoths",type:"area",tier:"core",colour:G,legend:"Visigoths",around:[[-8,38],[-2,43],[4,43],[3,39],[-2,37]],labelAt:[-2,40]},
-      {id:"ostrogoths",type:"area",tier:"core",colour:G,pattern:"hatch",legend:"Ostrogoths in Italy",around:[[8,45],[12,46],[16,43],[17,40],[15,37],[12,40],[10,43]],labelAt:[13,42]},
-      {id:"vandals",type:"area",tier:"core",colour:V,legend:"Vandals",around:[[8,34],[12,37],[17,36],[15,32],[9,32]],labelAt:[12,35]},
-      {id:"burgundians",type:"area",tier:"influence",colour:"#b07aa1",legend:"Burgundians",around:[[4,45],[6,47.3],[7.5,46],[6.2,44]],labelAt:[6,46]},
-      {id:"eastern-empire",type:"area",tier:"influence",colour:B,legend:"Eastern Roman Empire",around:[[20,40],[28,44],[34,40],[32,34],[23,35]],labelAt:[29,38]},
+      {id:"franks",type:"area",clipToLand:true,tier:"core",colour:FR,legend:"Franks",polygon:[[0.0,47.2],[2.5,50.8],[6.8,50.2],[7.0,47.0],[3.0,45.8]],smooth:false,labelAt:[4,49]},
+      {id:"visigoths",type:"area",clipToLand:true,tier:"core",colour:G,legend:"Visigoths",polygon:[[-8.5,37.0],[-5.5,42.2],[-1.0,43.6],[3.5,42.5],[3.2,38.0],[-2.5,36.4]],smooth:false,labelAt:[-2,40]},
+      {id:"ostrogoths",type:"area",clipToLand:true,tier:"core",colour:G,pattern:"hatch",legend:"Ostrogoths in Italy",polygon:[[8.3,45.4],[12.0,46.0],[16.2,43.3],[16.5,39.6],[14.6,37.9],[12.5,40.0],[10.3,43.3]],smooth:false,labelAt:[13,42]},
+      {id:"vandals",type:"area",clipToLand:true,tier:"core",colour:V,legend:"Vandals on the North African coast",polygon:[[7.5,33.5],[9.8,36.8],[13.2,37.0],[17.2,35.7],[17.5,33.7],[13.2,32.7]],smooth:false,labelAt:[12,35]},
+      {id:"burgundians",type:"area",clipToLand:true,tier:"influence",colour:"#b07aa1",legend:"Burgundians",polygon:[[4.2,45.2],[5.7,47.6],[7.5,46.2],[6.5,44.2]],smooth:false,labelAt:[6,46]},
+      {id:"eastern-empire",type:"area",clipToLand:true,tier:"influence",colour:B,legend:"Eastern Roman Empire",polygon:[[20,40],[26,44],[34,40],[32,34],[24,35]],smooth:false,labelAt:[29,38]},
       {id:"clovis-route",type:"arrow",colour:FR,width:5,legend:"Frankish advance",path:[[4,50],SOIS,TOUL],label:"Franks"},
       {id:"gothic-route",type:"route",style:"dashed",colour:G,legend:"Gothic movement",path:[[24,45],[18,44],RAV,[6,44],TOUL],head:true},
       {id:"soissons",type:"point",symbol:"battle",at:SOIS,name:"Soissons",tag:{text:"486",colour:"#e8806a"},legend:"Battle"},
@@ -17,9 +17,9 @@
       {type:"label",style:"water",text:"Mediterranean",at:[13,33.5],size:9}
     ], legend:{position:"bottom-left",columns:2} },
     { caption:"What survived from Rome", share:0.38, extent:[[-6,35],[18,52]], projection:"mercator", layers:[
-      {id:"roman-cities",type:"area",colour:"#e0a080",opacity:0.24,legend:"Roman city-and-bishop network",around:[[-3,43],[2,49],[8,50],[14,45],[13,40],[5,41]],labelAt:[6,45]},
-      {id:"catholic-franks",type:"area",tier:"core",colour:FR,legend:"Catholic Frankish kingship",around:[[1,48],[5,50.5],[7,49],[5,46.5],[2,46.5]],labelAt:[4,48.5]},
-      {id:"arian-kings",type:"area",colour:G,pattern:"hatch",legend:"Arian Gothic courts",around:[[-5,39],[2,43],[12,45],[16,41],[12,38],[2,38]],labelAt:[6,41]},
+      {id:"roman-cities",type:"area",clipToLand:true,colour:"#e0a080",opacity:0.24,legend:"Roman city-and-bishop network",polygon:[[-3,43],[2,49],[8,50],[14,45],[13,40],[5,41]],smooth:false,labelAt:[6,45]},
+      {id:"catholic-franks",type:"area",clipToLand:true,tier:"core",colour:FR,legend:"Catholic Frankish kingship",polygon:[[1,48],[5,50.5],[7,49],[5,46.5],[2,46.5]],smooth:false,labelAt:[4,48.5]},
+      {id:"arian-kings",type:"area",clipToLand:true,colour:G,pattern:"hatch",legend:"Arian Gothic courts",polygon:[[-5,39],[2,43],[12,45],[16,41],[12,38],[2,38]],smooth:false,labelAt:[6,41]},
       {id:"bishops",type:"route",style:"dotted",colour:"#111111",legend:"Bishops and councils",path:[[2.35,48.86],[4.84,45.76],[5.37,43.3],[12.5,41.9],[12.2,44.42]]},
       {id:"paris",type:"point",symbol:"bishopric",at:[2.35,48.86],name:"Paris"}, {id:"lyon",type:"point",symbol:"bishopric",at:[4.84,45.76],name:"Lyon"}, {id:"rome",type:"point",symbol:"bishopric",at:ROME,name:"Rome"}, {id:"milan",type:"point",symbol:"bishopric",at:[9.19,45.46],name:"Milan"}
     ], legend:{position:"bottom-left",columns:1} }
