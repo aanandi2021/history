@@ -77,7 +77,10 @@
         if (L.colour && !isColour(L.colour)) bad(`${lw}: bad colour ${L.colour}`);
         if (L.type === "area") {
           const pts = L.around || L.polygon;
-          if (!Array.isArray(pts) || !pts.length || !pts.every(isLonLat)) bad(`${lw}: needs around:[[lon,lat],...] or polygon`);
+          const hasRegions = Array.isArray(L.regions) && L.regions.length && L.regions.every((x) => typeof x === "string");
+          if ((!Array.isArray(pts) || !pts.length || !pts.every(isLonLat)) && !hasRegions) bad(`${lw}: needs around:[[lon,lat],...], polygon or regions:[code,...]`);
+          if (L.regions != null && !hasRegions) bad(`${lw}: regions must be non-empty string codes`);
+          if (L.minus != null && (!Array.isArray(L.minus) || !L.minus.every((x) => typeof x === "string"))) bad(`${lw}: minus must be string region codes`);
           if (L.pattern && !PATTERNS.includes(L.pattern)) bad(`${lw}: unknown pattern ${L.pattern}`);
           if (L.tier && !TIERS.includes(L.tier)) bad(`${lw}: unknown tier ${L.tier} (core, conquest or influence)`);
           if (L.clipToLand != null && typeof L.clipToLand !== "boolean") bad(`${lw}: clipToLand must be true or false`);

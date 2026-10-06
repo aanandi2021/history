@@ -15,6 +15,23 @@
   const AREA_DEFAULT = "#e0a080";
 
   const BASE = window.ATLAS_BASE;
+  const REGIONS = window.ATLAS_REGIONS;
+  let REGION_INDEX = null;
+  function regionIndex() {
+    if (REGION_INDEX) return REGION_INDEX;
+    REGION_INDEX = new Map();
+    const geoms = REGIONS && REGIONS.objects && REGIONS.objects.regions && REGIONS.objects.regions.geometries || [];
+    for (const g of geoms) if (g.properties && g.properties.code) REGION_INDEX.set(g.properties.code, g);
+    return REGION_INDEX;
+  }
+  function regionErrors(spec) {
+    const idx = regionIndex(), errs = [];
+    for (const fig of spec && spec.figures || []) for (const L of fig.layers || []) {
+      if (L.type !== "area") continue;
+      for (const code of [...(L.regions || []), ...(L.minus || [])]) if (!idx.has(code)) errs.push(`${spec.id}: layer ${L.id || L.legend || "area"}: unknown region ${code}`);
+    }
+    return errs;
+  }
   const LANDF = topojson.feature(BASE, BASE.objects.land);
   const LAND_FEATURES = LANDF.type === "FeatureCollection" ? LANDF.features : [LANDF];
   const RIVERS = topojson.feature(BASE, BASE.objects.rivers);
@@ -123,12 +140,27 @@
   }
 
   // ---- geometry: a soft "zone" around anchor places, the way the atlas draws realms
+  function polygonD(points, proj, smooth = true) {
+    const pts = normalisePolygonRing(points).map(proj).filter(Boolean);
+    const curve = smooth === false ? d3.curveLinearClosed : d3.curveCatmullRomClosed.alpha(0.5);
+    return pts.length ? d3.line().curve(curve)(pts) : null;
+  }
+
+  function regionPath(L, geo, proj) {
+    if (!L.regions) return null;
+    const idx = regionIndex();
+    const geoms = (L.regions || []).map((c) => idx.get(c)).filter(Boolean);
+    if (!geoms.length) return null;
+    let d = geo(topojson.merge(REGIONS, geoms)) || "";
+    if (L.polygon) d += polygonD(L.polygon, proj, L.smooth == null ? false : L.smooth) || "";
+    const minus = (L.minus || []).map((c) => idx.get(c)).filter(Boolean);
+    if (minus.length) d += geo(topojson.merge(REGIONS, minus)) || "";
+    return d;
+  }
+
   function zonePath(L, proj) {
     if (L.polygon) {
-      const pts = normalisePolygonRing(L.polygon).map(proj);
-      const smooth = L.smooth == null ? true : L.smooth;
-      const curve = smooth === false ? d3.curveLinearClosed : d3.curveCatmullRomClosed.alpha(0.5);
-      return d3.line().curve(curve)(pts);
+      return polygonD(L.polygon, proj, L.smooth == null ? true : L.smooth);
     }
     const padDeg = L.pad != null ? L.pad : 1.2;
     const pts = [];
@@ -302,10 +334,10 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
     const all = [...(fig.layers || []), ...(panel.layers || [])];
     let panelAreaSeq = 0;
     const drawPanelArea = (L0) => {
-      const L = areaLook(L0), d = zonePath(L, proj);
+      const L = areaLook(L0), d = regionPath(L, geo, proj) || zonePath(L, proj);
       if (!d) return;
       const lg = areaLayer.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null);
-      const clipToLand = areaClipToLand(L);
+      const clipToLand = areaClipToLand(L) && !L.regions;
       const fill = areaFill(defs, L);
       if (clipToLand) {
         const areaClip = `${uid}-sm-area-${fi}-${i}-${safeId(L.id || "area")}-${panelAreaSeq++}`;
@@ -313,7 +345,7 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
         lg.attr("clip-path", `url(#${areaClip})`);
         for (const f of LAND_FEATURES) lg.append("path").attr("d", geo(f)).attr("fill", fill.fill).attr("fill-opacity", fill.op).attr("stroke", "none");
       } else {
-        lg.append("path").attr("d", d).attr("fill", fill.fill).attr("fill-opacity", fill.op)
+        lg.append("path").attr("d", d).attr("fill", fill.fill).attr("fill-opacity", fill.op).attr("fill-rule", L.minus ? "evenodd" : null).attr("clip-rule", L.minus ? "evenodd" : null)
           .attr("stroke", L.edge === false ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", 0.7)
           .attr("stroke-dasharray", L.edge === "dashed" ? "5 3" : null);
       }
@@ -422,10 +454,10 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
     let areaSeq = 0;
     const drawArea = (L0) => {
       const L = areaLook(L0);
-      const d = zonePath(L, proj);
+      const d = regionPath(L, geo, proj) || zonePath(L, proj);
       if (!d) return;
       const g = layerG(L_AREA, L);
-      const clipToLand = areaClipToLand(L);
+      const clipToLand = areaClipToLand(L) && !L.regions;
       const { fill, op } = areaFill(defs, L);
       if (clipToLand && base.map !== false) {
         const areaClip = `${uid}-area-${fi}-${safeId(L.id || "area")}-${areaSeq++}`;
@@ -433,7 +465,7 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
         g.attr("clip-path", `url(#${areaClip})`);
         for (const f of LAND_FEATURES) g.append("path").attr("d", geo(f)).attr("fill", fill).attr("fill-opacity", op).attr("stroke", "none");
       } else {
-        g.append("path").attr("d", d).attr("fill", fill).attr("fill-opacity", op)
+        g.append("path").attr("d", d).attr("fill", fill).attr("fill-opacity", op).attr("fill-rule", L.minus ? "evenodd" : null).attr("clip-rule", L.minus ? "evenodd" : null)
           .attr("stroke", L.edge === false ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", L.edge === "strong" ? 1.6 : 0.8)
           .attr("stroke-dasharray", L.edge === "dashed" ? "5 3" : null);
       }
@@ -719,7 +751,7 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
   // ---- the spread
   function render(spec, host) {
     host.innerHTML = "";
-    const errs = P.validate(spec);
+    const errs = P.validate(spec).concat(regionErrors(spec));
     if (errs.length) { host.innerHTML = `<div class="errors"><h2>This plate has problems</h2><ul>${errs.map((e) => `<li>${esc(e)}</li>`).join("")}</ul></div>`; return { errors: errs }; }
     warnings = [];
     const spread = document.createElement("div");
@@ -889,7 +921,7 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
     window.ATLAS.ready = true;
   }
 
-  window.ATLAS = { render, figureSVG, show, drawSymbol, ready: false, test: { normalisePolygonRing } };
+  window.ATLAS = { render, figureSVG, show, drawSymbol, ready: false, test: { normalisePolygonRing, regionErrors } };
 
   document.addEventListener("DOMContentLoaded", () => {
     const pick = () => decodeURIComponent(location.hash.replace(/^#/, "")) || plateIds()[0];

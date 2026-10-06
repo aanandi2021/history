@@ -15,6 +15,7 @@
     "build:notes": "python scripts/build_data.py"
   },
   "devDependencies": {
+    "mapshaper": "^0.7.79",
     "marked": "^18.0.14",
     "puppeteer": "25.5.0",
     "topojson-client": "^3.1.0",

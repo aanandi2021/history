@@ -173,6 +173,30 @@ test("area polygon winding is normalised before drawing", async () => {
   await page.close();
 });
 
+test("administrative region areas union, subtract and fail on unknown codes", async () => {
+  const { page, errors } = await open("#key");
+  const st = await page.evaluate(() => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const spec = { id:"region-test", title:"Region test", figures:[{ caption:"France test", extent:[[5,47],[9,50]], layers:[
+      { id:"alsace", type:"area", regions:["FR-67","FR-68"], colour:"#d8a84f", legend:"Alsace" },
+      { id:"france-minus", type:"area", regions:["FRA"], minus:["FR-67","FR-68"], colour:"#8c3b3b", legend:"France without Alsace" }
+    ]}], text:{sections:[{heading:"h", entries:[{text:"x", refs:["alsace","france-minus"]}]}]} };
+    const res = window.ATLAS.render(spec, host);
+    const unionPaths = host.querySelectorAll('[data-layer="alsace"] path');
+    const minus = host.querySelector('[data-layer="france-minus"] path');
+    const bad = window.ATLAS.render({ id:"bad-region", title:"Bad", figures:[{caption:"c", extent:[[0,0],[10,10]], layers:[{id:"x", type:"area", regions:["NO-SUCH-REGION"]}]}] }, host).errors;
+    return { errors: res.errors, unionPathCount: unionPaths.length, minusFillRule: minus && minus.getAttribute("fill-rule"), minusSubpaths: (minus && minus.getAttribute("d") || "").split("M").length - 1, bad };
+  });
+  assert.deepEqual(errors, []);
+  assert.deepEqual(st.errors, []);
+  assert.equal(st.unionPathCount, 1, "a region union should render as one path element");
+  assert.equal(st.minusFillRule, "evenodd");
+  assert.ok(st.minusSubpaths >= 2, "minus should concatenate subtracting geometry into the path");
+  assert.match(st.bad.join(" | "), /unknown region NO-SUCH-REGION/);
+  await page.close();
+});
+
 test("the symbol key draws every registered symbol", async () => {
   const { page, errors } = await open("#key");
   assert.deepEqual(errors, []);

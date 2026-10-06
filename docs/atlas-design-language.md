@@ -377,6 +377,12 @@ Area polygons default to softened closed curves (`smooth: true`) that interpolat
 
 The clipping implementation is deliberately defensive. A land-clipped area now uses the area itself as the clip and paints the basemap land through it, so a broad realm field cannot bleed into the sea even when Natural Earth polygons, SVG clip-path fill rules or smoothed rings behave differently in Chrome. Polygon rings are normalised before drawing; a ring that D3 would read as the complement of the globe is reversed.
 
+### Administrative region building blocks
+
+For state-like areas in Europe, prefer Natural Earth building blocks over hand polygons. `atlas/data/regions-eu.js` is built from public-domain Natural Earth admin-0 countries (1:50m) and admin-1 states/provinces (1:10m) by `scripts/build_regions.mjs`, clipped to lon -25..65 and lat 25..72, simplified and quantised for `file://` loading. Country features use ISO_A3 codes such as `FRA` and `SWE`; admin-1 features use `iso_3166_2` such as `FR-67`, `SE-M`, `EE-37` or `HU-BA`.
+
+An area can now use `regions:[...]`, with optional `minus:[...]` and optional `polygon` additions. The renderer merges the listed regions and draws them as one SVG path, so adjacent provinces fill once instead of creating muddy overlap stripes. Use `minus` for a modern country minus provinces that were not yet in the state. Hand polygons remain appropriate for war zones, spheres of influence and vanished frontiers with no modern analogue, but snap them to region edges where possible and keep them subordinate to real administrative shapes.
+
 ## 18. Round 9: late-medieval networks and two-state war maps (PDF pp. 174–193)
 
 This batch covers Byzantium under Basil II and after Manzikert, the Mongol and Chinese context pages, late-medieval towns and trade, England, France, the Hundred Years War, Switzerland and Burgundy. Analyses are in `study/analysis/spread-p174…p192.json` and `round9-findings.md`.
