@@ -4,10 +4,10 @@
   const CON=[28.98,41.01], NIC=[29.72,40.43], TRE=[39.72,41.0], ADR=[26.55,41.68], GALL=[26.67,40.42], VAR=[27.91,43.21], KOS=[20.93,42.57], NICO=[24.0,43.7], BUR=[29.06,40.19];
   window.PLATES["ottoman-rise-1453"] = { id:"ottoman-rise-1453", title:"Byzantium's end and the Ottoman rise", head:"Late Middle Ages / 1453", folio:"28", viewer:"medieval/1453/ch-ottoman-rise-1453", figures:[
     {caption:"After the Fourth Crusade: fragments, 1204-1261", share:0.5, extent:[[16,34],[43,46]], projection:"conic", layers:[
-      {id:"latin",type:"area",tier:"core",colour:LAT,legend:"Latin states",polygon:[[22.0,37.0],[24.5,39.0],[26.4,41.0],[29.2,41.3],[29.3,40.3],[25.0,38.0]],smooth:false},
-      {id:"nicaea",type:"area",tier:"core",colour:BYZ,legend:"Greek successor states",polygon:[[27.0,37.5],[30.0,40.6],[33.5,41.0],[34.0,38.5],[31.0,37.0]],smooth:false},
-      {id:"trebizond",type:"area",tier:"core",colour:BYZ,polygon:[[36.0,40.5],[40.4,41.5],[42.4,41.2],[40.8,40.2]],smooth:false},
-      {id:"epirus",type:"area",tier:"core",colour:BYZ,polygon:[[20.0,38.5],[22.2,40.8],[24.0,40.0],[22.4,38.0]],smooth:false},
+      {id:"latin",type:"area",tier:"core",colour:LAT,legend:"Latin states",polygon:[[21.5,37.3],[23.0,38.5],[24.7,39.6],[26.8,40.8],[29.2,41.2],[29.5,40.4],[27.2,39.4],[24.8,38.2],[23.0,37.5]],smooth:true},
+      {id:"nicaea",type:"area",tier:"core",colour:BYZ,legend:"Greek successor states",polygon:[[26.6,37.0],[26.9,38.2],[27.4,39.4],[28.3,40.4],[29.4,40.9],[30.3,40.5],[30.4,39.5],[30.0,38.4],[29.1,37.5],[27.8,37.0]],smooth:true},
+      {id:"trebizond",type:"area",tier:"core",colour:BYZ,polygon:[[34.0,41.1],[35.5,41.4],[37.6,41.4],[39.7,41.2],[42.1,41.4],[43.0,40.9],[41.0,40.6],[38.7,40.7],[36.5,40.8],[34.6,40.7]],smooth:true},
+      {id:"epirus",type:"area",tier:"core",colour:BYZ,polygon:[[20.0,38.5],[21.0,39.7],[22.4,40.8],[24.0,40.0],[23.3,38.8],[22.4,38.0],[21.0,37.8]],smooth:true},
       {id:"venetian",type:"area",tier:"influence",colour:VEN,legend:"Venetian sea possessions",polygon:[[19.5,35.0],[23.5,36.2],[25.5,37.6],[24.0,39.0],[20.0,38.0]],smooth:false,clipToLand:false},
       {id:"recovery",type:"arrow",colour:BYZ,width:3.2,legend:"Nicaean recovery in 1261",path:[NIC,[28.6,40.8],CON]},
       {id:"constantinople",type:"point",symbol:"capital",at:CON,name:"Constantinople",labelPos:"nw",tag:{text:"1204",colour:"#e8806a"}}, {id:"nicaea-pt",type:"point",symbol:"capital",at:NIC,name:"Nicaea",labelPos:"se"}, {id:"trebizond-pt",type:"point",symbol:"capital",at:TRE,name:"Trebizond"}

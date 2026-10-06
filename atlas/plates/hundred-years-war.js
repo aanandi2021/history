@@ -4,8 +4,8 @@
   const PAR=[2.35,48.86], CAL=[1.85,50.95], BOR=[-0.58,44.84], CRE=[1.88,50.26], POI=[0.34,46.58], AGI=[2.14,50.46], ORL=[1.91,47.9], REI=[4.03,49.26], ROU=[1.1,49.44], DOM=[5.4,47.1];
   window.PLATES["hundred-years-war"] = { id:"hundred-years-war", title:"France and the Hundred Years War", head:"Late Middle Ages / France and England", folio:"25", viewer:"medieval/1429/ch-hundred-years-war", figures:[
     { caption:"English claims and the treaty map, 1328-1360", share:0.5, extent:[[-6,42],[8,52]], projection:"mercator", layers:[
-      {id:"france-north-1328",type:"area",tier:"core",colour:FR,legend:"French crown lands and vassals",polygon:[[-4.4,47.2],[-1.6,49.6],[2.5,51.0],[5.8,49.3],[5.3,46.2],[2.0,45.3],[-0.4,46.2]],smooth:false},
-      {id:"france-east-1328",type:"area",tier:"core",colour:FR,polygon:[[1.5,43.4],[4.8,44.0],[5.3,46.2],[2.0,45.3],[-0.4,46.2],[-0.1,44.6]],smooth:false},
+      {id:"france-north-1328",type:"area",tier:"core",colour:FR,legend:"French crown lands and vassals",polygon:[[-4.4,47.7],[-3.0,48.7],[-1.5,49.8],[0.5,50.6],[2.2,50.9],[3.4,50.4],[4.3,49.6],[4.7,48.4],[4.5,47.2],[3.5,46.4],[2.0,45.8],[0.7,46.7],[-0.4,47.6],[-1.5,47.5],[-3.1,47.4]],smooth:false},
+      {id:"france-east-1328",type:"area",tier:"core",colour:FR,polygon:[[0.9,43.4],[2.5,43.4],[4.5,44.2],[5.2,45.4],[4.5,47.2],[3.5,46.4],[2.0,45.8],[1.1,46.5],[0.5,45.3]],smooth:false},
       {id:"english-1360",type:"area",tier:"conquest",colour:ENG,legend:"English-held lands after Bretigny",polygon:[[-1.7,43.3],[-1.5,45.2],[-1.6,46.5],[-1.0,47.3],[-0.2,47.9],[0.7,47.8],[1.5,46.7],[1.7,45.3],[1.2,44.2],[-0.2,43.4]],smooth:false},
       {id:"calais",type:"area",tier:"core",colour:ENG,legend:"Calais and Ponthieu",polygon:[[1.45,50.1],[2.2,51.1],[2.45,50.75],[2.0,49.9]],smooth:false},
       {id:"edward-claim",type:"arrow",colour:ENG,width:3.2,legend:"English campaigns",path:[[0.0,51.0],CRE,POI,BOR],label:"Crecy-Poitiers"},

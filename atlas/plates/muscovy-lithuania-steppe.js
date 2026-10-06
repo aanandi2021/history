@@ -4,9 +4,9 @@
   const MOSCOW=[37.62,55.75], NOV=[31.28,58.52], TVE=[35.91,56.86], KAZ=[49.12,55.79], SAR=[46.03,51.53], KUL=[38.7,53.65], UGRA=[35.0,54.8], KIEV=[30.52,50.45], VIL=[25.28,54.69], CRI=[34.1,44.95];
   window.PLATES["muscovy-lithuania-steppe"] = { id:"muscovy-lithuania-steppe", title:"Muscovy, Lithuania and the steppe", head:"Late Middle Ages / Rus to Russia", folio:"27", viewer:"medieval/1480/ch-muscovy-lithuania-steppe", figures:[
     {caption:"Moscow among Rus, Lithuania and the Horde, c. 1380", share:0.5, extent:[[20,43],[56,61]], projection:"conic", layers:[
-      {id:"lithuania-1380",type:"area",tier:"core",colour:LIT,legend:"Lithuania and Rus lands",polygon:[[22,54],[27,56.5],[32,55.7],[36,52.5],[34,49.0],[29,48.2],[25,51.0]],smooth:false},
-      {id:"moscow-1380",type:"area",tier:"core",colour:MOS,legend:"Grand Duchy of Moscow",polygon:[[35.0,54.0],[38.5,56.5],[41.5,56.0],[41.0,54.0],[38.0,53.0]],smooth:false},
-      {id:"horde",type:"area",tier:"influence",colour:HORDE,legend:"Golden Horde tribute world",polygon:[[33,47],[42,51],[55,53],[55,46],[46,44],[38,44]],smooth:false},
+      {id:"lithuania-1380",type:"area",tier:"core",colour:LIT,legend:"Lithuania and Rus lands",polygon:[[22.2,54.4],[24.8,56.1],[28.0,56.6],[31.8,55.7],[34.8,53.6],[36.1,51.2],[34.2,49.0],[30.8,48.2],[27.6,49.6],[24.8,51.4],[22.8,52.8]],smooth:true},
+      {id:"moscow-1380",type:"area",tier:"core",colour:MOS,legend:"Grand Duchy of Moscow",polygon:[[35.0,54.0],[36.7,55.6],[38.5,56.5],[40.9,56.2],[42.1,55.0],[41.2,53.7],[38.8,52.8],[36.5,53.2]],smooth:true},
+      {id:"horde",type:"area",tier:"influence",colour:HORDE,legend:"Golden Horde tribute world",polygon:[[31.0,46.2],[35.5,48.2],[41.0,50.6],[47.5,52.3],[55.2,52.3],[56.0,49.2],[53.0,46.5],[47.0,44.8],[40.0,44.0],[34.0,44.8]],smooth:true},
       {id:"tribute",type:"route",style:"dashed",weight:2,colour:HORDE,legend:"Tribute and diplomacy",path:[MOSCOW,[42,53],SAR]},
       {id:"kulikovo-route",type:"arrow",colour:LINE,width:3,legend:"Kulikovo campaign",path:[MOSCOW,[38.2,54.0],KUL],label:"1380"},
       {id:"moscow",type:"point",symbol:"capital",at:MOSCOW,name:"Moscow"}, {id:"novgorod",type:"point",symbol:"large-city",at:NOV,name:"Novgorod"}, {id:"tver",type:"point",symbol:"large-city",at:TVE,name:"Tver"}, {id:"vilnius",type:"point",symbol:"capital",at:VIL,name:"Vilnius"}, {id:"kulikovo",type:"point",symbol:"battle",at:KUL,name:"Kulikovo",tag:{text:"1380",colour:"#e8806a"}}
