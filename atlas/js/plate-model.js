@@ -91,6 +91,7 @@
           if (L.type === "boundary" && L.style && !BOUNDARY_STYLES.includes(L.style)) bad(`${lw}: unknown boundary style ${L.style}`);
           if (L.type === "route" && L.style && !ROUTE_STYLES.includes(L.style)) bad(`${lw}: unknown route style ${L.style}`);
           if (L.type === "route" && L.weight != null && (!Number.isFinite(L.weight) || L.weight <= 0)) bad(`${lw}: route weight must be a positive number`);
+          if (L.geo != null && (L.type !== "route" || typeof L.geo !== "boolean")) bad(`${lw}: geo must be true or false on a route`);
           for (const dt of L.dates || []) {
             if (!Array.isArray(dt) || typeof dt[0] !== "number" || dt[0] < 0 || dt[0] > 1 || !dt[1]) bad(`${lw}: dates must be [[0..1, "text"], ...]`);
           }

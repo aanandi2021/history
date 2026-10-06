@@ -73,6 +73,7 @@ test("validate catches the mistakes a generator is likely to make", () => {
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "route", style: "highway", path: [[1, 1], [2, 2]] }); }), /unknown route style/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "route", weight: 0, path: [[1, 1], [2, 2]] }); }), /route weight/);
   assert.doesNotMatch(bad((s) => { s.figures[0].layers.push({ type: "route", segments: [[[1, 1], [2, 2]], [[3, 3], [4, 4]]] }); }), /needs path/);
+  assert.doesNotMatch(bad((s) => { s.figures[0].layers.push({ type: "route", geo: true, path: [[170, 1], [-170, 2]] }); }), /geo/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "area", around: [[1, 1]], phaseLabel: 1453 }); }), /phaseLabel/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "area", around: [[1, 1]], phaseLabel: "1453", phaseAt: [1, 95] }); }), /phaseAt/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "wall", path: [[1, 1], [2, 2]], dates: [[1.5, "214"]] }); }), /dates must be/);

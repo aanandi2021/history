@@ -39,13 +39,15 @@
       const pad = 6;
       const x = d3.scaleLinear().domain([W, E]).range([pad, w - pad]);
       const y = d3.scaleLinear().domain([S, N]).range([h - pad, pad]);
-      const flat = ([lon, lat]) => [x(lon), y(lat)];
-      flat.stream = (stream) => d3.geoTransform({ point(lon, lat) { const p = flat([lon, lat]); stream.point(p[0], p[1]); } }).stream(stream);
-      return flat;
+      return ([lon, lat]) => [x(lon), y(lat)];
     }
     if (kind === "conic") {
       const p1 = S + (N - S) / 6, p2 = N - (N - S) / 6;
       proj = d3.geoConicConformal().parallels([p1, p2]).rotate([-(W + E) / 2, 0]);
+    } else if (kind === "naturalEarth") {
+      proj = d3.geoNaturalEarth1().rotate([-(fig.centerLon != null ? fig.centerLon : (W + E) / 2), 0]);
+    } else if (kind === "equirectangular") {
+      proj = d3.geoEquirectangular().rotate([-(fig.centerLon != null ? fig.centerLon : (W + E) / 2), 0]);
     } else proj = d3.geoMercator();
     proj.fitExtent([[6, 6], [w - 6, h - 6]], corners);
     // clip geometry to the frame so a figure only carries the coastline it shows (keeps SVG exports small)
@@ -405,6 +407,12 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
         L_WATER.append("path").attr("d", geo(f)).attr("fill", "none").attr("stroke", RIVER).attr("stroke-width", Math.max(0.5, 1.6 - sr * 0.18)).attr("stroke-linecap", "round");
       }
     }
+    if (base.cropToExtent && fig.extent) {
+      const [[W, S], [E, N]] = fig.extent, mid = (W + E) / 2;
+      const top = proj([mid, N])?.[1], bottom = proj([mid, S])?.[1];
+      if (Number.isFinite(top) && top > 0) root.append("rect").attr("x", 0).attr("y", 0).attr("width", w).attr("height", top).attr("fill", base.sea || SEA);
+      if (Number.isFinite(bottom) && bottom < h) root.append("rect").attr("x", 0).attr("y", bottom).attr("width", w).attr("height", h - bottom).attr("fill", base.sea || SEA);
+    }
 
     const layerG = (parent, L) => parent.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null);
     const layers = fig.layers || [];
@@ -477,8 +485,9 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
       const c = L.colour || "#b0753a";
       const rw = weightedWidth(L, L.style === "road" ? 2.4 : L.style === "dashed" ? 2 : 3);
       const segs = L.segments || [L.path];
-      const ds = segs.map((seg) => d3.line().curve(d3.curveCatmullRom.alpha(0.5))(seg.map(proj)));
+      const ds = L.geo ? segs.map((seg) => geo({ type: "LineString", coordinates: seg })) : segs.map((seg) => d3.line().curve(d3.curveCatmullRom.alpha(0.5))(seg.map(proj)));
       for (const d of ds) {
+        if (!d) continue;
         if (L.style === "road") {
           // a built road (the Persian royal road, the Roman roads): pale bed with dark dashes, never confused with a campaign
           g.append("path").attr("d", d).attr("fill", "none").attr("stroke", L.bed || "#f0d27a").attr("stroke-width", rw + 1.6).attr("stroke-linecap", "round");
@@ -486,9 +495,10 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
         } else if (L.style === "dashed") g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", rw).attr("stroke-dasharray", "7 4");
         else g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", rw).attr("stroke-linecap", "round").attr("stroke-dasharray", "0.1 5.5");
       }
-      if (L.head) arrowHead(svg, g, ds[ds.length - 1], rw, c, 6);
+      const headPath = ds.filter(Boolean).at(-1);
+      if (L.head && headPath) arrowHead(svg, g, headPath, rw, c, 6);
       const labelSeg = L.labelSegment != null ? segs[L.labelSegment] : segs.reduce((best, seg) => (seg.length > best.length ? seg : best), segs[0]);
-      if (L.label && labelSeg) alongLabel(g, svg, readable(labelSeg, proj), L.label, { size: 8.5, fill: shade(c, -1.2), dy: -5, italic: true });
+      if (L.label && labelSeg) alongLabel(g, svg, L.geo ? (geo({ type: "LineString", coordinates: labelSeg }) || readable(labelSeg, proj)) : readable(labelSeg, proj), L.label, { size: 8.5, fill: shade(c, -1.2), dy: -5, italic: true });
       lineDates(g, svg, L, proj, c);
     }
 
