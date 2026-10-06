@@ -16,6 +16,7 @@
 
   const BASE = window.ATLAS_BASE;
   const LANDF = topojson.feature(BASE, BASE.objects.land);
+  const LAND_FEATURES = LANDF.type === "FeatureCollection" ? LANDF.features : [LANDF];
   const RIVERS = topojson.feature(BASE, BASE.objects.rivers);
   const LAKES = topojson.feature(BASE, BASE.objects.lakes);
 
@@ -83,6 +84,28 @@
   /** An area with its tier defaults filled in; anything set on the layer wins. */
   function areaLook(L) { return L.tier ? Object.assign({}, TIER_LOOK[L.tier], L) : L; }
 
+  const safeId = (s) => String(s || "plate").replace(/[^a-z0-9_-]+/gi, "-");
+
+  function closeRing(points) {
+    if (!points.length) return points;
+    const first = points[0], last = points[points.length - 1];
+    return first[0] === last[0] && first[1] === last[1] ? points : [...points, first];
+  }
+
+  function normalisePolygonRing(points) {
+    const ring = closeRing(points);
+    const area = d3.geoArea({ type: "Polygon", coordinates: [ring] });
+    return area > Math.PI * 2 ? [...points].reverse() : points;
+  }
+
+  function areaClipToLand(L) {
+    return L.clipToLand == null ? (L.clip !== "none" && L.clip !== false) : L.clipToLand;
+  }
+
+  function seaCutoutPath(geo, w, h) {
+    return `M0,0H${w}V${h}H0Z${geo(LANDF) || ""}`;
+  }
+
   function areaFill(defs, L) {
     L = areaLook(L);
     const c = L.colour || AREA_DEFAULT, pat = L.pattern || "solid";
@@ -94,7 +117,7 @@
   // ---- geometry: a soft "zone" around anchor places, the way the atlas draws realms
   function zonePath(L, proj) {
     if (L.polygon) {
-      const pts = L.polygon.map(proj);
+      const pts = normalisePolygonRing(L.polygon).map(proj);
       const smooth = L.smooth == null ? true : L.smooth;
       const curve = smooth === false ? d3.curveLinearClosed : d3.curveCatmullRomClosed.alpha(0.5);
       return d3.line().curve(curve)(pts);
@@ -173,16 +196,16 @@
   }
 
   const haloText = (sel, colour = LAND, w = 2.6) => sel.attr("stroke", colour).attr("stroke-width", w).attr("stroke-linejoin", "round").attr("paint-order", "stroke");
-function drawDiagramFigure(container, fig, fi, w, h) {
+function drawDiagramFigure(container, fig, fi, w, h, uid) {
   h = fig.diagram && fig.diagram.height ? Math.round(w * fig.diagram.height) : h;
   const svg = d3.select(container).append("svg")
     .attr("xmlns", "http://www.w3.org/2000/svg").attr("viewBox", `0 0 ${w} ${h}`).attr("width", w).attr("height", h)
     .attr("class", "fig").attr("data-fig", fi).attr("font-family", SANS);
   const defs = svg.append("defs");
-  defs.append("marker").attr("id", `diag-head-${fi}`).attr("viewBox", "0 0 10 10").attr("refX", 9).attr("refY", 5)
+  defs.append("marker").attr("id", `${uid}-diag-head-${fi}`).attr("viewBox", "0 0 10 10").attr("refX", 9).attr("refY", 5)
     .attr("markerWidth", 7).attr("markerHeight", 7).attr("orient", "auto-start-reverse")
     .append("path").attr("d", "M0,0L10,5L0,10Z").attr("fill", INK);
-  defs.append("marker").attr("id", `diag-bar-${fi}`).attr("viewBox", "0 0 10 10").attr("refX", 5).attr("refY", 5)
+  defs.append("marker").attr("id", `${uid}-diag-bar-${fi}`).attr("viewBox", "0 0 10 10").attr("refX", 5).attr("refY", 5)
     .attr("markerWidth", 8).attr("markerHeight", 8).attr("orient", "auto")
     .append("path").attr("d", "M5,1L5,9").attr("stroke", INK).attr("stroke-width", 2);
   svg.append("rect").attr("width", w).attr("height", h).attr("fill", LAND);
@@ -228,7 +251,7 @@ function drawDiagramFigure(container, fig, fi, w, h) {
     const dPath = route.length ? d3.line().curve(d3.curveLinear)(pts) : `M${p[0]},${p[1]}C${p[0]},${mid[1]} ${q[0]},${mid[1]} ${q[0]},${q[1]}`;
     g.append("path").attr("d", dPath)
       .attr("fill", "none").attr("stroke", a.colour || INK).attr("stroke-width", a.width || 1.6)
-      .attr("stroke-dasharray", a.dashed ? "5 4" : null).attr("marker-end", `url(#${a.end === "bar" ? "diag-bar" : "diag-head"}-${fi})`);
+      .attr("stroke-dasharray", a.dashed ? "5 4" : null).attr("marker-end", `url(#${uid}-${a.end === "bar" ? "diag-bar" : "diag-head"}-${fi})`);
     const labelAt = a.labelAt ? [sx(a.labelAt[0]), sy(a.labelAt[1])] : mid;
     if (a.label) haloText(g.append("text").attr("x", labelAt[0]).attr("y", labelAt[1] - 4).attr("text-anchor", "middle")
       .attr("font-size", 10).attr("font-style", "italic").attr("fill", a.colour || INK).text(a.label), LAND, 4);
@@ -236,7 +259,7 @@ function drawDiagramFigure(container, fig, fi, w, h) {
   return svg.node();
 }
 
-function drawSmallMultiplesFigure(container, fig, fi, w, h) {
+function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
   const svg = d3.select(container).append("svg")
     .attr("xmlns", "http://www.w3.org/2000/svg").attr("viewBox", `0 0 ${w} ${h}`).attr("width", w).attr("height", h)
     .attr("class", "fig").attr("data-fig", fi).attr("font-family", SANS);
@@ -252,12 +275,13 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
     const panelDefs = g.append("defs");
     const proj = projectionFor(fig, pw, ph);
     const geo = d3.geoPath(proj);
-    const clipId = `sm-frame-${fi}-${i}`, landClip = `sm-land-${fi}-${i}`, landMask = `sm-land-mask-${fi}-${i}`;
+    const clipId = `${uid}-sm-frame-${fi}-${i}`, landClip = `${uid}-sm-land-${fi}-${i}`, landMask = `${uid}-sm-land-mask-${fi}-${i}`;
     panelDefs.append("clipPath").attr("id", clipId).attr("clipPathUnits", "userSpaceOnUse").append("rect").attr("width", pw).attr("height", ph);
-    panelDefs.append("clipPath").attr("id", landClip).attr("clipPathUnits", "userSpaceOnUse").append("path").attr("d", geo(LANDF));
+    const plc = panelDefs.append("clipPath").attr("id", landClip).attr("clipPathUnits", "userSpaceOnUse");
+    for (const f of LAND_FEATURES) plc.append("path").attr("d", geo(f));
     const lm = panelDefs.append("mask").attr("id", landMask).attr("maskUnits", "userSpaceOnUse");
     lm.append("rect").attr("width", pw).attr("height", ph).attr("fill", "#000");
-    lm.append("path").attr("d", geo(LANDF)).attr("fill", "#fff");
+    for (const f of LAND_FEATURES) lm.append("path").attr("d", geo(f)).attr("fill", "#fff");
     const root = g.append("g").attr("clip-path", `url(#${clipId})`);
     root.append("rect").attr("width", pw).attr("height", ph).attr("fill", SEA);
     root.append("path").attr("d", geo(LANDF)).attr("fill", LAND).attr("stroke", "#7fa9c4").attr("stroke-width", 0.5);
@@ -268,17 +292,30 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
     const pointLayer = root.append("g").attr("class", "points");
     const labelLayer = root.append("g").attr("class", "labels");
     const all = [...(fig.layers || []), ...(panel.layers || [])];
-    for (const L0 of all.filter((l) => l.type === "area")) {
+    let panelAreaSeq = 0;
+    const drawPanelArea = (L0) => {
       const L = areaLook(L0), d = zonePath(L, proj);
-      if (!d) continue;
+      if (!d) return;
       const lg = areaLayer.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null);
-      const clipToLand = L.clipToLand == null ? (L.clip !== "none" && L.clip !== false) : L.clipToLand;
-      if (clipToLand) lg.attr("clip-path", `url(#${landClip})`).attr("mask", `url(#${landMask})`);
+      const clipToLand = areaClipToLand(L);
       const fill = areaFill(defs, L);
-      lg.append("path").attr("d", d).attr("fill", fill.fill).attr("fill-opacity", fill.op)
-        .attr("stroke", L.edge === false || clipToLand ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", 0.7)
-        .attr("stroke-dasharray", L.edge === "dashed" ? "5 3" : null);
-    }
+      if (clipToLand) {
+        const areaClip = `${uid}-sm-area-${fi}-${i}-${safeId(L.id || "area")}-${panelAreaSeq++}`;
+        panelDefs.append("clipPath").attr("id", areaClip).attr("clipPathUnits", "userSpaceOnUse").append("path").attr("d", d);
+        lg.attr("clip-path", `url(#${areaClip})`);
+        for (const f of LAND_FEATURES) lg.append("path").attr("d", geo(f)).attr("fill", fill.fill).attr("fill-opacity", fill.op).attr("stroke", "none");
+      } else {
+        lg.append("path").attr("d", d).attr("fill", fill.fill).attr("fill-opacity", fill.op)
+          .attr("stroke", L.edge === false ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", 0.7)
+          .attr("stroke-dasharray", L.edge === "dashed" ? "5 3" : null);
+      }
+    };
+    const areaLayers = all.filter((l) => l.type === "area");
+    for (const L of areaLayers.filter(areaClipToLand)) drawPanelArea(L);
+    root.append("path").attr("d", seaCutoutPath(geo, pw, ph)).attr("fill", SEA).attr("fill-rule", "evenodd").attr("pointer-events", "none");
+    root.append("path").attr("d", geo(LAKES)).attr("fill", SEA).attr("stroke", "#7fa9c4").attr("stroke-width", 0.35);
+    for (const f of RIVERS.features) if ((f.properties.scalerank || 6) <= 4) root.append("path").attr("d", geo(f)).attr("fill", "none").attr("stroke", RIVER).attr("stroke-width", 0.45);
+    for (const L of areaLayers.filter((l) => !areaClipToLand(l))) drawPanelArea(L);
     for (const L of all.filter((l) => l.type === "boundary")) {
       const d = d3.line().curve(L.closed ? d3.curveCatmullRomClosed.alpha(0.5) : d3.curveCatmullRom.alpha(0.5))(L.path.map(proj));
       lineLayer.append("path").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null)
@@ -319,21 +356,25 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
 }
 
   // ---- one figure
-  function drawFigure(container, fig, fi, w, h) {
-    if (fig.kind === "diagram") return drawDiagramFigure(container, fig, fi, w, h);
-    if (fig.kind === "small-multiples") return drawSmallMultiplesFigure(container, fig, fi, w, h);
+  function drawFigure(container, fig, fi, w, h, uid) {
+    if (fig.kind === "diagram") return drawDiagramFigure(container, fig, fi, w, h, uid);
+    if (fig.kind === "small-multiples") return drawSmallMultiplesFigure(container, fig, fi, w, h, uid);
     const svg = d3.select(container).append("svg")
       .attr("xmlns", "http://www.w3.org/2000/svg").attr("viewBox", `0 0 ${w} ${h}`).attr("width", w).attr("height", h)
       .attr("class", "fig").attr("data-fig", fi).attr("font-family", SANS);
     const defs = svg.append("defs");
     const proj = projectionFor(fig, w, h);
     const geo = d3.geoPath(proj);
-    const clipId = `frame-${fi}`, landClip = `land-${fi}`;
-    defs.append("clipPath").attr("id", clipId).append("rect").attr("width", w).attr("height", h);
+    const clipId = `${uid}-frame-${fi}`, landClip = `${uid}-land-${fi}`, landMask = `${uid}-land-mask-${fi}`;
+    defs.append("clipPath").attr("id", clipId).attr("clipPathUnits", "userSpaceOnUse").append("rect").attr("width", w).attr("height", h);
     const base = fig.base || {};
-    const landDef = defs.append("clipPath").attr("id", landClip);
+    const landDef = defs.append("clipPath").attr("id", landClip).attr("clipPathUnits", "userSpaceOnUse");
     if (base.map === false) landDef.append("rect").attr("width", w).attr("height", h);
-    else landDef.append("path").attr("d", geo(LANDF));
+    else for (const f of LAND_FEATURES) landDef.append("path").attr("d", geo(f));
+    const lm = defs.append("mask").attr("id", landMask).attr("maskUnits", "userSpaceOnUse");
+    lm.append("rect").attr("width", w).attr("height", h).attr("fill", "#000");
+    if (base.map === false) lm.append("rect").attr("width", w).attr("height", h).attr("fill", "#fff");
+    else for (const f of LAND_FEATURES) lm.append("path").attr("d", geo(f)).attr("fill", "#fff");
     const blur = defs.append("filter").attr("id", `soft-${fi}`).attr("x", "-10%").attr("y", "-10%").attr("width", "120%").attr("height", "120%");
     blur.append("feGaussianBlur").attr("stdDeviation", 3);
 
@@ -365,19 +406,39 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
     const layerG = (parent, L) => parent.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null);
     const layers = fig.layers || [];
 
-    // areas first, largest first so cores sit on top of extents
-    for (const L0 of layers.filter((l) => l.type === "area")) {
+    // areas first, largest first so cores sit on top of extents. Land-clipped areas are drawn under a
+    // sea cutout; explicit clipToLand:false areas (e.g. maritime zones) are drawn above it.
+    let areaSeq = 0;
+    const drawArea = (L0) => {
       const L = areaLook(L0);
       const d = zonePath(L, proj);
-      if (!d) continue;
+      if (!d) return;
       const g = layerG(L_AREA, L);
-      const clipToLand = L.clipToLand == null ? (L.clip !== "none" && L.clip !== false) : L.clipToLand;
-      if (clipToLand) g.attr("clip-path", `url(#${landClip})`);
+      const clipToLand = areaClipToLand(L);
       const { fill, op } = areaFill(defs, L);
-      g.append("path").attr("d", d).attr("fill", fill).attr("fill-opacity", op)
-        .attr("stroke", L.edge === false || clipToLand ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", L.edge === "strong" ? 1.6 : 0.8)
-        .attr("stroke-dasharray", L.edge === "dashed" ? "5 3" : null);
+      if (clipToLand && base.map !== false) {
+        const areaClip = `${uid}-area-${fi}-${safeId(L.id || "area")}-${areaSeq++}`;
+        defs.append("clipPath").attr("id", areaClip).attr("clipPathUnits", "userSpaceOnUse").append("path").attr("d", d);
+        g.attr("clip-path", `url(#${areaClip})`);
+        for (const f of LAND_FEATURES) g.append("path").attr("d", geo(f)).attr("fill", fill).attr("fill-opacity", op).attr("stroke", "none");
+      } else {
+        g.append("path").attr("d", d).attr("fill", fill).attr("fill-opacity", op)
+          .attr("stroke", L.edge === false ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", L.edge === "strong" ? 1.6 : 0.8)
+          .attr("stroke-dasharray", L.edge === "dashed" ? "5 3" : null);
+      }
+    };
+    const areaLayers = layers.filter((l) => l.type === "area");
+    for (const L of areaLayers.filter(areaClipToLand)) drawArea(L);
+    if (base.map !== false) {
+      L_WATER.append("path").attr("d", seaCutoutPath(geo, w, h)).attr("fill", base.sea || SEA).attr("fill-rule", "evenodd").attr("pointer-events", "none");
+      L_WATER.append("path").attr("d", geo(LAKES)).attr("fill", base.sea || SEA).attr("stroke", "#7fa9c4").attr("stroke-width", 0.4);
+      for (const f of RIVERS.features) {
+        const sr = f.properties.scalerank || 6;
+        if (sr > (base.riverRank || 6)) continue;
+        L_WATER.append("path").attr("d", geo(f)).attr("fill", "none").attr("stroke", RIVER).attr("stroke-width", Math.max(0.5, 1.6 - sr * 0.18)).attr("stroke-linecap", "round");
+      }
     }
+    for (const L of areaLayers.filter((l) => !areaClipToLand(l))) drawArea(L);
 
     for (const L of layers.filter((l) => l.type === "boundary")) {
       const g = layerG(L_LINES, L);
@@ -637,6 +698,7 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
     spread.appendChild(left);
 
     const figs = spec.figures;
+    const uid = `p-${safeId(spec.id)}`;
     const avail = PAGE_H - HEAD_H - figs.length * (CAP_H + GAP);
     const shares = figs.map((f) => f.share || 1), tot = shares.reduce((a, b) => a + b, 0);
     figs.forEach((fig, i) => {
@@ -644,7 +706,7 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
       box.className = "fig-box";
       left.appendChild(box);
       const h = Math.round((avail * shares[i]) / tot);
-      drawFigure(box, fig, i, PAGE_W, h);
+      drawFigure(box, fig, i, PAGE_W, h, uid);
       const cap = document.createElement("figcaption");
       cap.textContent = fig.caption;
       box.appendChild(cap);
@@ -793,7 +855,7 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h) {
     window.ATLAS.ready = true;
   }
 
-  window.ATLAS = { render, figureSVG, show, drawSymbol, ready: false };
+  window.ATLAS = { render, figureSVG, show, drawSymbol, ready: false, test: { normalisePolygonRing } };
 
   document.addEventListener("DOMContentLoaded", () => {
     const pick = () => decodeURIComponent(location.hash.replace(/^#/, "")) || plateIds()[0];

@@ -150,6 +150,22 @@ test("an invalid plate shows its problems instead of a broken map", async () => 
   await page.close();
 });
 
+test("area polygon winding is normalised before drawing", async () => {
+  const { page } = await open("#hammurabi");
+  const st = await page.evaluate(() => {
+    const a = [[0, 0], [0, 10], [10, 10], [10, 0]];
+    const b = [...a].reverse();
+    const area = (ring) => d3.geoArea({ type: "Polygon", coordinates: [[...ring, ring[0]]] });
+    const bad = area(a) > Math.PI * 2 ? a : b;
+    const fixed = window.ATLAS.test.normalisePolygonRing(bad);
+    return { before: area(bad), after: area(fixed), reversed: fixed[0][0] === bad[bad.length - 1][0] && fixed[0][1] === bad[bad.length - 1][1] };
+  });
+  assert.ok(st.before > Math.PI * 2, `test ring did not cover the complement: ${st.before}`);
+  assert.ok(st.after < Math.PI * 2, `normalised ring still covers the complement: ${st.after}`);
+  assert.equal(st.reversed, true);
+  await page.close();
+});
+
 test("the symbol key draws every registered symbol", async () => {
   const { page, errors } = await open("#key");
   assert.deepEqual(errors, []);
