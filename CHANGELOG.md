@@ -10,6 +10,7 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 ## Unreleased
 
 - Atlas area layers can opt into land clipping with `clipToLand: true`; the Roman frontier, Augustus and late-antique migration plates now keep empire washes off the Mediterranean, Black Sea and Atlantic water.
+- Added a second cause-and-effect board, "From Mongols to Mughals", connecting Genghis Khan, the khanates, Timur, Babur, Panipat, Mughal India, Russia and maritime Asia.
 
 ## 0.6.0 (5 Oct 2026)
 

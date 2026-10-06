@@ -1,0 +1,83 @@
+// Cause-and-effect board: how the Mongol world connects to Timur, Babur and the Mughals.
+window.BOARDS = window.BOARDS || {};
+window.BOARDS["mongols-mughals"] = {
+  id: "mongols-mughals",
+  title: "From Mongols to Mughals",
+  question: "How does a steppe empire end up shaping India, Russia and the sea routes? Draw an arrow from each cause to what it led to.",
+  viewer: "russia/1526-04-21",
+  legend: [
+    { kind: "background", label: "Steppe roots" },
+    { kind: "crisis", label: "Mongol empire" },
+    { kind: "trigger", label: "After the split" },
+    { kind: "july", label: "Timur and Babur" },
+    { kind: "war", label: "New empires" }
+  ],
+  tiles: [
+    { id: "steppe", kind: "background", date: "before 1200", title: "The steppe rewards mobility",
+      text: "Horse archers, herds and clan politics make the Inner Asian steppe a hard place for settled states to control.", wiki: "Eurasian Steppe" },
+    { id: "genghis", kind: "background", date: "1206", title: "Genghis Khan unites the Mongols",
+      text: "Temujin becomes Genghis Khan and turns rival clans into a disciplined war machine.", wiki: "Genghis Khan" },
+    { id: "conquests", kind: "crisis", date: "1211–1260", title: "A continental conquest",
+      text: "Mongol armies move into China, Central Asia, Iran, Russia and eastern Europe. The empire becomes the largest land empire in history.", wiki: "Mongol Empire" },
+    { id: "khanates", kind: "crisis", date: "1260s", title: "The empire breaks into khanates",
+      text: "The family empire does not stay one state. It becomes linked but rival houses: Yuan China, the Golden Horde, the Chagatai realm and the Ilkhanate.", wiki: "Division of the Mongol Empire" },
+    { id: "silk-road", kind: "trigger", date: "1200s–1300s", title: "The Silk Road opens wider",
+      text: "Mongol protection makes long-distance movement easier for merchants, monks, envoys, technologies and disease.", wiki: "Pax Mongolica" },
+    { id: "yuan", kind: "trigger", date: "1271–1368", title: "Yuan China",
+      text: "Kublai Khan rules China as the Yuan dynasty. China is pulled more tightly into the Mongol world.", wiki: "Yuan dynasty" },
+    { id: "ming", kind: "trigger", date: "1368", title: "The Ming replace the Yuan",
+      text: "The Ming drive the Yuan from China and rebuild Chinese rule. Maritime Asia keeps changing after the Mongol age.", wiki: "Ming dynasty" },
+    { id: "portuguese", kind: "war", date: "1498–1511", title: "The Portuguese enter the Indian Ocean",
+      text: "Vasco da Gama reaches India, and Portugal takes Malacca in 1511. Sea routes start competing with the old overland roads.", wiki: "Portuguese India" },
+    { id: "golden-horde", kind: "trigger", date: "1200s–1400s", title: "Golden Horde over Rus'",
+      text: "The western khanate rules through tribute. In Russian history this is the Tatar yoke: painful, real, and politically formative.", wiki: "Golden Horde" },
+    { id: "moscow", kind: "war", date: "1480", title: "Moscow stops paying tribute",
+      text: "Ivan III faces the Great Horde at the Ugra River. The armies do not fight, but Moscow's dependence ends.", wiki: "Great Stand on the Ugra River" },
+    { id: "kazan", kind: "war", date: "1552", title: "Kazan falls to Ivan IV",
+      text: "Moscow turns from tribute-payer to conqueror of Tatar khanates. The Volga road opens toward Siberia.", wiki: "Siege of Kazan (1552)" },
+    { id: "chagatai", kind: "trigger", date: "1200s–1300s", title: "Chagatai Central Asia",
+      text: "The Central Asian Mongol line becomes the world Timur and Babur inherit: Turkic-speaking, Persianate, Islamic and still proud of Genghis.", wiki: "Chagatai Khanate" },
+    { id: "timur", kind: "july", date: "1370–1405", title: "Timur rebuilds conquest from Samarkand",
+      text: "Timur is not a direct Genghisid khan, so he rules through marriage, prestige and terrifying campaigns from Central Asia.", wiki: "Timur" },
+    { id: "timurids", kind: "july", date: "1405–1500s", title: "The Timurids turn conquest into court culture",
+      text: "After Timur, his heirs make Samarkand and Herat centres of Persian art, astronomy, gardens and royal memory.", wiki: "Timurid Empire" },
+    { id: "babur", kind: "july", date: "1483–1526", title: "Babur inherits both names",
+      text: "Babur is a Timurid through his father and claims descent from Genghis through his mother. He loses Central Asia, then looks south.", wiki: "Babur" },
+    { id: "panipat", kind: "war", date: "21 Apr 1526", title: "Panipat: guns beat elephants",
+      text: "Babur defeats the Delhi sultan Ibrahim Lodi with field artillery, cavalry tactics and a disciplined line.", wiki: "First Battle of Panipat" },
+    { id: "mughals", kind: "war", date: "1526 onward", title: "The Mughal Empire",
+      text: "The Mughals are not simply 'Indian kings'. They are a Central Asian dynasty ruling in India, carrying Mongol, Timurid, Persian and local traditions together.", wiki: "Mughal Empire" }
+  ],
+  links: [
+    { from: "steppe", to: "genghis", why: "The steppe world supplies the horses, skills and clan politics Genghis Khan reorganizes." },
+    { from: "genghis", to: "conquests", why: "Genghis turns a tribal coalition into an army and state that can keep conquering after him." },
+    { from: "conquests", to: "khanates", why: "One family empire stretches too far to stay one government, so it splits into related khanates." },
+    { from: "conquests", to: "silk-road", why: "Mongol control makes the overland routes safer and more connected for a time." },
+    { from: "khanates", to: "yuan", why: "One branch of the Mongol house rules China as the Yuan dynasty." },
+    { from: "yuan", to: "ming", why: "Chinese rebellion against Yuan rule produces the Ming dynasty." },
+    { from: "ming", to: "portuguese", why: "Ming China and maritime Asia are already part of a rich oceanic world when the Portuguese arrive by sea." },
+    { from: "khanates", to: "golden-horde", why: "The western Mongol realm becomes the Golden Horde, ruling Rus' through tribute and princes." },
+    { from: "golden-horde", to: "moscow", why: "Moscow grows inside the Horde system, then uses Horde weakness to stop paying tribute." },
+    { from: "moscow", to: "kazan", why: "Once Moscow is independent, later tsars can attack successor khanates instead of paying them." },
+    { from: "khanates", to: "chagatai", why: "Central Asia belongs to the Chagatai branch, the political world behind Timur and Babur." },
+    { from: "chagatai", to: "timur", why: "Timur rises in the Chagatai world and borrows Mongol legitimacy while building his own empire." },
+    { from: "timur", to: "timurids", why: "Timur's heirs lose some conquests but keep a powerful dynastic and cultural inheritance." },
+    { from: "timurids", to: "babur", why: "Babur grows up as a Timurid prince, with Samarkand as the lost prize in his imagination." },
+    { from: "babur", to: "panipat", why: "Driven out of Central Asia, Babur uses Kabul as a base and turns toward north India." },
+    { from: "panipat", to: "mughals", why: "The victory at Panipat gives Babur Delhi and the starting point for Mughal rule." }
+  ],
+  also: [
+    { from: "silk-road", to: "yuan" },
+    { from: "silk-road", to: "timurids" },
+    { from: "golden-horde", to: "kazan" },
+    { from: "timur", to: "babur" },
+    { from: "chagatai", to: "babur" },
+    { from: "conquests", to: "golden-horde" },
+    { from: "portuguese", to: "mughals" }
+  ],
+  books: [
+    { title: "Genghis Khan and the Making of the Modern World", author: "Jack Weatherford", year: 2004 },
+    { title: "The Mughal World", author: "Abraham Eraly", year: 2007 },
+    { title: "The Silk Roads", author: "Peter Frankopan", year: 2015 }
+  ]
+};
