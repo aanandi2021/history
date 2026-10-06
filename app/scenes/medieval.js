@@ -108,6 +108,39 @@ window.SCENES = window.SCENES || {};
       {type:"arrow",name:"Third Crusade coast",colour:ROAD,path:[[32,36],[35.08,32.92],[34.75,32.05]],labelAt:[34,34]},
       {type:"point",symbol:"large-city",name:"Clermont",year:"1095",at:[3.08,45.78]}, {type:"point",symbol:"fortress",name:"Antioch",year:"1098",at:[36.16,36.2]}, {type:"point",symbol:"fortress",name:"Jerusalem",year:"1099",at:[35.21,31.77]}, {type:"point",symbol:"battle",name:"Hattin",year:"1187",at:[35.46,32.8]}, {type:"point",symbol:"fortress",name:"Acre",year:"1191",at:[35.08,32.92]}
     ], terms:[{t:"First Crusade",wiki:"First Crusade"},{t:"Saladin",wiki:"Saladin"},{t:"Hattin",wiki:"Battle of Hattin"},{t:"Acre",wiki:"Siege of Acre (1189-1191)"}]}
+,
+    "ch-capetian-france": { caption:"Capetian France grows from a Paris-Reims core into a kingdom that can absorb Normandy and press south.", bbox:[[-6,42],[9,52]], layers:[
+      {type:"area",name:"Royal domain",tier:"core",colour:FR,around:[[2.3,48.9],[3.0,49.2],[2.7,48.2]],labelAt:[2.6,48.7]},
+      {type:"area",name:"Northern gains",tier:"conquest",from:"1204",colour:FR,around:[[0,49],[1.1,49.4],[2.3,50.6],[3.8,48.8]],labelAt:[1.7,49.3]},
+      {type:"area",name:"Languedoc",tier:"conquest",from:"1209",colour:NORM,around:[[1.4,43.6],[3.2,43.3],[2.3,44.0]],labelAt:[2.2,43.5]},
+      {type:"point",symbol:"capital",name:"Paris",at:[2.35,48.86]}, {type:"point",symbol:"battle",name:"Bouvines",year:"1214",at:[2.34,50.58]}, {type:"point",symbol:"battle",name:"Muret",year:"1213",at:[1.33,43.46]}
+    ], terms:[{t:"Capetian",wiki:"House of Capet"},{t:"Bouvines",wiki:"Battle of Bouvines"},{t:"Albigensian Crusade",wiki:"Albigensian Crusade"},{t:"Louis IX",wiki:"Louis IX of France"}]},
+    "ch-angevin-england": { caption:"Angevin England is an island kingdom joined to French fiefs until John loses most of them.", bbox:[[-9,42],[5,57]], layers:[
+      {type:"area",name:"England",tier:"core",colour:ENG,around:[[-3,52],[-1,54],[0,51]],labelAt:[-1.5,52.5]},
+      {type:"area",name:"Angevin lands",tier:"conquest",colour:NORM,around:[[1.1,49.4],[-0.55,47.47],[0.34,46.58],[-0.58,44.84]],labelAt:[0,47]},
+      {type:"arrow",name:"Norman invasion",colour:NORM,path:[[1.1,49.44],[0.49,50.91]],labelAt:[0.9,50.2]},
+      {type:"boundary",style:"partition",colour:"#5f4b8b",name:"Losses to France",from:"1204",path:[[0,50],[0,48.5],[0.4,47]]},
+      {type:"point",symbol:"battle",name:"Hastings",year:"1066",at:[0.49,50.91]}, {type:"point",symbol:"treaty",name:"Runnymede",year:"1215",at:[-0.57,51.44]}, {type:"point",symbol:"battle",name:"Bouvines",year:"1214",at:[2.34,50.58]}
+    ], terms:[{t:"Norman",wiki:"Norman Conquest"},{t:"Angevin",wiki:"Angevin Empire"},{t:"Bouvines",wiki:"Battle of Bouvines"},{t:"Magna Carta",wiki:"Magna Carta"}]},
+    "ch-hohenstaufen-empire": { caption:"The Hohenstaufen empire is strong, but its Italian cities and German dukes have bargaining power.", bbox:[[3,41],[18,55]], layers:[
+      {type:"area",name:"German kingdom",tier:"core",colour:FR,around:[[7,49],[10,52],[14,50],[12,47]],labelAt:[10,50]},
+      {type:"area",name:"Lombard cities",tier:"influence",colour:BYZ,around:[[8.9,45.6],[10,45.5],[11,45]],labelAt:[10,45.4]},
+      {type:"arrow",name:"Italian campaigns",colour:FR,path:[[8.68,50.11],[8.9,45.6],[12.5,41.9]],labelAt:[9.2,46.5]},
+      {type:"point",symbol:"battle",name:"Legnano",year:"1176",at:[8.92,45.60]}, {type:"point",symbol:"capital",name:"Rome",at:[12.5,41.9]}, {type:"point",symbol:"large-city",name:"Brunswick",at:[10.52,52.27]}
+    ], terms:[{t:"Hohenstaufen",wiki:"Hohenstaufen"},{t:"Frederick Barbarossa",wiki:"Frederick Barbarossa"},{t:"Lombard League",wiki:"Lombard League"},{t:"Henry the Lion",wiki:"Henry the Lion"}]},
+    "ch-reconquista": { caption:"Iberian Christian kingdoms push south as al-Andalus fragments and Almohad power breaks.", bbox:[[-10,35],[4,44]], layers:[
+      {type:"area",name:"Christian kingdoms",tier:"conquest",colour:FR,around:[[-8,42],[-4,42.5],[-1,41.8]],labelAt:[-4,42]},
+      {type:"area",name:"al-Andalus and Granada",tier:"core",colour:IS,around:[[-6,37],[-4,38],[-2.5,37]],labelAt:[-4,37.5]},
+      {type:"arrow",name:"Castilian advance",colour:FR,path:[[-4,41],[-3.53,38.29],[-4.78,37.88],[-5.99,37.39]],labelAt:[-4.2,39]},
+      {type:"point",symbol:"battle",name:"Las Navas",year:"1212",at:[-3.53,38.29]}, {type:"point",symbol:"large-city",name:"Cordoba",year:"1236",at:[-4.78,37.88]}, {type:"point",symbol:"large-city",name:"Seville",year:"1248",at:[-5.99,37.39]}
+    ], terms:[{t:"Reconquista",wiki:"Reconquista"},{t:"Las Navas",wiki:"Battle of Las Navas de Tolosa"},{t:"Cordoba",wiki:"Cordoba, Spain"},{t:"Granada",wiki:"Emirate of Granada"}]},
+    "ch-eastern-kingdoms": { caption:"Poland, Hungary and Rus are tied to Latin, Orthodox and steppe worlds before the Mongol shock.", bbox:[[10,42],[55,60]], layers:[
+      {type:"area",name:"Poland",tier:"core",colour:ASIA,around:[[17,52],[20,51],[19,50]],labelAt:[19,51]},
+      {type:"area",name:"Hungary",tier:"core",colour:NORM,around:[[18,47],[21,48],[23,46]],labelAt:[20,47]},
+      {type:"area",name:"Rus principalities",tier:"influence",colour:RUS,around:[[30.52,50.45],[31.28,58.52],[37,55]],labelAt:[33,53]},
+      {type:"arrow",name:"Mongol campaigns",colour:STEP,path:[[50,48],[38.5,47.1],[30.52,50.45],[20.8,48.1]],labelAt:[36,49]},
+      {type:"point",symbol:"battle",name:"Kalka",year:"1223",at:[38.5,47.1]}, {type:"point",symbol:"capital",name:"Kiev",year:"1240",at:[30.52,50.45]}, {type:"point",symbol:"battle",name:"Legnica",year:"1241",at:[16.16,51.21]}, {type:"point",symbol:"battle",name:"Sajo",year:"1241",at:[20.8,48.1]}
+    ], terms:[{t:"Kievan Rus",wiki:"Kievan Rus'"},{t:"Mongol",wiki:"Mongol invasion of Europe"},{t:"Golden Horde",wiki:"Golden Horde"},{t:"Russia",wiki:"History of Russia"}]}
 
   };
 })();

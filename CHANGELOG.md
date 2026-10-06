@@ -19,6 +19,8 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 - Atlas round 7 (PDF pp. 134–153): added Abbasid Baghdad and the House of Wisdom, the Abbasid political world, Ottonian/Salian Germany, church reform, and the First through Third Crusades.
 - Three new plates: Abbasid Baghdad's Round City and knowledge flows, the Abbasid caliphate after 750, and the first three crusades with the crusader states.
 - Atlas figures can now turn the basemap off for diagrammatic city plans while keeping the same legend, label and cross-reference system.
+- Atlas round 8 (PDF pp. 154–173): added Capetian France, Norman/Angevin England, Hohenstaufen Germany, Reconquista context, and the Poland-Hungary-Rus frontier at the Mongol arrival.
+- Three new plates: Capetian France, England and the Angevin empire, and Poland/Hungary/Rus under the Mongol shock.
 
 ## 0.6.0 (5 Oct 2026)
 
