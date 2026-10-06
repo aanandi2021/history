@@ -7,6 +7,13 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
+## 0.7.0 (Unreleased / 0.7.0-dev)
+
+- Atlas round 6 (PDF pp. 114–133): opened the medieval period with successor kingdoms, Justinian's reconquest, early Islam, Franks/Carolingians, Normans/Vikings and Kievan Rus roots.
+- New period dataset, **The Middle Ages** (AD 500–1500), with lanes for Canada and the Americas, Western Europe, Byzantium, Islam, Steppe/Rus and Asia.
+- Three new plates: the barbarian kingdoms around 500, Justinian's reconquest, and Charlemagne's empire plus the Treaty of Verdun.
+- New atlas boundary style for partition lines, used for Verdun-style divisions that are not modern state borders.
+
 ## 0.6.0 (5 Oct 2026)
 
 - Master timeline across the very top: every period on one strip, the open one highlighted with its from/to years and the current date, in sync with the Period dropdown both ways.

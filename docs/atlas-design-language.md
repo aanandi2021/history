@@ -164,6 +164,7 @@ Sea `#b9dff5`, land `#f3ebcb`–`#f7f7fb`, desert `#efd96d`, cultivation `#72ad4
 | Self-review: label collisions, labels under the legend, arrow labels that don't fit | done (`ATLAS.current.warnings`) |
 | Degrees of control: `tier` core / conquest (stripe) / influence (pale, dashed) | done (round 2) |
 | Fortified frontier (`boundary` style `wall`), dates printed on lines (`dates`) | done (round 2), with a run-off check |
+| Partition lines (`boundary` style `partition`) | done (round 6) for Verdun-style family or treaty divisions that cut one realm without pretending to be modern borders |
 | Built roads (`route` style `road`), fine stipple for fuzzy social zones | done (round 2) |
 | Origin halos on points (colony by founder) | done (round 2) |
 | Relief / environment tints | **not yet**: needs a hillshade or land-cover layer. Round 2 used terrain only faintly, so this stays low priority |
@@ -324,3 +325,30 @@ What we built from it:
   and Christianity plus migrations. This keeps the late Roman and early medieval material in the same Rome tree.
 - No new renderer primitive was needed for the delivered plates. The current map primitives handled the chosen
   plates; institution and genealogy diagrams are the next useful atlas-only primitive.
+
+## 17. Round 6: early Middle Ages (PDF pp. 114–133)
+
+This batch moves from late Roman systems into medieval successor maps: Attila and the steppe peoples, Germanic
+kingdoms, Lombard and Byzantine Italy, the Franks, Charlemagne, Verdun, Anglo-Saxon England, Normans and Kievan
+Rus. Analyses are in `study/analysis/spread-p114…p132.json` and `round6-findings.md`.
+
+New moves:
+
+- **Partition lines.** Verdun, Mersen and Ribemont divide one Carolingian inheritance. These are not modern
+  frontiers, so they now use `boundary` `style: "partition"`: a warm casing with a strong centre line. It reads
+  as a legal/family cut across a realm, not a state border.
+- **State mosaics in sequence.** The Franks and England spreads use fixed-extent small maps to show settlement,
+  kingdom growth and later partition. Our delivered plates use one synthesis map, but the grammar points toward
+  small multiples for later rounds.
+- **Routes hardening into states.** Viking, Norman and Rus pages start as arrows and dotted trade lines, then
+  become Normandy, Sicily, England and Kiev. Use both: movement first, then a soft field where movement becomes
+  rule.
+- **Administration diagrams return.** Charlemagne's court diagram is a map-page figure without geography. This
+  remains a future atlas-only chart primitive rather than a viewer-map primitive.
+
+What we built from it:
+
+- New medieval period dataset, AD 500–1500, with lanes for Canada and the Americas, Western Europe, Byzantium,
+  Islam, Steppe/Rus and Asia.
+- Three plates: `barbarian-kingdoms`, `justinian-reconquest` and `carolingian-partition`.
+- First use of `boundary` `style: "partition"` on the Verdun plate.

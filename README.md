@@ -32,7 +32,7 @@ Cards link to the matching heading in the vault note (`obsidian://`), to Wikiped
 
 **Amit's Fiction.** A period can list Amit's own writing as a book with `amits: true` and a vault `note`. Any event, ruler or chapter in its years then shows an "Amit's Fiction" section on its card. Items tagged `fic: "<heading>"` (or `fic: { note, heading }` for a sibling research file) also get an "Amit's Fiction" link straight to that heading. A lane with `fiction: true` holds the novel's own storyline. It is labelled as fiction, and each of its events must point into the novel. The first example is *The Unseen Tomorrow* in the Maritime Asia period (`#maritime`), whose research lives in the vault under `Writing/The Unseen Tomorrow/`.
 
-Periods so far: **WW2** (1939–45), **Russia** (1450–1946), **Maritime Asia** (745–865: Bengal, Srivijaya, Java and Tang China), and **The ancient world** (1800 BC–AD 500: Hammurabi, Han China and Rome).
+Periods so far: **WW2** (1939–45), **Russia** (1450–1946), **Maritime Asia** (745–865: Bengal, Srivijaya, Java and Tang China), **The ancient world** (1800 BC–AD 700: Hammurabi, Han China and Rome), and **The Middle Ages** (AD 500–1500: successor kingdoms, Byzantium, Islam, Franks, Vikings and Rus).
 
 Family birth years are typed into the Family row and saved in this browser's localStorage only. They are never written to the repo.
 

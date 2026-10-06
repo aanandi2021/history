@@ -9,7 +9,7 @@ const DATASETS = loadDatasets();
 const ids = Object.keys(DATASETS);
 
 test("all datasets are registered", () => {
-  for (const id of ["ww2", "russia", "maritime", "ancient"]) assert.ok(ids.includes(id), id);
+  for (const id of ["ww2", "russia", "maritime", "ancient", "medieval"]) assert.ok(ids.includes(id), id);
 });
 
 for (const id of ids) {

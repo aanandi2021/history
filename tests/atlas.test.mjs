@@ -68,6 +68,7 @@ test("validate catches the mistakes a generator is likely to make", () => {
   // round 2 grammar (PDF pp. 34–53)
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "area", around: [[1, 1]], tier: "vassal" }); }), /unknown tier vassal/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "zigzag", path: [[1, 1], [2, 2]] }); }), /unknown boundary style/);
+  assert.doesNotMatch(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "partition", path: [[1, 1], [2, 2]] }); }), /unknown boundary style/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "route", style: "highway", path: [[1, 1], [2, 2]] }); }), /unknown route style/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "wall", path: [[1, 1], [2, 2]], dates: [[1.5, "214"]] }); }), /dates must be/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "point", at: [1, 1], halo: "not a colour!" }); }), /bad halo/);

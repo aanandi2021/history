@@ -221,8 +221,12 @@
       const g = layerG(L_LINES, L);
       const c = L.colour || "#4a3f35";
       const d = d3.line().curve(d3.curveCatmullRom.alpha(0.5))(L.path.map(proj));
+      if (L.style === "partition") {
+        g.append("path").attr("d", d).attr("fill", "none").attr("stroke", L.bed || "#f4e8b8").attr("stroke-width", (L.width || 2.8) + 3.4).attr("stroke-linecap", "round");
+      }
       const line = g.append("path").attr("d", d).attr("fill", "none").attr("stroke", c).attr("stroke-width", L.width || (L.style === "wall" ? 1.8 : 1.3))
-        .attr("stroke-dasharray", L.style === "solid" || L.style === "wall" ? null : L.style === "dashdot" ? "7 3 1.5 3" : "6 3.5");
+        .attr("stroke-dasharray", L.style === "solid" || L.style === "wall" || L.style === "partition" ? null : L.style === "dashdot" ? "7 3 1.5 3" : "6 3.5")
+        .attr("stroke-linecap", L.style === "partition" ? "round" : null);
       if (L.style === "wall") crenellate(g, line.node(), c, L.side === "right" ? 1 : -1);
       lineDates(g, svg, L, proj, c);
     }

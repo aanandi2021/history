@@ -29,7 +29,7 @@
   const PATTERNS = ["solid", "hatch", "hatch-back", "crosshatch", "dots", "stripe", "stipple", "none"];
   // degrees of control, from round 2 (China, Asoka, Persia): solid core, striped conquest, pale influence
   const TIERS = ["core", "conquest", "influence"];
-  const BOUNDARY_STYLES = ["dashed", "solid", "dashdot", "wall"];
+  const BOUNDARY_STYLES = ["dashed", "solid", "dashdot", "wall", "partition"];
   const ROUTE_STYLES = ["dotted", "dashed", "road"];
   const LABEL_STYLES = ["region", "people", "water", "date", "note", "realm"];
 
