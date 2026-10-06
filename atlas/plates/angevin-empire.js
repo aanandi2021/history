@@ -11,7 +11,8 @@
     ], legend:{position:"bottom-left",columns:1} },
     { caption:"The Angevin realm and its crisis", share:0.52, extent:[[-9,42],[5,57]], projection:"mercator", layers:[
       {id:"england2",type:"area",tier:"core",colour:ENG,legend:"England (not Wales)",polygon:[[-5.7,50.0],[-4.4,50.3],[-2.6,50.5],[-0.5,50.7],[1.4,51.0],[1.3,52.3],[0.4,53.3],[-1.1,54.3],[-2.1,55.0],[-2.9,55.5],[-3.3,54.9],[-2.8,54.1],[-3.0,53.1],[-2.7,52.3],[-3.3,51.9],[-4.4,51.8],[-5.2,51.2]],smooth:false},
-      {id:"angevin",type:"area",tier:"conquest",colour:ANJ,legend:"Angevin lands in France",polygon:[[-2.2,43.1],[-1.8,45.0],[-1.4,47.6],[-1.2,49.7],[0.2,50.1],[1.7,49.7],[2.3,47.2],[1.0,45.0],[-0.2,43.5]],smooth:true},
+      {id:"angevin",type:"area",tier:"conquest",colour:ANJ,legend:"Angevin lands in France",polygon:[[-1.9,43.1],[-1.6,45.0],[-1.4,46.6],[-2.0,47.8],[-1.5,49.6],[-0.4,49.9],[1.6,49.9],[1.7,48.9],[0.9,47.8],[1.1,46.5],[0.4,45.2],[0.5,44.1],[-0.2,43.3]],smooth:false},
+      {id:"brittany",type:"area",tier:"influence",colour:ANJ,legend:"Brittany dependent",polygon:[[-4.8,47.8],[-3.3,48.8],[-1.5,49.6],[-2.0,47.8],[-3.8,47.5]],smooth:false},
       {id:"ireland",type:"area",tier:"influence",colour:IR,legend:"English foothold in Ireland",polygon:[[-8,51.5],[-6.5,54.2],[-5.5,53.0],[-5.8,51.8]],smooth:true},
       {id:"capetian",type:"area",tier:"influence",colour:FR,legend:"Capetian pressure",polygon:[[0.8,47.5],[2.3,49.7],[4.2,49.2],[4.0,47.2],[2.1,46.8]],smooth:"basis"},
       {id:"loss",type:"boundary",style:"partition",colour:LINE,width:2.6,legend:"Losses to Philip II",path:[[0.0,50.0],[0.0,48.8],[0.6,47.5],[0.3,46.5]]},
@@ -23,7 +24,7 @@
       {date:"1106", text:"Henry I reunites England and Normandy after Tinchebray, keeping the Channel at the centre of English politics.", refs:["england","normandy","winchester"]}
     ]},
     {heading:"Angevin crisis", entries:[
-      {date:"1154", text:"Henry II inherits England, Normandy, Anjou and Aquitaine through family claims and Eleanor of Aquitaine.", refs:["england2","angevin","angers","bordeaux"]},
+      {date:"1154", text:"Henry II inherits England, Normandy, Anjou and Aquitaine through family claims and Eleanor of Aquitaine; Brittany sits in the Angevin orbit.", refs:["england2","angevin","brittany","angers","bordeaux"]},
       {date:"1171", text:"English power begins in Ireland, adding another frontier to the Angevin world.", refs:["ireland","dublin"]},
       {date:"1204-15", text:"John loses Normandy to Philip II, loses at Bouvines, and then grants Magna Carta at Runnymede under baronial pressure.", refs:["loss","capetian","rouen","bouvines","runnymede"]}
     ]}

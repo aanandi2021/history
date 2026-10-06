@@ -14,10 +14,10 @@
       {id:"novgorod",type:"point",symbol:"large-city",hub:4,hubColour:STEP,at:NOV,name:"Novgorod"}, {id:"riga",type:"point",symbol:"port",at:RIG,name:"Riga"}, {id:"danzig",type:"point",symbol:"port",at:VIS,name:"Danzig"}
     ], legend:{position:"bottom-left",columns:1}},
     { caption:"Venice, Genoa and the eastern Mediterranean", share:0.5, extent:[[-2,29],[43,48]], projection:"conic", layers:[
-      {id:"venice-route",type:"route",style:"dotted",weight:4,colour:VEN,legend:"Venetian spice and luxury routes",path:[VENICE,CON,TRE,[41,42],TANA]},
-      {id:"venice-egypt",type:"route",style:"dotted",weight:3,colour:VEN,path:[VENICE,[18,39],ALEX]},
-      {id:"genoa-black-sea",type:"route",style:"dotted",weight:4,colour:GEN,legend:"Genoese Black Sea routes",path:[GENOA,[16,39],CON,CAFFA,TANA]},
-      {id:"levant",type:"route",style:"dotted",weight:2,colour:GOODS,legend:"Levantine ports",path:[VENICE,[22,38],BEIR,ALEX]},
+      {id:"venice-route",type:"route",style:"dotted",weight:4,colour:VEN,legend:"Venetian spice and luxury routes",path:[VENICE,[13.8,44.6],[15.4,42.2],[18.2,39.6],[22.5,38.0],CON,TRE,[41,42],TANA]},
+      {id:"venice-egypt",type:"route",style:"dotted",weight:3,colour:VEN,path:[VENICE,[13.8,44.6],[15.4,42.2],[18.2,39.6],[22.5,36.2],[26.5,34.0],ALEX]},
+      {id:"genoa-black-sea",type:"route",style:"dotted",weight:4,colour:GEN,legend:"Genoese Black Sea routes",path:[GENOA,[9.5,43.2],[10.8,41.0],[12.5,38.3],[15.6,38.1],[19.0,37.5],[23.0,38.4],CON,CAFFA,TANA]},
+      {id:"levant",type:"route",style:"dotted",weight:2,colour:GOODS,legend:"Levantine ports",path:[VENICE,[13.8,44.6],[15.4,42.2],[18.2,39.6],[22.5,36.2],BEIR,ALEX]},
       {id:"venice",type:"point",symbol:"port",hub:5,hubColour:VEN,at:VENICE,name:"Venice"}, {id:"genoa",type:"point",symbol:"port",hub:5,hubColour:GEN,at:GENOA,name:"Genoa"},
       {id:"constantinople",type:"point",symbol:"capital",hub:4,hubColour:GOODS,at:CON,name:"Constantinople"}, {id:"caffa",type:"point",symbol:"port",hub:3,hubColour:GEN,at:CAFFA,name:"Caffa"},
       {id:"alexandria",type:"point",symbol:"port",hub:4,hubColour:VEN,at:ALEX,name:"Alexandria"}, {id:"beirut",type:"point",symbol:"port",at:BEIR,name:"Beirut"}, {id:"tana",type:"point",symbol:"port",at:TANA,name:"Tana"}
