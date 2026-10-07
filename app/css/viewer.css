@@ -295,3 +295,15 @@ ul.terms .copy-ask { margin-left: 6px; font-size: 11px; padding: 1px 6px; }
 #world-underlay:disabled + span, #world-toggle:has(#world-underlay:disabled) { opacity: .55; }
 #master .m-gap-label { font-size: 9.5px; fill: #8f8068; }
 #tour-card .tour-plate { margin-top: 8px; }
+
+/* Reading shelves */
+#books { position: fixed; z-index: 40; top: 70px; right: 20px; width: 520px; max-height: calc(100vh - 100px); overflow-y: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 6px 18px 14px; box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+#books h4 { margin: 16px 0 4px; font-size: 15px; }
+#books ul { margin: 4px 0; padding-left: 18px; }
+#books li { margin: 6px 0; font-size: 13px; line-height: 1.35; }
+#books .b-note, #books .b-shelf-note { color: var(--muted); font-size: 12px; }
+#books .b-shelf-note { margin: 0 0 4px; font-style: italic; }
+#books .b-year { color: var(--muted); font-size: 11px; }
+#books .b-pair { font-size: 11px; color: var(--accent); border: 1px solid var(--accent); border-radius: 8px; padding: 0 5px; }
+#books li.find i { color: var(--muted); }
+#books .b-tour { margin-left: 6px; font-size: 11px; border: 1px solid var(--line); background: #fff; border-radius: 6px; cursor: pointer; }

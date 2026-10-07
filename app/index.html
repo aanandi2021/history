@@ -22,6 +22,7 @@
     </div>
     <a id="board-link" class="ctl" href="board.html#ww1-origins" title="Cause-and-effect board: draw what led to what">⇄ Board</a>
     <button id="tour-btn" class="ctl" title="Guided tours">Tour</button><div id="tour-menu" hidden></div>
+    <button id="books-btn" class="ctl" title="Reading shelves">Books</button>
     <button id="help-btn" class="ctl" title="Keys and tips">?</button>
   </header>
   <nav id="master" aria-label="Master timeline: every period on one strip. Click a period to open it.">
@@ -69,6 +70,7 @@
     <p>The address bar always holds the current period, date and selection, so you can paste it into an Obsidian note.</p>
     <button id="help-close">Close</button>
   </div>
+  <div id="books" hidden><div id="books-body"></div><button id="books-close">Close</button></div>
   <div id="tooltip" hidden></div>
 
   <script src="version.js"></script>
@@ -94,6 +96,7 @@
   <script src="scenes/early-modern.js"></script>
   <script src="tours/jewish-history.js"></script>
   <script src="tours/rome-rise-fall.js"></script>
+  <script src="data/reading.js"></script>
   <script src="js/model.js"></script>
   <script src="js/viewer.js"></script>
 </body>

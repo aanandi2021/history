@@ -1293,7 +1293,7 @@
   document.addEventListener("keydown", (ev) => {
     if (ev.target.matches("input, select, textarea")) return;
     if (ev.key === "/") { ev.preventDefault(); searchEl.focus(); searchEl.select(); }
-    else if (ev.key === "Escape") { if (!$("#help").hidden) $("#help").hidden = true; else clearSelection(); }
+    else if (ev.key === "Escape") { if (!$("#books").hidden) $("#books").hidden = true; else if (!$("#help").hidden) $("#help").hidden = true; else clearSelection(); }
     else if ((ev.key === "ArrowRight" || ev.key === "ArrowLeft") && state.tour) { ev.preventDefault(); moveTour(ev.key === "ArrowRight" ? 1 : -1); }
     else if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") {
       const e = M.stepEvent(state.ds, state.cursor, ev.key === "ArrowRight" ? 1 : -1);
@@ -1556,6 +1556,24 @@
   $("#world-underlay").addEventListener("change", () => { drawWorldUnderlay(state.cursor); });
   $("#fit").addEventListener("click", () => zoomToDomain(state.ds.t0, state.ds.t1));
   $("#help-btn").addEventListener("click", () => { $("#help").hidden = !$("#help").hidden; });
+  function renderBooks() {
+    const shelves = window.READING || [];
+    const book = (b) => b.find
+      ? `<li class="find"><i>${esc(b.title)}</i> <span class="b-note">${esc(b.note || "")}</span></li>`
+      : `<li><b>${esc(b.title)}</b>${b.author ? ", " + esc(b.author) : ""}${b.year ? ` <span class="b-year">${b.year}</span>` : ""}<br><span class="b-note">${esc(b.note || "")}</span></li>`;
+    $("#books-body").innerHTML = `<h3>Reading shelves</h3>` + shelves.map((s) => {
+      const T = s.tour && window.TOURS && window.TOURS[s.tour];
+      const books = s.books || (T && T.answer && T.answer.reading || []).map((r) => ({ title: r.title, author: r.author, note: r.note }));
+      const link = T ? ` <button class="b-tour" data-tour="${esc(s.tour)}">take the tour ›</button>` : "";
+      return `<section><h4>${esc(s.title)}${link}</h4>${s.note ? `<p class="b-shelf-note">${esc(s.note)}</p>` : ""}<ul>${books.map(book).join("")}</ul></section>`;
+    }).join("");
+  }
+  $("#books-btn").addEventListener("click", () => { const el = $("#books"); if (el.hidden) renderBooks(); el.hidden = !el.hidden; });
+  $("#books-close").addEventListener("click", () => { $("#books").hidden = true; });
+  $("#books-body").addEventListener("click", (ev) => {
+    const b = ev.target.closest("button.b-tour");
+    if (b) { $("#books").hidden = true; startTour(b.dataset.tour, 0); }
+  });
   $("#help-close").addEventListener("click", () => { $("#help").hidden = true; });
   let resizeTimer = null;
   window.addEventListener("resize", () => {
