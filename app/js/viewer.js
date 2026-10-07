@@ -140,35 +140,106 @@
     const f = polityFeature(P);
     return f ? geoPath(f) : "";
   }
-  function drawWorldUnderlay(t) {
+  const HIST_PALETTE = ["#9f7d56", "#8a9a72", "#7d8ea8", "#a87970", "#8e7aa3", "#b0925d", "#6f9a8f", "#a06f87", "#87966a", "#9b8267"];
+  const histFeatureCache = new Map();
+  let histLoadSeq = 0;
+  function hashText(text) {
+    let h = 2166136261;
+    for (const ch of String(text || "")) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+    return h >>> 0;
+  }
+  function histColour(d) {
+    const p = d.properties || {};
+    const group = p.PARTOF || p.SUBJECTO || p.NAME || "unnamed";
+    const base = d3.hsl(HIST_PALETTE[hashText(group) % HIST_PALETTE.length]);
+    base.h = (base.h + (hashText(p.NAME || group) % 19) - 9 + 360) % 360;
+    base.s = Math.max(0.24, base.s * 0.72);
+    base.l = Math.min(0.68, Math.max(0.48, base.l * 1.02));
+    return base.formatHex();
+  }
+  function histName(d) { return String((d.properties && d.properties.NAME) || "").trim(); }
+  function histPrecision(d) { return Math.max(1, Math.min(3, +(d.properties && d.properties.BORDERPRECISION) || 1)); }
+  function histFeatures(date, topology) {
+    const k = String(date);
+    if (histFeatureCache.has(k)) return histFeatureCache.get(k);
+    const obj = topology && topology.objects && (topology.objects.world || Object.values(topology.objects)[0]);
+    const features = obj ? topojson.feature(topology, obj).features : [];
+    histFeatureCache.set(k, features);
+    return features;
+  }
+  function ensureHistSoftFilter() {
+    if (!sceneDefs.select("#hist-soft-edge").empty()) return;
+    const f = sceneDefs.append("filter").attr("id", "hist-soft-edge").attr("x", "-8%").attr("y", "-8%").attr("width", "116%").attr("height", "116%");
+    f.append("feGaussianBlur").attr("stdDeviation", 0.7);
+  }
+  function drawLegacyWorldUnderlay(t, label) {
     const snap = M.snapshotAt(window.WORLD_SNAPSHOTS || [], t);
-    const cb = $("#world-underlay");
-    const on = !!(state.dsId !== "ww2" && (!cb || cb.checked) && snap);
-    worldLayer.attr("display", on ? null : "none");
-    if (!on) { worldLayer.selectAll("*").remove(); return; }
+    if (!snap) { worldLayer.selectAll("*").remove(); return; }
     worldLayer.selectAll("path.polity").data(snap.polities, (d) => d.id).join(
-      (e) => e.append("path").attr("class", "polity"),
+      (e) => e.append("path").attr("class", "polity legacy"),
       (u) => u,
       (x) => x.remove()
-    ).attr("d", polityPath).attr("fill", (d) => d.colour).attr("stroke", (d) => d.colour);
+    ).attr("d", polityPath).attr("fill", (d) => d.colour).attr("stroke", (d) => d.colour).attr("filter", null)
+      .attr("stroke-dasharray", null).attr("stroke-opacity", null).attr("fill-opacity", null);
     worldLayer.selectAll("g.world-label").data(snap.polities.filter((d) => d.label || d.at), (d) => d.id).join(
-      (e) => {
-        const g = e.append("g").attr("class", "world-label sc");
-        g.append("text").attr("class", "polity-label");
-        return g;
-      },
+      (e) => { const g = e.append("g").attr("class", "world-label sc"); g.append("text").attr("class", "polity-label"); return g; },
       (u) => u,
       (x) => x.remove()
     ).each(function (d) {
-      const p = projection(d.label || d.at);
-      d.x = p[0]; d.y = p[1];
+      const p = projection(d.label || d.at); d.x = p[0]; d.y = p[1];
       const f = polityFeature(d), b = f ? geoPath.bounds(f) : [[0, 0], [0, 0]];
       d.screenArea0 = Math.max(0, b[1][0] - b[0][0]) * Math.max(0, b[1][1] - b[0][1]);
       d.priority = d.priority || d.regions && d.regions.length || 1;
       d3.select(this).datum(d).select("text").text(d.name + (d.approx ? " (approx.)" : ""));
     });
     const el = $("#world-date-label");
-    if (el) el.textContent = `(${M.masterYear(snap.year)})`;
+    if (el) el.textContent = label || `(${M.masterYear(snap.year)})`;
+    scaleWorldLabels();
+  }
+  function drawWorldUnderlay(t) {
+    const cb = $("#world-underlay");
+    const year = t instanceof Date ? t.getUTCFullYear() : Number(t);
+    const hist = window.HistBasemaps;
+    const histDate = hist && hist.dateForYear(year);
+    const on = !!(state.dsId !== "ww2" && (!cb || cb.checked) && (histDate != null || (window.WORLD_SNAPSHOTS || []).length));
+    worldLayer.attr("display", on ? null : "none");
+    if (!on) { worldLayer.selectAll("*").remove(); return; }
+    const label = histDate == null ? "" : `(${M.masterYear(histDate)} map${hist && !hist.isLoaded(histDate) ? ", loading" : ""})`;
+    if (hist && histDate != null && !hist.isLoaded(histDate)) {
+      const seq = ++histLoadSeq;
+      hist.load(histDate).then(() => { if (seq === histLoadSeq) drawWorldUnderlay(state.cursor); }).catch((err) => console.warn(err.message));
+      drawLegacyWorldUnderlay(t, label);
+      return;
+    }
+    const topology = hist && hist.topology(histDate);
+    if (!topology) { drawLegacyWorldUnderlay(t, label); return; }
+    ensureHistSoftFilter();
+    const features = histFeatures(histDate, topology);
+    worldLayer.selectAll("path.polity").data(features, (d, i) => (d.properties && `${d.properties.NAME}|${d.properties.SUBJECTO}|${d.properties.PARTOF}|${i}`) || i).join(
+      (e) => e.append("path").attr("class", "polity hist-polity"),
+      (u) => u,
+      (x) => x.remove()
+    ).attr("d", geoPath)
+      .attr("fill", (d) => histColour(d))
+      .attr("stroke", (d) => histColour(d))
+      .attr("fill-opacity", (d) => histName(d) ? (histPrecision(d) === 1 ? 0.22 : 0.25) : 0.07)
+      .attr("stroke-opacity", (d) => histName(d) ? (histPrecision(d) === 3 ? 0.48 : histPrecision(d) === 2 ? 0.28 : 0.03) : 0.02)
+      .attr("stroke-dasharray", (d) => histPrecision(d) === 2 ? "3 3" : null)
+      .attr("filter", (d) => histPrecision(d) === 1 ? "url(#hist-soft-edge)" : null);
+    worldLayer.selectAll("g.world-label").data(features.filter(histName), (d, i) => `${histName(d)}|${i}`).join(
+      (e) => { const g = e.append("g").attr("class", "world-label sc hist-label"); g.append("text").attr("class", "polity-label"); return g; },
+      (u) => u,
+      (x) => x.remove()
+    ).each(function (d) {
+      const c = geoPath.centroid(d);
+      d.x = Number.isFinite(c[0]) ? c[0] : 0; d.y = Number.isFinite(c[1]) ? c[1] : 0;
+      const b = geoPath.bounds(d);
+      d.screenArea0 = Math.max(0, b[1][0] - b[0][0]) * Math.max(0, b[1][1] - b[0][1]);
+      d.priority = d.screenArea0 * (histPrecision(d) === 3 ? 1.15 : 1);
+      d3.select(this).datum(d).select("text").text(histName(d));
+    });
+    const el = $("#world-date-label");
+    if (el) el.textContent = label;
     scaleWorldLabels();
   }
   function overlapsRect(a, b, pad = 2) {
@@ -1597,6 +1668,8 @@
     isFolded: (id) => isFolded(state.ds.byId.get(id)), setFold: (id, f) => { setFold(id, f); refold(); }, setAllFolds,
     zoomTimeline: (a, b) => zoomToDomain(M.parseDate(a), M.parseDate(b), 0),
     focus: () => state.sceneFocus,
+    histBasemapDate: () => window.HistBasemaps && window.HistBasemaps.dateForYear(state.cursor.getUTCFullYear()),
+    histBasemapLoaded: () => { const h = window.HistBasemaps; const d = h && h.dateForYear(state.cursor.getUTCFullYear()); return !!(h && h.isLoaded(d)); },
     ready: true
   };
 })();

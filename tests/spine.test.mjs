@@ -14,6 +14,12 @@ function loadSnapshots() {
   vm.runInContext(fs.readFileSync(path.join(ROOT, "app", "data", "world-snapshots.js"), "utf8"), ctx);
   return JSON.parse(JSON.stringify(ctx.window.WORLD_SNAPSHOTS));
 }
+function loadHistDates() {
+  const ctx = { window: {} };
+  vm.createContext(ctx);
+  vm.runInContext(fs.readFileSync(path.join(ROOT, "app", "data", "hist", "index.js"), "utf8"), ctx);
+  return ctx.window.HIST_BASEMAP_DATES;
+}
 function loadRegions() {
   const ctx = { window: {} };
   vm.createContext(ctx);
@@ -30,7 +36,7 @@ test("spine: Russia and Maritime are threads, not master-strip eras", () => {
   assert.deepEqual(L.periods.map((p) => p.id), ["ancient", "medieval", "transition", "early-modern", "ww2"]);
 });
 
-test("spine: Vol. 2 gap and world snapshot selection", () => {
+test("spine: Vol. 2 gap, world snapshots and historical basemap date selection", () => {
   const L = HM.masterLayout(DS);
   const early = L.periods.find((p) => p.id === "early-modern");
   assert.equal(early.gapAfter, "1800-1939 not yet built (Penguin Vol. 2)");
@@ -38,6 +44,11 @@ test("spine: Vol. 2 gap and world snapshot selection", () => {
   assert.equal(HM.snapshotAt(snaps, 1301).year, 1300);
   assert.equal(HM.snapshotAt(snaps, 1715).year, 1715);
   assert.equal(HM.snapshotAt(snaps, 1938).year, 1914);
+  const histDates = loadHistDates();
+  assert.equal(HM.histBasemapDateAtOrBefore(histDates, 1789), 1783);
+  assert.equal(HM.histBasemapDateAtOrBefore(histDates, 1715), 1715);
+  assert.equal(HM.histBasemapDateAtOrBefore(histDates, -999), -1000);
+  assert.equal(HM.histBasemapDateAtOrBefore(histDates, 1), -1);
 });
 
 test("spine: unknown region codes in snapshots fail", () => {
@@ -64,6 +75,29 @@ test("e2e: switching era carries and clamps the current year; dropdown has Threa
     const groups = await page.evaluate(() => [...document.querySelectorAll("#dataset optgroup")].map((g) => ({ label:g.label, ids:[...g.children].map((o)=>o.value) })));
     assert.ok(groups.find((g) => g.label === "Threads").ids.includes("russia"));
     assert.equal(await page.$('#master .m-period[data-id="russia"]') === null, true);
+  } finally {
+    await browser.close();
+  }
+});
+
+test("e2e: historical basemap lazy loader works from file URL", async () => {
+  const browser = await puppeteer.launch({ headless: true });
+  try {
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1440, height: 900 });
+    await page.goto(pathToFileURL(path.join(ROOT, "app", "index.html")).href + "#early-modern/1789");
+    await page.waitForFunction("window.APP && APP.ready");
+    await page.waitForFunction("window.APP.histBasemapLoaded && APP.histBasemapLoaded()", { timeout: 8000 });
+    const info = await page.evaluate(() => ({
+      date: APP.histBasemapDate(),
+      loaded: !!(window.HIST_BASEMAPS && window.HIST_BASEMAPS["1783"]),
+      src: document.querySelector('script[data-hist-basemap="1783"]')?.getAttribute("src") || "",
+      label: document.querySelector("#world-date-label")?.textContent || ""
+    }));
+    assert.equal(info.date, 1783);
+    assert.equal(info.loaded, true);
+    assert.match(info.src, /data\/hist\/world_1783\.js$/);
+    assert.equal(info.label, "(1783 map)");
   } finally {
     await browser.close();
   }

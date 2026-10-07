@@ -12,7 +12,7 @@
   // Dates are YYYY, YYYY-MM or YYYY-MM-DD. BC years take a minus sign and the historian's numbering, with no
   // year 0: "-0218" is 218 BC, "-0216-08-02" is 2 Aug 216 BC. Inside, they become astronomical years (218 BC = -217),
   // which is what JavaScript dates use.
-  const DATE_RE = /^(-\d{1,4}|\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/;
+  const DATE_RE = /^(-\d{1,4}|\d{1,4})(?:-(\d{2})(?:-(\d{2}))?)?$/;
   const YEAR_ONLY = /^(-\d{1,4}|\d{4})$/, YEAR_MONTH = /^(-\d{1,4}|\d{4})-\d{2}$/;
   const toAstro = (y) => (y < 0 ? y + 1 : y);
   const toHist = (Y) => (Y <= 0 ? Y - 1 : Y);
@@ -337,6 +337,14 @@
   function queryString(params) {
     const pairs = Object.entries(params || {}).filter(([, v]) => v != null && v !== "");
     return pairs.length ? "?" + pairs.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join("&") : "";
+  }
+
+  function histBasemapDateAtOrBefore(dates, t) {
+    const y = t instanceof Date ? yearOf(t) : Number(t);
+    const sorted = (dates || []).map(Number).filter(Number.isFinite).sort((a, b) => a - b);
+    let best = null;
+    for (const d of sorted) { if (d <= y) best = d; else break; }
+    return best == null ? (sorted[0] ?? null) : best;
   }
 
   function snapshotAt(snapshots, t) {
@@ -755,7 +763,7 @@
   }
 
   return {
-    yearOf, masterLayout, masterX, masterYear, snapshotAt, validateWorldSnapshots,
+    yearOf, masterLayout, masterX, masterYear, histBasemapDateAtOrBefore, snapshotAt, validateWorldSnapshots,
     plateContext,
     sceneKey,
     sceneFor, visibleAt, liveAt, itineraryAt, stopLabel, sceneLadder, dateStart, dateEnd, linkTerms, termUrl, validateScene, SCENE_SYMBOLS,

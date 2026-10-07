@@ -1,11 +1,9 @@
-# World snapshots
+# Historical basemap underlay
 
-The viewer's muted political underlay is `app/data/world-snapshots.js`. It defines dated snapshots and the viewer picks the latest snapshot at or before the current year.
+The viewer's muted **World at this date** underlay now uses generated TopoJSON from [`aourednik/historical-basemaps`](https://github.com/aourednik/historical-basemaps), licensed GPL-3.0. The generated files live in `app/data/hist/world_<year>.js`; each registers one topology in `window.HIST_BASEMAPS[year]`. `app/data/hist/index.js` lists available dates so `app/js/hist-basemaps.js` can lazy-load the nearest map at or before the cursor year by injecting a `<script>`. That keeps `file://` working and avoids loading every map up front.
 
-Each polity is approximate and deliberately quiet:
+The build script is `scripts/build_hist_basemaps.mjs`. It caches source GeoJSON and `index.json` under `study/hist-src/` and writes generated JS to `app/data/hist/`. `study/` is git-ignored, so the downloaded source files stay out of the repo. The script keeps `NAME`, `SUBJECTO`, `PARTOF` and `BORDERPRECISION`; it drops features with no identifying text, simplifies geometry with mapshaper, and preserves the source attribution in each generated file.
 
-```js
-{ id, name, colour, regions:["FRA", "DEU"], minus:[...], polygon:[[lon,lat],...], label:[lon,lat], approx:true }
-```
+Rendering is intentionally quiet. Colours are stable hashes grouped by `PARTOF` / `SUBJECTO` / `NAME`, so related imperial or cultural features tend to share a hue. `BORDERPRECISION` controls the boundary: approximate borders use a very soft blurred fill with almost no stroke, moderate borders use a light dashed stroke, and treaty/legal borders use a thin solid stroke. Labels are constant screen size and declutter against story labels. The old `app/data/world-snapshots.js` remains as a fallback while the historical JS file is loading, and for development if generated files are absent.
 
-`regions` and `minus` use Natural Earth region codes from `atlas/data/regions-eu.js`, the same building blocks used by atlas plates. Use modern countries or provinces only as school-atlas approximations. If a border is uncertain, prefer omitting the polity or marking it approximate rather than inventing precision. `tests/spine.test.mjs` fails on unknown region codes.
+Caveats matter. This source is much better than modern-province approximations because it includes peoples, cultures, nomads, hunter-gatherers and uncertain zones. It is still one compiled dataset, not a neutral view of the past. Many Indigenous North American areas after 1700 are generalized or subordinated visually beneath colonial claims; India alternates between large imperial frames and regional polities that can flatten local authority; Japan appears mostly as broad cultural/state areas rather than the full texture of court, shogunate, daimyo and Ainu/Ryukyuan worlds. Treat the underlay as context, not authority.
