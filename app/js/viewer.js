@@ -161,7 +161,6 @@
     const geoms = (L.regions || []).map((c) => idx.get(c)).filter(Boolean);
     if (!geoms.length) return null;
     let d = geoPath(topojson.merge(REGIONS, geoms)) || "";
-    if (L.polygon) d += atlasPolygonD(L.polygon, L.smooth == null ? false : L.smooth) || "";
     const minus = (L.minus || []).map((c) => idx.get(c)).filter(Boolean);
     if (minus.length) d += geoPath(topojson.merge(REGIONS, minus)) || "";
     return d;
@@ -189,33 +188,22 @@
     const plate = chapterPlateSpec(ch);
     if (!plate) return [];
     const all = (plate.figures || []).filter((fig) => !(fig.base && fig.base.map === false) && fig.projection !== "plan").flatMap((fig) => fig.layers || []);
-    return all.filter((L) => L.type === "area").map((L) => ({ ...L, source: "plate" }));
+    return all.filter((L) => L.type === "area" && L.regions).map((L) => ({ ...L, source: "plate" }));
   }
   function areaClipToLand(L) { return L.clipToLand == null ? (L.clip !== "none" && L.clip !== false) : L.clipToLand; }
   function drawPlateArea(g, L, colour, ghost) {
-    const d = atlasRegionD(L) || atlasZoneD(L);
+    const d = atlasRegionD(L);
     if (!d) return;
     const tier = L.tier || "core";
     const opacity = ghost ? 0.13 : (tier === "influence" ? 0.15 : 0.26);
     const fill = L.pattern && L.pattern !== "solid" ? stripeFill(colour) : colour;
     const strokeDash = L.edge === "dashed" || tier === "conquest" ? "3 2" : null;
-    if (!L.regions) {
-      const id = `scene-clip-${Math.random().toString(36).slice(2)}`;
-      sceneDefs.append("clipPath").attr("id", id).attr("clipPathUnits", "userSpaceOnUse").append("path").attr("d", d);
-      const cg = g.append("g").attr("clip-path", `url(#${id})`);
-      countryPaths.each(function (f) { cg.append("path").attr("d", geoPath(f)).attr("class", `s-fill ${tier}`).attr("data-source", "plate").style("fill", fill).style("fill-opacity", opacity).style("stroke", "none"); });
-      cg.append("path").attr("d", d).attr("fill", "none").attr("data-source", "plate").style("stroke", L.edge === false ? "none" : colour).style("stroke-dasharray", strokeDash);
-    } else {
-      g.append("path").attr("d", d).attr("class", `s-fill ${tier}`).attr("data-source", "plate")
-        .attr("fill-rule", L.minus ? "evenodd" : null).attr("clip-rule", L.minus ? "evenodd" : null)
-        .style("fill", fill).style("fill-opacity", opacity).style("stroke", L.edge === false ? "none" : colour).style("stroke-dasharray", strokeDash);
-    }
-    if (L.name && !ghost) {
-      const at = L.labelAt || (L.polygon && d3.geoCentroid({ type: "Polygon", coordinates: [closeRing(normalisePolygonRing(L.polygon))] }));
-      if (at) {
-        const [x, y] = projection(at);
-        sceneText(screenSized(g, x, y), [{ text: L.name, cls: "s-realm" }], "middle").style("fill", L.labelColour || d3.color(colour).darker(1.2));
-      }
+    g.append("path").attr("d", d).attr("class", `s-fill ${tier}`).attr("data-source", "plate")
+      .attr("fill-rule", L.minus ? "evenodd" : null).attr("clip-rule", L.minus ? "evenodd" : null)
+      .style("fill", fill).style("fill-opacity", opacity).style("stroke", L.edge === false ? "none" : colour).style("stroke-dasharray", strokeDash);
+    if (L.name && !ghost && L.labelAt) {
+      const [x, y] = projection(L.labelAt);
+      sceneText(screenSized(g, x, y), [{ text: L.name, cls: "s-realm" }], "middle").style("fill", L.labelColour || d3.color(colour).darker(1.2));
     }
   }
   function sceneLayersForChapter(ch, scene) {
@@ -298,7 +286,9 @@
     if (hist && histDate != null && !hist.isLoaded(histDate)) {
       const seq = ++histLoadSeq;
       hist.load(histDate).then(() => { if (seq === histLoadSeq) drawWorldUnderlay(state.cursor); }).catch((err) => console.warn(err.message));
-      drawLegacyWorldUnderlay(t, label);
+      worldLayer.selectAll("path.polity,g.world-label").remove();
+      const el = $("#world-date-label");
+      if (el) el.textContent = label;
       return;
     }
     const topology = hist && hist.topology(histDate);
@@ -310,6 +300,7 @@
       (u) => u,
       (x) => x.remove()
     ).attr("d", geoPath)
+      .attr("data-name", histName)
       .attr("fill", (d) => histColour(d))
       .attr("stroke", (d) => histColour(d))
       .attr("fill-opacity", histFillOpacity)
@@ -536,13 +527,33 @@
     }
   }
 
-  /** The chapter whose map fits this moment, the timeline zoom and the folds: a big part when zoomed out or folded. */
+  /** The chapter whose map fits this moment. Default-folded timeline parts should not steal follow focus; explicit folds still do. */
+  function explicitFolded(c) { return (loadFolds()[state.dsId] || {})[c.id] === true; }
+  function focusOk(c) { return !M.ancestors(state.ds, c).some(explicitFolded) && !!M.sceneFor(SCENES, state.dsId, c); }
+  function visibleLonLatBBox() {
+    const tr = d3.zoomTransform(mapSvg.node());
+    const pts = [[0, 0], [MAP_W, 0], [MAP_W, MAP_H], [0, MAP_H]].map((p) => projection.invert(tr.invert(p))).filter(Boolean);
+    if (pts.length < 2) return null;
+    return [[Math.max(-180, Math.min(...pts.map((p) => p[0]))), Math.max(-90, Math.min(...pts.map((p) => p[1])))], [Math.min(180, Math.max(...pts.map((p) => p[0]))), Math.min(90, Math.max(...pts.map((p) => p[1])))]];
+  }
+  function bboxOverlap(a, b) {
+    if (!a || !b) return 0;
+    const w = Math.max(0, Math.min(a[1][0], b[1][0]) - Math.max(a[0][0], b[0][0]));
+    const h = Math.max(0, Math.min(a[1][1], b[1][1]) - Math.max(a[0][1], b[0][1]));
+    return w * h;
+  }
+  function bboxArea(b) { return b ? Math.max(0.0001, (b[1][0] - b[0][0]) * (b[1][1] - b[0][1])) : 1; }
   function focusAt(t) {
     const span = xs ? tlDomain()[1] - tlDomain()[0] : null;
-    const open = new Set(M.openChapters(state.ds, isFolded));
-    return M.focusChapter(state.ds, t, span, (c) => open.has(c) && !!M.sceneFor(SCENES, state.dsId, c));
+    const cands = M.activeChapters(state.ds, t).filter(focusOk);
+    if (state.mapK > 1.25 && cands.length) {
+      const vb = visibleLonLatBBox();
+      const scored = cands.map((c) => { const ov = bboxOverlap(vb, c.bbox); return { c, score: ov / bboxArea(c.bbox), dur: c.t1 - c.t0 }; }).filter((x) => x.score > 0.05)
+        .sort((a, b) => b.score - a.score || a.dur - b.dur);
+      if (scored.length) return scored[0].c;
+    }
+    return M.focusChapter(state.ds, t, span, focusOk);
   }
-
   function currentTourStop() {
     return state.tour && state.tourStop < state.tour.stops.length ? state.tour.stops[state.tourStop] : null;
   }
@@ -560,13 +571,7 @@
     const withScene = (c) => M.sceneFor(SCENES, state.dsId, c);
     const tourCh = tourChapter();
     const focus = tourCh && withScene(tourCh) ? tourCh : sel && sel.kind === "chapter" && withScene(sel) ? sel : focusAt(t);
-    // "Meanwhile" stories only: a part's own chapters, or the part above a chapter, are the same story at another scale
-    const open = new Set(M.openChapters(ds, isFolded));
-    const live = M.activeChapters(ds, t).filter((c) => withScene(c) && open.has(c));
-    const ghosts = live
-      .filter((c) => !focus || !(M.within(ds, focus, c) || M.within(ds, c, focus)))
-      .filter((c) => !live.some((k) => k.parentId === c.id));
-    const key = [state.tour ? "tour" : "normal", state.dsId, focus && focus.id, ...ghosts.map((c) => c.id)].join("|");
+    const key = [state.tour ? "tour" : "normal", state.dsId, focus && focus.id].join("|");
     state.sceneT = t;
     if (key === sceneKey) { scaleScene(); return; }
     sceneKey = key;
@@ -581,7 +586,6 @@
       scaleScene();
       return;
     }
-    for (const c of ghosts) drawSceneLayers(sceneLayer.append("g").attr("class", "ghost").attr("data-ch", c.id), sceneLayersForChapter(c, withScene(c)).filter((L) => L.type === "area"), true);
     if (focus) drawSceneLayers(sceneLayer.append("g").attr("class", "focus").attr("data-ch", focus.id), sceneLayersForChapter(focus, withScene(focus)), false);
     state.sceneFocus = focus ? focus.id : null;
     const cap = focus && withScene(focus).caption;
@@ -1033,7 +1037,7 @@
     for (const r of TL_REGIONS) {
       const empty = !regionCounts.get(r), on = currentRegion === r || (!currentRegion && state.regionOverride === "all");
       const g = chipG.append("g").attr("class", `region-chip${on ? " on" : ""}${empty ? " empty" : ""}`).attr("data-region", r).attr("transform", `translate(${cx},0)`);
-      const label = TL_REGION_LABEL[r] + (empty ? " (none yet)" : "");
+      const label = TL_REGION_LABEL[r] + (empty ? " (no chapters yet)" : "");
       const wChip = Math.max(54, label.length * 6.2 + 14);
       g.append("rect").attr("width", wChip).attr("height", 18).attr("rx", 8);
       g.append("text").attr("x", 7).attr("y", 12).text(label);
@@ -1042,10 +1046,6 @@
     }
     chipG.append("text").attr("class", "expand-all").attr("x", cx + 6).attr("y", 12).text("Expand all").on("click", (ev) => { ev.stopPropagation(); state.regionOverride = "all"; setAllFolds(false); });
     y += 24;
-    labels.append("text").attr("class", "fold-all").attr("data-fold-all", "open").attr("x", 76).attr("y", y - 4).text("▾ open all")
-      .on("click", (ev) => { ev.stopPropagation(); setAllFolds(false); });
-    labels.append("text").attr("class", "fold-all").attr("data-fold-all", "fold").attr("x", 126).attr("y", y - 4).text("▸ fold")
-      .on("click", (ev) => { ev.stopPropagation(); setAllFolds(true); });
     const open = M.openChapters(ds, isFolded);
     let ri = 0;
     for (const r of TL_REGIONS) {
@@ -1056,7 +1056,7 @@
       if (filteredOut || !allRegion.length) {
         const hgt = 17;
         bg.append("rect").attr("class", `lane-bg collapsed${ri % 2 ? " alt" : ""}`).attr("x", 0).attr("y", y).attr("width", tlW).attr("height", hgt);
-        labels.append("text").attr("class", `region-lane-label${!allRegion.length ? " empty" : ""}`).attr("x", 12).attr("y", y + 12).text(TL_REGION_LABEL[r] + (!allRegion.length ? " (none yet)" : ""));
+        labels.append("text").attr("class", `region-lane-label${!allRegion.length ? " empty" : ""}`).attr("x", 12).attr("y", y + 12).text(TL_REGION_LABEL[r] + (!allRegion.length ? " (no chapters yet)" : ""));
         y += hgt; ri++;
         continue;
       }
@@ -1548,11 +1548,16 @@
 
 
   // ---------------------------------------------------------------- tours
+  function tourSubtitle(t) {
+    const q = (t.question || "").trim();
+    if (q && q !== t.title) return q;
+    return String(t.intro || "").replace(/\s+/g, " ").trim().split(/[.!?]\s/)[0];
+  }
   function renderTourMenu() {
     const menu = $("#tour-menu");
     if (!menu) return;
     const tours = Object.values(window.TOURS || {});
-    menu.innerHTML = tours.map((t) => `<button data-tour="${esc(t.id)}"><b>${esc(t.title)}</b><br><span>${esc(t.question || t.intro || "")}</span></button>`).join("");
+    menu.innerHTML = tours.map((t) => `<button data-tour="${esc(t.id)}"><b>${esc(t.title)}</b>${tourSubtitle(t) ? `<br><span>${esc(tourSubtitle(t))}</span>` : ""}</button>`).join("");
   }
   function tourYearDate(y) { return y < 0 ? `-${String(Math.abs(y)).padStart(4, "0")}` : String(y).padStart(4, "0"); }
   function startTour(id, stop = 0) {
@@ -1786,7 +1791,7 @@
     if (!el) return;
     if (kind === "tour") {
       const tours = Object.values(window.TOURS || {});
-      el.innerHTML = tours.map((t) => `<button data-orient-tour="${esc(t.id)}"><b>${esc(t.title)}</b><span class="small">${esc(t.question || t.intro || "")}</span></button>`).join("");
+      el.innerHTML = tours.map((t) => `<button data-orient-tour="${esc(t.id)}"><b>${esc(t.title)}</b><span class="small">${esc(tourSubtitle(t))}</span></button>`).join("");
     } else {
       el.innerHTML = master.layout.periods.map((p) => `<button data-orient-era="${esc(p.id)}"><b>${esc(p.title)}</b><span class="small">${esc(p.from)} – ${esc(p.to)}</span></button>`).join("");
     }
@@ -1801,9 +1806,10 @@
   function maybeShowOrientation() {
     const showAtStart = localStorage.getItem(ORIENT_SHOW) === "1";
     const firstVisit = !localStorage.getItem(ORIENT_SEEN);
-    if (!location.hash && (firstVisit || showAtStart)) setOrientation(true);
     const cb = $("#orientation-show");
     if (cb) cb.checked = localStorage.getItem(ORIENT_SHOW) !== "0";
+    if (!location.hash && (firstVisit || showAtStart)) { setOrientation(true); return true; }
+    return false;
   }
 
   // ---------------------------------------------------------------- controls
@@ -1874,8 +1880,8 @@
   loadDataset(p.dataset, { cursor: location.hash ? p.date : M.parseDate(window.DATASETS[p.dataset].range[0]), quiet: true });
   if (location.hash) applyHash();
   if (p.query && p.query.tour) startTour(p.query.tour, +p.query.stop || 0);
-  if (!location.hash) { const m = $("#tour-menu"); if (m) m.hidden = false; }
-  maybeShowOrientation();
+  const orientationOpen = maybeShowOrientation();
+  if (!location.hash) { const m = $("#tour-menu"); if (m) m.hidden = !!orientationOpen; }
 
   // Hooks for tests and the console.
   window.APP = {

@@ -178,7 +178,18 @@ test("e2e: selecting a detail opens its folded parts and shows breadcrumbs; a pa
 });
 
 
-test("e2e: region chips filter timeline lanes and expand all restores them", async () => {
+
+test("e2e: follow focus prefers the local medieval story over Asia", async () => {
+  const { page, errors, ctx } = await open("#medieval/1096-01-01");
+  await settle();
+  assert.notEqual(await page.evaluate(() => APP.focus()), "ch-medieval-asia");
+  await page.evaluate(() => APP.flyTo([[-10, 35], [30, 58]], 0));
+  await page.evaluate(() => APP.setCursor(new Date(Date.UTC(1180, 0, 1))));
+  await settle(400);
+  assert.notEqual(await page.evaluate(() => APP.focus()), "ch-medieval-asia");
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});test("e2e: region chips filter timeline lanes and expand all restores them", async () => {
   const { page, errors, ctx } = await open("#medieval/1300-01-01/ch-baltic-orders-kalmar");
   await settle();
   assert.ok(await page.$('#tl .region-chip[data-region="asia"].on'), "selection follows the Asia lane");
@@ -216,7 +227,8 @@ test("e2e: zoom-aware focus and a colour key that names who is who", async () =>
   await page.evaluate(() => APP.setCursor(new Date(Date.UTC(1942, 5, 1))));
   await settle(300);
   const close = await page.evaluate(() => APP.focus());
-  assert.notEqual(wide, close, `wide ${wide} vs close ${close}`);
+  assert.ok(wide, `wide focus ${wide}`);
+  assert.equal(close, "ch-barbarossa-to-stalingrad", `wide ${wide} vs close ${close}`);
   assert.deepEqual(errors, []);
   await ctx.close();
 });

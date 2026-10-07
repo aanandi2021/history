@@ -120,9 +120,31 @@ test("e2e: no-hash landing opens ancient spine, tour menu and orientation splash
     assert.equal(info.hash, "");
     assert.equal(info.dataset, "ancient");
     assert.equal(info.cursor, "1800 BC");
-    assert.equal(info.tourMenuOpen, true);
+    assert.equal(info.tourMenuOpen, false, "tour menu waits until the orientation splash is gone");
     assert.equal(info.orientationOpen, true);
     assert.match(info.title, /History of the World/);
+  } finally {
+    await browser.close();
+  }
+});
+test("e2e: AD 1 historical underlay draws a visible Roman Empire", async () => {
+  const browser = await puppeteer.launch({ headless: true });
+  try {
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1440, height: 900 });
+    await page.goto(pathToFileURL(path.join(ROOT, "app", "index.html")).href + "#ancient/1");
+    await page.waitForFunction("window.APP && APP.ready");
+    await page.waitForFunction("window.APP.histBasemapLoaded && APP.histBasemapLoaded()", { timeout: 8000 });
+    await page.evaluate(() => APP.flyTo([[-10, 30], [45, 55]], 0));
+    await new Promise((r) => setTimeout(r, 300));
+    const roman = await page.$$eval("#map .world-underlay path.hist-polity", (paths) => paths.map((p) => ({
+      name: p.getAttribute("data-name") || "",
+      d: p.getAttribute("d") || "",
+      fillOpacity: Number(p.getAttribute("fill-opacity") || getComputedStyle(p).fillOpacity || 0)
+    })).find((p) => /Roman/i.test(p.name)) || null);
+    assert.ok(roman, "Roman Empire feature is present");
+    assert.ok(roman.d.length > 100, "Roman Empire feature has real geometry");
+    assert.ok(roman.fillOpacity >= 0.25, `fill-opacity ${roman.fillOpacity}`);
   } finally {
     await browser.close();
   }

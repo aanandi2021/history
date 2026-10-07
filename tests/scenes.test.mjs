@@ -114,9 +114,9 @@ test("e2e: selecting Abbasid Baghdad draws its scene, links its names, and offer
 
 
 test("e2e: chapter story fields use atlas plate areas when available", async () => {
-  const { page, ctx, errors } = await open("#medieval/1096/ch-crusades");
+  const { page, ctx, errors } = await open("#early-modern/1715/ch-austria-ottoman-danube");
   await settle(500);
-  assert.ok(await page.$$eval(".scene .focus [data-source=plate]", (els) => els.length) > 0, "selected chapter draws plate-derived area fields");
+  assert.ok(await page.$$eval(".scene .focus [data-source=plate]", (els) => els.length) > 0, "selected chapter draws region-derived plate area fields");
   assert.equal(await page.$$eval(".scene .focus .s-area path:not([data-source=plate])", (els) => els.length), 0, "hand-drawn area polygons are not used");
   assert.deepEqual(errors, []);
   await ctx.close();
