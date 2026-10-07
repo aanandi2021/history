@@ -11,7 +11,7 @@ Open `app/index.html` in a browser. It works offline from `file://`, with no ser
 The aim is to move through history the way you'd move through a city with a good guide. You start with the whole shape, then step into a period, then a place, then a book. Three things work together:
 
 - **The viewer** (`app/index.html`): a map, a timeline and a side panel, all at one moment in time.
-- **The atlas** (`atlas/index.html`): about 45 plates drawn in the style of the Penguin Atlas, one per spread.
+- **The atlas** (`atlas/index.html`): about 50 plates drawn in the style of the Penguin Atlas, one per spread.
 - **The vault**: Amit's notes, which are the source of truth. The app links to them; it never copies them.
 
 ## 2. First visit
@@ -39,7 +39,7 @@ Untick **Show this at start** to stop it appearing. You can reopen it from the *
 ### Master strip
 This is the whole of history on one strip, from 1800 BC to 1945. Each era is a bar; the open one is red. Click an era to jump to it. **The year comes with you.** If you're at 1500 and switch eras, you stay at 1500, or the nearest year that era covers.
 
-The scale stretches toward the present, so a six-year war isn't a hairline next to two thousand years of antiquity. The hatched stretch from 1800 to 1939 isn't built yet; it will come from the Penguin Atlas Vol. 2.
+The scale stretches toward the present, so a six-year war isn't a hairline next to two thousand years of antiquity. The hatched stretch from 1815 to 1939 is not built yet; the first Penguin Atlas Vol. 2 period now runs through the age of revolution and Napoleon.
 
 ### Map
 - **World at this date.** A quiet political map underneath everything, showing who held what at the nearest mapped date. The label says which date's map you're seeing. It shows states, and also peoples, nomads and Indigenous nations.
@@ -120,7 +120,7 @@ The address bar always holds where you are, for example `#medieval/1096` or `#me
 
 ## 10. What it isn't (yet)
 
-- **1800–1939** is waiting for Penguin Vol. 2.
+- **1815–1939** is still waiting for later Penguin Vol. 2 rounds.
 - **WW2** still uses an older style that colours whole modern countries. It will be repainted to match.
 - **Sub-Saharan Africa, the Pacific and much of the Americas** are thin on chapters. Region chips show where.
 - **Borders are approximate** everywhere before about 1800, and that is labelled.

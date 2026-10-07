@@ -1,0 +1,145 @@
+// The Age of Revolution and Napoleon, 1763-1815: Atlantic revolution, France, empire and settlement.
+(function () {
+  const S = {
+    canada:"Canada, Indigenous nations and the Loyalist north",
+    theory:"Political and economic theory",
+    america:"United States and Atlantic revolution",
+    france:"France and the Revolution",
+    europe:"Coalition wars and Napoleonic Europe",
+    britain:"Britain, empire and industrial strain",
+    germany:"Germany, reform and national consciousness",
+    atlantic:"Haiti, slavery and the Atlantic world",
+    india:"Egypt, India and imperial routes",
+    vienna:"Congress of Vienna and restoration"
+  };
+  const L = { QUE:[-71.21,46.81], MTL:[-73.56,45.50], HAL:[-63.58,44.65], FRED:[-66.64,45.96], TOR:[-79.38,43.65], NIAG:[-79.06,43.15], KING:[-76.49,44.23], DET:[-83.05,42.33], WASH:[-77.04,38.90], YORKT:[-76.51,37.24], SAR:[-73.64,43.08], BOS:[-71.06,42.36], PHI:[-75.16,39.95], PAR:[2.35,48.86], VERS:[2.12,48.80], VAL:[4.77,49.08], LYON:[4.84,45.76], VEN:[-1.30,46.67], TOUL:[5.93,43.13], CAIRO:[31.24,30.04], ACRE:[35.08,32.92], VIEN:[16.37,48.21], BER:[13.40,52.52], MOS:[37.62,55.75], LEIP:[12.37,51.34], WATER:[4.40,50.68], LON:[-0.13,51.51], CADIZ:[-6.29,36.53], MAD:[-3.70,40.42], LIS:[-9.14,38.72], WARSAW:[21.01,52.23], DELHI:[77.21,28.61], PUNE:[73.86,18.52], CAL:[88.36,22.57], CAP:[-72.20,19.76], PORT:[-72.34,18.54], BUEN:[-58.38,-34.60], CAR:[-66.90,10.48] };
+  const E=(lane,date,title,at,extra)=>Object.assign({lane,date,title,at},extra||{});
+  const R=(name,country,side,born,died,start,end,section,extra)=>Object.assign({name,country,side,born,died,start,end,section},extra||{});
+  const events = [
+    E("canada","1763","Royal Proclamation recognizes Indigenous land beyond the colonies",[-78,42],{section:S.canada,wiki:"Royal Proclamation of 1763",text:"Britain tries to hold western settlement behind the Appalachian line and treats Indigenous nations as political actors, not scenery.",plate:"american-revolution-loyalist-north-1763-1783"}),
+    E("canada","1774","Quebec Act protects Catholic practice and French civil law",L.QUE,{section:S.canada,wiki:"Quebec Act",text:"The Quebec Act extends the province and protects French civil law and Catholic worship. In the Thirteen Colonies it is read as one of the Intolerable Acts."}),
+    E("canada","1775-09","American invasion of Quebec begins",L.MTL,{section:S.canada,wiki:"Invasion of Quebec (1775)",text:"Continental forces take Montreal and move on Quebec, hoping French Canadians will join the rebellion."}),
+    E("canada","1775-12-31","Assault on Quebec fails",L.QUE,{section:S.canada,wiki:"Battle of Quebec (1775)",text:"Montgomery is killed, Arnold is wounded and Quebec stays British. Canada does not become the fourteenth colony.",plate:"american-revolution-loyalist-north-1763-1783"}),
+    E("canada","1783","Loyalists migrate north after the peace",L.HAL,{section:S.canada,wiki:"United Empire Loyalist",text:"Tens of thousands of Loyalists, Black Loyalists and disbanded soldiers move into Nova Scotia, New Brunswick, Quebec and what becomes Upper Canada.",plate:"american-revolution-loyalist-north-1763-1783"}),
+    E("canada","1784","New Brunswick is created for the Loyalist settlements",L.FRED,{section:S.canada,wiki:"New Brunswick",text:"Nova Scotia is divided so the Loyalist settlements along the Saint John River have their own colonial government."}),
+    E("canada","1791","Constitutional Act creates Upper and Lower Canada",[-75,45],{section:S.canada,wiki:"Constitutional Act 1791",text:"Britain divides Quebec into English-speaking Upper Canada and French-speaking Lower Canada, each with an elected assembly.",plate:"haiti-abolition-war-of-1812-atlantic-1791-1815"}),
+    E("canada","1811","Tecumseh's confederacy resists American expansion",[-86.84,40.51],{section:S.canada,wiki:"Tecumseh's Confederacy",text:"Tecumseh and Tenskwatawa organize a pan-Indigenous resistance to settler expansion in the Old Northwest."}),
+    E("canada","1812-06-18","United States declares war on Britain",[-77.04,38.90],{section:S.canada,wiki:"War of 1812",text:"Madison's war aims include ending impressment and taking Canada while Britain is absorbed in Europe."}),
+    E("canada","1812-08-16","Brock and Tecumseh take Detroit",L.DET,{section:S.canada,wiki:"Siege of Detroit",text:"Isaac Brock and Tecumseh force Hull to surrender Detroit, buying Upper Canada time."}),
+    E("canada","1812-10-13","Queenston Heights",[-79.05,43.16],{section:S.canada,wiki:"Battle of Queenston Heights",text:"Brock is killed, but the American crossing is defeated at Queenston Heights."}),
+    E("canada","1813-04-27","York is burned",L.TOR,{section:S.canada,wiki:"Battle of York",text:"American troops take and burn parts of York, the capital of Upper Canada."}),
+    E("canada","1813-10-05","Tecumseh dies at the Thames",[-81.98,42.56],{section:S.canada,wiki:"Battle of the Thames",text:"The British retreat from Detroit ends with Tecumseh's death and the collapse of his confederacy's battlefield power."}),
+    E("canada","1813-10-26","Chateauguay blocks the Montreal campaign",[-73.75,45.13],{section:S.canada,wiki:"Battle of the Chateauguay",text:"Charles de Salaberry and Canadian militia turn back an American advance toward Montreal."}),
+    E("canada","1814-12-24","Treaty of Ghent restores the pre-war border",[3.72,51.05],{section:S.canada,wiki:"Treaty of Ghent",text:"The Treaty of Ghent restores the status quo ante. The Great Lakes are later neutralized.",plate:"haiti-abolition-war-of-1812-atlantic-1791-1815"}),
+
+    E("ideas","1748","Montesquieu publishes The Spirit of the Laws",L.PAR,{section:S.theory,wiki:"The Spirit of Law",text:"Montesquieu turns separation of powers into a usable constitutional language."}),
+    E("ideas","1762","Rousseau publishes The Social Contract",[6.14,46.20],{section:S.theory,wiki:"The Social Contract",text:"Rousseau's popular sovereignty and general will become live ammunition in revolutionary politics."}),
+    E("ideas","1776","Adam Smith publishes The Wealth of Nations",[-3.19,55.95],{section:S.theory,wiki:"The Wealth of Nations",text:"Smith gives economic liberalism its most durable eighteenth-century statement."}),
+    E("america","1765","Stamp Act crisis",L.BOS,{section:S.america,wiki:"Stamp Act 1765",text:"Taxation without colonial representation turns imperial finance into a constitutional fight."}),
+    E("america","1773-12-16","Boston Tea Party",L.BOS,{section:S.america,wiki:"Boston Tea Party",text:"Boston radicals dump East India Company tea into the harbour; Britain answers by closing the port."}),
+    E("america","1774-09-05","First Continental Congress",L.PHI,{section:S.america,wiki:"First Continental Congress",text:"Twelve colonies coordinate resistance at Philadelphia while Quebec is being reorganized to the north."}),
+    E("america","1775-04-19","Lexington and Concord",[-71.23,42.45],{section:S.america,wiki:"Battles of Lexington and Concord",text:"The first armed clash begins the American War of Independence."}),
+    E("america","1776-07-04","Declaration of Independence",L.PHI,{section:S.america,wiki:"United States Declaration of Independence",text:"Jefferson's declaration makes natural rights and the right of political opposition part of a new state's founding language."}),
+    E("america","1777-10-17","Saratoga brings France in",L.SAR,{section:S.america,wiki:"Battles of Saratoga",text:"Saratoga persuades France that the American rebellion can survive."}),
+    E("america","1781-10-19","Yorktown",L.YORKT,{section:S.america,wiki:"Siege of Yorktown",text:"Washington and Rochambeau trap Cornwallis with French naval support."}),
+    E("america","1783-09-03","Peace of Paris recognizes the United States",L.PAR,{section:S.america,wiki:"Treaty of Paris (1783)",text:"Britain recognizes American independence. France gains little territory and more debt."}),
+    E("america","1787-09-17","United States Constitution issued",L.PHI,{section:S.america,wiki:"Constitution of the United States",text:"The Philadelphia convention turns a loose confederation into a federal republic with checks and balances."}),
+    E("america","1803","Louisiana Purchase",[-90.07,29.95],{section:S.america,wiki:"Louisiana Purchase",text:"Jefferson buys Louisiana from Napoleon, opening the Mississippi and doubling the claimed size of the United States."}),
+    E("america","1807","United States bans the importation of enslaved people",L.WASH,{section:S.atlantic,wiki:"Act Prohibiting Importation of Slaves",text:"The United States bars the overseas slave trade from 1808, while domestic slavery expands westward."}),
+
+    E("france","1789-05-05","Estates General opens at Versailles",L.VERS,{section:S.france,wiki:"Estates General of 1789",text:"The fiscal crisis forces Louis XVI to summon the Estates General for the first time since 1614.",plate:"french-revolution-france-1789-1799"}),
+    E("france","1789-06-20","Tennis Court Oath",L.VERS,{section:S.france,wiki:"Tennis Court Oath",text:"Deputies of the Third Estate swear not to separate until France has a constitution."}),
+    E("france","1789-07-14","Storming of the Bastille",L.PAR,{section:S.france,wiki:"Storming of the Bastille",text:"Paris takes the Bastille; the king loses the ability to govern without the street and the National Assembly."}),
+    E("france","1789-08-26","Declaration of the Rights of Man",L.PAR,{section:S.france,wiki:"Declaration of the Rights of Man and of the Citizen",text:"The Assembly proclaims liberty, equality before the law and the rights of citizens."}),
+    E("france","1791-09-03","Constitution of 1791",L.PAR,{section:S.france,wiki:"French Constitution of 1791",text:"France becomes a constitutional monarchy with active-citizen suffrage and a weak executive."}),
+    E("france","1792-08-10","Tuileries stormed",L.PAR,{section:S.france,wiki:"Insurrection of 10 August 1792",text:"The monarchy is overthrown under pressure from war, suspicion and the Paris sections."}),
+    E("france","1793-01-21","Louis XVI executed",L.PAR,{section:S.france,wiki:"Execution of Louis XVI",text:"The king's execution brings Britain and other powers fully into the war."}),
+    E("france","1793-07","Committee of Public Safety dominates the Terror",L.PAR,{section:S.france,wiki:"Committee of Public Safety",text:"Robespierre and the Jacobins use emergency government, requisition and terror to defend the republic."}),
+    E("france","1794-07-28","Robespierre falls",L.PAR,{section:S.france,wiki:"Fall of Maximilien Robespierre",text:"Thermidor ends the Jacobin dictatorship and begins a conservative reaction."}),
+    E("france","1795-10-05","Napoleon suppresses the royalist rising",L.PAR,{section:S.france,wiki:"13 Vendémiaire",text:"Barras relies on Napoleon's artillery to save the Directory from a royalist rising."}),
+    E("france","1799-11-09","Coup of 18 Brumaire",L.PAR,{section:S.france,wiki:"Coup of 18 Brumaire",text:"Napoleon overthrows the Directory and begins the Consulate."}),
+    E("france","1804-03-21","Code Napoleon",L.PAR,{section:S.france,wiki:"Napoleonic Code",text:"The Civil Code secures equality before the law, property and civil marriage while reinforcing patriarchal authority."}),
+    E("france","1804-12-02","Napoleon crowned emperor",L.PAR,{section:S.france,wiki:"Coronation of Napoleon",text:"The revolutionary general becomes hereditary emperor in Notre-Dame."}),
+    E("europe","1792-09-20","Valmy",L.VAL,{section:S.europe,wiki:"Battle of Valmy",text:"The Prussian retreat after Valmy saves the Revolution and gives the new republic time."}),
+    E("europe","1796","Napoleon's Italian campaign",[9.19,45.46],{section:S.europe,wiki:"Italian campaigns of the French Revolutionary Wars",text:"Napoleon breaks Austria in northern Italy and creates daughter republics."}),
+    E("europe","1798","Napoleon lands in Egypt",L.CAIRO,{section:S.india,wiki:"French campaign in Egypt and Syria",text:"Napoleon strikes at Britain's route to India through Egypt, bringing soldiers, engineers and scholars."}),
+    E("europe","1798-08-01","Nelson wins at Aboukir Bay",[30.10,31.33],{section:S.india,wiki:"Battle of the Nile",text:"The British fleet destroys Napoleon's fleet and leaves the French army isolated in Egypt."}),
+    E("europe","1805-10-21","Trafalgar secures British sea power",[-6.25,36.18],{section:S.britain,wiki:"Battle of Trafalgar",text:"Nelson dies, but the French invasion threat to Britain is finished."}),
+    E("europe","1805-12-02","Austerlitz",[16.76,49.13],{section:S.europe,wiki:"Battle of Austerlitz",text:"Napoleon defeats Austria and Russia in the Three Emperors' Battle."}),
+    E("europe","1806-08-06","Holy Roman Empire ends",L.VIEN,{section:S.germany,wiki:"Dissolution of the Holy Roman Empire",text:"Francis II gives up the imperial crown after the Confederation of the Rhine is formed."}),
+    E("europe","1806-10-14","Jena and Auerstedt",[11.58,50.93],{section:S.germany,wiki:"Battle of Jena–Auerstedt",text:"Prussia collapses militarily and morally after the double battle."}),
+    E("europe","1806-11-21","Berlin Decree begins the Continental System",L.BER,{section:S.europe,wiki:"Berlin Decree",text:"Napoleon tries to close the Continent to British trade."}),
+    E("europe","1807-07","Tilsit",[21.88,55.08],{section:S.europe,wiki:"Treaties of Tilsit",text:"Russia joins Napoleon's system, and Prussia is cut down under occupation."}),
+    E("europe","1808-05-02","Madrid rises against French occupation",L.MAD,{section:S.europe,wiki:"Dos de Mayo Uprising",text:"Spanish resistance turns occupation into a guerrilla and British-supported war."}),
+    E("europe","1812-06-24","Grande Armee crosses the Niemen",[23.90,54.90],{section:S.europe,wiki:"French invasion of Russia",text:"Napoleon invades Russia to enforce the Continental System.",plate:"napoleonic-europe-empire-1812"}),
+    E("europe","1812-09-14","Napoleon enters Moscow",L.MOS,{section:S.europe,wiki:"French occupation of Moscow",text:"Moscow is occupied and burns. Alexander refuses peace.",plate:"napoleonic-europe-empire-1812"}),
+    E("europe","1813-10-16","Leipzig",L.LEIP,{section:S.europe,wiki:"Battle of Leipzig",text:"The Battle of the Nations breaks the Napoleonic system in Germany."}),
+    E("europe","1814-04-06","Napoleon abdicates at Fontainebleau",[2.70,48.40],{section:S.europe,wiki:"Treaty of Fontainebleau (1814)",text:"The army forces Napoleon to abdicate. The Bourbons return under Louis XVIII."}),
+    E("europe","1815-06-18","Waterloo",L.WATER,{section:S.europe,wiki:"Battle of Waterloo",text:"Wellington and Blucher defeat Napoleon's last army."}),
+    E("europe","1815-06-09","Final Act of the Congress of Vienna",L.VIEN,{section:S.vienna,wiki:"Congress of Vienna",text:"The settlement restores a balance among the great powers and builds a conservative European order.",plate:"congress-vienna-settlement-1815"}),
+
+    E("britain","1788","Sydney penal settlement begins",[151.21,-33.87],{section:S.britain,wiki:"History of Sydney",text:"Britain begins a penal colony at Sydney after losing the American colonies."}),
+    E("britain","1791","Constitutional Act reorganizes Canada",L.QUE,{section:S.britain,wiki:"Constitutional Act 1791",text:"Canada is divided into Lower Canada and Upper Canada as part of Britain's post-American imperial stabilization."}),
+    E("britain","1801","Act of Union joins Ireland to Great Britain",[-6.26,53.35],{section:S.britain,wiki:"Acts of Union 1800",text:"Ireland is joined to the United Kingdom after rebellion and French war scares."}),
+    E("britain","1803","Wellesley defeats Maratha power in India",L.PUNE,{section:S.india,wiki:"Second Anglo-Maratha War",text:"Richard Wellesley's wars extend Company power on the eastern and central Indian fronts."}),
+    E("britain","1807","Britain abolishes the Atlantic slave trade",L.LON,{section:S.atlantic,wiki:"Slave Trade Act 1807",text:"Parliament abolishes British participation in the Atlantic slave trade, though slavery in British colonies remains."}),
+    E("britain","1811","Luddite machine-breaking begins",[-1.15,52.95],{section:S.britain,wiki:"Luddite",text:"Industrial pressure, war disruption and hunger produce anti-machine riots in the textile districts."}),
+    E("germany","1807","Prussian emancipation edict",L.BER,{section:S.germany,wiki:"Prussian Reform Movement",text:"Stein and Hardenberg begin a reform from above after Prussia's collapse."}),
+    E("germany","1810","Berlin University founded",L.BER,{section:S.germany,wiki:"Humboldt University of Berlin",text:"Humboldt's university gives the reform state an educational model built around research and teaching."}),
+    E("germany","1812","Prussia emancipates Jews",L.BER,{section:S.germany,wiki:"Prussian Edict of Emancipation",text:"The reform state grants Jews civil rights, though equality remains incomplete."}),
+    E("atlantic","1791-08","Haitian Revolution begins",L.CAP,{section:S.atlantic,wiki:"Haitian Revolution",text:"Enslaved people in Saint-Domingue begin the revolution that will destroy slavery and French colonial rule."}),
+    E("atlantic","1794","French Convention abolishes slavery in the colonies",L.PAR,{section:S.atlantic,wiki:"Abolitionism in France",text:"The republic abolishes slavery after the uprising in Saint-Domingue changes what liberty can mean."}),
+    E("atlantic","1802","Toussaint Louverture is deported",L.CAP,{section:S.atlantic,wiki:"Toussaint Louverture",text:"Napoleon's expedition arrests Toussaint Louverture while trying to restore French control."}),
+    E("atlantic","1804-01-01","Haiti declares independence",L.PORT,{section:S.atlantic,wiki:"Haitian Declaration of Independence",text:"Haiti becomes the first Black republic and the first state born from a successful slave revolution.",plate:"haiti-abolition-war-of-1812-atlantic-1791-1815"}),
+    E("atlantic","1810","Spanish American juntas begin independence movements",L.CAR,{section:S.atlantic,wiki:"Spanish American wars of independence",text:"Juntas in Caracas, Buenos Aires and elsewhere open the Latin American independence cycle."}),
+    E("atlantic","1810-05-25","Buenos Aires forms a junta",L.BUEN,{section:S.atlantic,wiki:"May Revolution",text:"The May Revolution in Buenos Aires becomes one of the starts of Spanish America's independence wars."})
+  ];
+  const leaders = [
+    R("George III","Britain","britain","1738","1820","1760","1820",S.britain,{wiki:"George III"}),
+    R("George Washington","United States","america","1732","1799","1789","1797",S.america,{wiki:"George Washington"}),
+    R("Thomas Jefferson","United States","america","1743","1826","1801","1809",S.america,{wiki:"Thomas Jefferson"}),
+    R("James Madison","United States","america","1751","1836","1809","1817",S.america,{wiki:"James Madison"}),
+    R("Louis XVI","France","france","1754","1793","1774","1792",S.france,{wiki:"Louis XVI"}),
+    R("Robespierre","France","jacobin","1758","1794","1793","1794",S.france,{wiki:"Maximilien Robespierre"}),
+    R("Napoleon I","France","napoleon","1769","1821","1799","1815",S.europe,{wiki:"Napoleon"}),
+    R("Alexander I","Russia","russia","1777","1825","1801","1825",S.europe,{wiki:"Alexander I of Russia"}),
+    R("William Pitt the Younger","Britain","britain","1759","1806","1783","1806",S.britain,{wiki:"William Pitt the Younger"}),
+    R("Metternich","Austria","austria","1773","1859","1809","1815",S.vienna,{wiki:"Klemens von Metternich"})
+  ];
+  const chapters = [
+    {id:"part-atlantic-revolutions",title:"Atlantic revolutions",start:"1748",end:"1815",section:S.america,region:"americas",text:"The Atlantic revolutions connect British imperial reform, the American Revolution, Loyalist migration to Canada, the French fiscal crisis and the Haitian Revolution. Canada is part of the story from the Quebec Act and the failed invasion of Quebec to the Loyalist north.",bbox:[[-85,15],[-55,52]]},
+    {id:"ch-theory-revolution",parent:"part-atlantic-revolutions",title:"Ideas before revolution",start:"1748",end:"1776",section:S.theory,region:"europe",text:"Montesquieu, Rousseau and Adam Smith give the age a vocabulary for separation of powers, popular sovereignty and economic liberalism before the revolutions make those ideas institutional problems.",bbox:[[-5,43],[8,56]]},
+    {id:"ch-american-revolution-loyalist-north",parent:"part-atlantic-revolutions",title:"American Revolution and the Loyalist north",start:"1763",end:"1784",plate:"american-revolution-loyalist-north-1763-1783",section:S.canada,region:"americas",text:"The American Revolution begins in imperial crisis, but the northern story matters: the Quebec Act, the American invasion of Quebec, Indigenous alliances and Loyalist migration shape British North America as much as Yorktown shapes the United States.",bbox:[[-84,36],[-60,50]]},
+    {id:"ch-united-states-constitution-west",parent:"part-atlantic-revolutions",title:"United States, constitution and westward expansion",start:"1783",end:"1815",section:S.america,region:"americas",text:"The United States moves from Articles of Confederation to a federal constitution, Louisiana and westward settlement. The same expansion sharpens conflict with Indigenous nations and helps lead to the War of 1812.",bbox:[[-100,25],[-70,48]]},
+    {id:"ch-haiti-abolition-atlantic",parent:"part-atlantic-revolutions",title:"Haiti, abolition and the Atlantic world",start:"1791",end:"1815",plate:"haiti-abolition-war-of-1812-atlantic-1791-1815",section:S.atlantic,region:"americas",text:"The Haitian Revolution, Toussaint Louverture, Haitian independence, British abolition of the slave trade, the United States ban, Tecumseh and the War of 1812 put slavery, empire and Indigenous sovereignty inside the age of revolution without reducing the period to oppression alone.",bbox:[[-85,14],[-55,50]]},
+    {id:"part-french-revolution",title:"France and revolutionary war",start:"1774",end:"1799",section:S.france,region:"europe",text:"France moves from fiscal crisis and the Estates General through constitutional monarchy, republic, Terror, Directory and military dictatorship. The war carries the revolution across Europe and into Egypt.",bbox:[[-6,42],[16,52]]},
+    {id:"ch-france-before-1789",parent:"part-french-revolution",title:"France before 1789",start:"1774",end:"1788",section:S.france,region:"europe",text:"Louis XVI inherits a state with privileged estates, the Third Estate, cahiers, a broken fiscal system, parlements, grain unrest and public opinion sharpened by the Enlightenment and the American war debt.",bbox:[[-5,42],[8,51]]},
+    {id:"ch-french-revolution-1789-1799",parent:"part-french-revolution",title:"The French Revolution in France",start:"1789",end:"1799",plate:"french-revolution-france-1789-1799",section:S.france,region:"europe",text:"The French Revolution in France runs from Versailles and the Bastille to the Rights of Man, the constitutional monarchy, the republic, the Terror, Thermidor and the Directory. Paris, the provinces and the war all press on one another.",bbox:[[-5,42],[8,51]]},
+    {id:"ch-europe-1792-1799",parent:"part-french-revolution",title:"Europe and Egypt, 1792-1799",start:"1792",end:"1799",section:S.europe,region:"europe",text:"The first coalition war makes the Revolution a European war. Valmy, Belgium, the Rhine, Napoleon's Italian campaign and the Egyptian expedition show how a national army and a bankrupt Directory turn war into expansion.",bbox:[[-10,30],[35,56]]},
+    {id:"part-napoleonic-system",title:"The Napoleonic system",start:"1783",end:"1815",section:S.europe,region:"europe",text:"Napoleon turns revolutionary energy into the Napoleonic system, an imperial system of annexations, family kingdoms, dependent states and allies. The Continental System, Spain, Russia and German reform reveal both the power and the limits of that system.",bbox:[[-10,35],[38,57]]},
+    {id:"ch-napoleonic-france-1799-1812",parent:"part-napoleonic-system",title:"Napoleonic France",start:"1799",end:"1812",section:S.france,region:"europe",text:"The Consulate and Empire centralize administration, education, finance, police and law. The Code Napoleon carries some revolutionary gains while the regime becomes a military dictatorship and hereditary empire.",bbox:[[-5,42],[8,51]]},
+    {id:"ch-napoleonic-europe-1812",parent:"part-napoleonic-system",title:"Napoleonic Europe at its height",start:"1804",end:"1812",plate:"napoleonic-europe-empire-1812",section:S.europe,region:"europe",text:"Napoleonic Europe at its height contains France, annexed departments, dependent kingdoms, allies and the Continental System trade war against Britain. The Russian campaign of 1812 exposes the system's dependence on coercion and logistics.",bbox:[[-10,35],[38,57]]},
+    {id:"ch-britain-war-empire",parent:"part-napoleonic-system",title:"Britain, war and world power",start:"1783",end:"1815",section:S.britain,region:"europe",text:"Britain absorbs the loss of America, reorganizes Canada, builds India and Australia into the empire, fights France with money and navy, abolishes the slave trade and faces industrial distress at home.",bbox:[[-15,35],[90,60]]},
+    {id:"ch-germany-reform-national",parent:"part-napoleonic-system",title:"Germany, reform and national consciousness",start:"1797",end:"1814",section:S.germany,region:"europe",text:"The Holy Roman Empire dissolves, the Confederation of the Rhine reorganizes Germany, Prussia collapses and reforms, and German national consciousness turns from culture toward anti-Napoleonic politics.",bbox:[[5,47],[25,56]]},
+    {id:"ch-wars-liberation-vienna",parent:"part-napoleonic-system",title:"Wars of Liberation and Vienna",start:"1812",end:"1815",plate:"congress-vienna-settlement-1815",section:S.vienna,region:"europe",text:"The Wars of Liberation begin with Russia and Prussia, widen through Austria and Britain, defeat Napoleon at Leipzig, Paris and Waterloo, then settle Europe at the Congress of Vienna around restoration, legitimacy and balance of power.",bbox:[[-5,42],[35,58]]}
+  ];
+  const books = [];
+  window.DATASETS = window.DATASETS || {};
+  window.DATASETS["revolution"] = {
+    id:"revolution", title:"The age of revolution", subtitle:"1763-1815", range:["1748-01-01","1815-12-31"], gapAfter:"1815-1939 not yet built (Penguin Vol. 2)", startAt:"1789", precision:"year",
+    note:"Amit's Notes of the History of the World/The age of revolution",
+    mapNote:"The quiet underlay is the nearest historical-basemaps state map. The story layers are schematic fields and routes from the Penguin Atlas spreads; Canada is kept first, and Indigenous nations are shown as political actors where the period data supports it.",
+    lanes:[{id:"canada",label:"Canada, Indigenous nations and Loyalists",colour:"#b22d2d",pinned:true},{id:"ideas",label:"Ideas and political economy",colour:"#6b6b6b"},{id:"america",label:"United States",colour:"#2f7f86"},{id:"france",label:"France and revolution",colour:"#8c3b3b"},{id:"europe",label:"Napoleonic Europe",colour:"#7a5a8c"},{id:"britain",label:"Britain and empire",colour:"#2f5f93"},{id:"germany",label:"Germany and reform",colour:"#6b8c3f"},{id:"atlantic",label:"Haiti, slavery and Latin America",colour:"#b36b2e"},{id:"india",label:"Egypt and India",colour:"#8c6d3f"}],
+    chapterRegions:{"part-atlantic-revolutions":"americas","ch-theory-revolution":"europe","ch-american-revolution-loyalist-north":"americas","ch-united-states-constitution-west":"americas","ch-haiti-abolition-atlantic":"americas","part-french-revolution":"europe","ch-france-before-1789":"europe","ch-french-revolution-1789-1799":"europe","ch-europe-1792-1799":"europe","part-napoleonic-system":"europe","ch-napoleonic-france-1799-1812":"europe","ch-napoleonic-europe-1812":"europe","ch-britain-war-empire":"europe","ch-germany-reform-national":"europe","ch-wars-liberation-vienna":"europe"},
+    events, leaders, chapters, books,
+    colours:{lanes:{canada:"#b22d2d",ideas:"#6b6b6b",america:"#2f7f86",france:"#8c3b3b",europe:"#7a5a8c",britain:"#2f5f93",germany:"#6b8c3f",atlantic:"#b36b2e",india:"#8c6d3f"},sides:{britain:"#2f5f93",america:"#2f7f86",france:"#8c3b3b",jacobin:"#b22d2d",napoleon:"#7a5a8c",russia:"#6b8c3f",austria:"#d8a84f"}},
+    plates:[
+      {id:"american-revolution-loyalist-north-1763-1783",title:"American Revolution and the Loyalist north",start:"1763",end:"1784"},
+      {id:"french-revolution-france-1789-1799",title:"The French Revolution in France",start:"1789",end:"1799"},
+      {id:"napoleonic-europe-empire-1812",title:"Napoleonic Europe at its height",start:"1804",end:"1812"},
+      {id:"congress-vienna-settlement-1815",title:"The Congress of Vienna settlement",start:"1814",end:"1815"},
+      {id:"haiti-abolition-war-of-1812-atlantic-1791-1815",title:"Haiti, abolition and the War of 1812",start:"1791",end:"1815"}
+    ],
+    changelog:["Added in v1.2.0-dev for Penguin Atlas Vol. 2 round 1: Atlantic revolution, Canada and Loyalists, France, Napoleon, Haiti, War of 1812 and Vienna."]
+  };
+})();

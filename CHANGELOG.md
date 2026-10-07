@@ -9,6 +9,7 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 
 ## 1.2.0 (Unreleased / 1.2.0-dev)
 
+- Added Penguin Atlas Vol. 2 round 1: the age of revolution period, chapter scenes, five plates, Canada-first War of 1812 coverage, Haiti and abolition, and the master-strip gap moved to 1815-1939.
 - Books button opens reading shelves (`app/data/reading.js`): the Western lens, comparing colonial powers, after empire, the Atlantic slave trade, slavery to Obama and the backlash; tour shelves pull their reading from the tour and link to it.
 
 ## 1.1.0 (7 Oct 2026)
