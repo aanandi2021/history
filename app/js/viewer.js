@@ -1562,6 +1562,7 @@
     else keepInView(p.date, 0.5);
     tlSvg.selectAll("g.item").classed("sel", (d) => d && d.id === state.selected);
     setCursor(p.date);
+    if (!item && state.follow) followChapter(p.date);
     renderCard();
     if (p.query && p.query.tour && window.TOURS && window.TOURS[p.query.tour]) { state.tour = window.TOURS[p.query.tour]; state.tourStop = Math.max(0, Math.min(+p.query.stop || 0, state.tour.stops.length)); renderTourCard(); }
     else if (!state.tour) renderTourCard();

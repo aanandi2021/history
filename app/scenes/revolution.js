@@ -1,8 +1,8 @@
 // Chapter scenes for the Age of Revolution and Napoleonic Age.
 window.SCENES = window.SCENES || {};
 (function () {
-  const CAN="#b22d2d", USA="#2f7f86", FRA="#8c3b3b", NAP="#7a5a8c", BRIT="#2f5f93", IND="#8c6d3f", HAITI="#b36b2e", AUS="#d8a84f", RUS="#6b8c3f", PRUS="#4f7f4f", ROAD="#5b4a3f";
-  (window.SCENE_ACTORS = window.SCENE_ACTORS || {})["revolution"] = { [CAN]:"Canada and British North America", [USA]:"United States", [FRA]:"Revolutionary France", [NAP]:"Napoleonic France", [BRIT]:"Britain and empire", [IND]:"Indigenous nations", [HAITI]:"Haiti and abolition", [AUS]:"Austria", [RUS]:"Russia", [PRUS]:"Prussia" };
+  const CAN="#b22d2d", USA="#2f7f86", FRA="#8c3b3b", NAP="#7a5a8c", BRIT="#2f5f93", IND="#8c6d3f", HAITI="#b36b2e", AUS="#d8a84f", RUS="#6b8c3f", PRUS="#4f7f4f", OTT="#9a6a32", ASIA="#387a5b", AFR="#7a6b42", ROAD="#5b4a3f";
+  (window.SCENE_ACTORS = window.SCENE_ACTORS || {})["revolution"] = { [CAN]:"Canada and British North America", [USA]:"United States", [FRA]:"Revolutionary France", [NAP]:"Napoleonic France", [BRIT]:"Britain and empire", [IND]:"Indigenous nations", [HAITI]:"Haiti and abolition", [AUS]:"Austria", [RUS]:"Russia", [PRUS]:"Prussia", [OTT]:"Ottoman world and Egypt", [ASIA]:"India and Qing China", [AFR]:"Africa and Atlantic bases" };
   window.SCENES["revolution"] = {
     "part-atlantic-revolutions": { caption:"Atlantic revolution runs through Boston, Quebec, Paris and Saint-Domingue.", bbox:[[-85,14],[-55,52]], layers:[
       {type:"area",name:"British North America",tier:"core",colour:CAN,around:[[-66,43],[-72,47],[-79,45],[-82,43],[-75,42],[-70,44]]},
@@ -93,7 +93,24 @@ window.SCENES = window.SCENES || {};
       {type:"route",style:"dashed",colour:AUS,name:"Austria joins",path:[[16.37,48.21],[12.37,51.34],[2.35,48.86]]},
       {type:"route",style:"dashed",colour:BRIT,name:"Waterloo campaign",path:[[-0.13,51.51],[4.35,50.85],[4.40,50.68],[2.35,48.86]]},
       {type:"point",symbol:"battle",name:"Leipzig",at:[12.37,51.34],tag:{text:"1813",colour:"#f1c75b"}}, {type:"point",symbol:"capital",name:"Paris",at:[2.35,48.86]}, {type:"point",symbol:"battle",name:"Waterloo",at:[4.40,50.68]}, {type:"point",symbol:"treaty",name:"Vienna",at:[16.37,48.21],tag:{text:"1815",colour:"#f1c75b"}}
-    ], terms:[{t:"Wars of Liberation",wiki:"German campaign of 1813"},{t:"Waterloo",wiki:"Battle of Waterloo"},{t:"Congress of Vienna",wiki:"Congress of Vienna",star:"Why did the settlement restore dynasties but not restore the old map?"},{t:"balance of power",wiki:"Balance of power (international relations)"}]}
+    ], terms:[{t:"Wars of Liberation",wiki:"German campaign of 1813"},{t:"Waterloo",wiki:"Battle of Waterloo"},{t:"Congress of Vienna",wiki:"Congress of Vienna",star:"Why did the settlement restore dynasties but not restore the old map?"},{t:"balance of power",wiki:"Balance of power (international relations)"}]},
+    "ch-islamic-ottoman-egypt": { caption:"Egypt, Syria, Istanbul and Serbia put the Ottoman world inside the revolutionary age.", bbox:[[18,28],[36,46]], layers:[
+      {type:"area",name:"Ottoman world",tier:"core",colour:OTT,around:[[20,38],[28,42],[35,40],[34,32],[30,29],[24,33]]},
+      {type:"route",style:"dashed",colour:NAP,name:"French expedition",path:[[5.37,43.30],[29.92,31.20],[31.24,30.04],[35.08,32.92]]},
+      {type:"point",symbol:"battle",name:"Pyramids",at:[31.13,29.98],tag:{text:"1798",colour:"#f1c75b"}}, {type:"point",symbol:"battle",name:"The Nile",at:[30.10,31.33]}, {type:"point",symbol:"find",name:"Rosetta Stone",at:[30.63,31.40]}, {type:"point",symbol:"fortress",name:"Acre",at:[35.08,32.92]}, {type:"point",symbol:"capital",name:"Istanbul",at:[28.98,41.01]}, {type:"point",symbol:"insurrection",name:"Serbian rising",at:[20.56,44.23]}
+    ], terms:[{t:"Bonaparte in Egypt and Syria",wiki:"French campaign in Egypt and Syria"},{t:"the Nile",wiki:"Battle of the Nile"},{t:"Rosetta Stone",wiki:"Rosetta Stone"},{t:"Selim III",wiki:"Selim III"},{t:"Serbian rising",wiki:"First Serbian Uprising"}]},
+    "ch-asia-india-qing": { caption:"Qing China and British India face the same age of pressure from European trade and war.", bbox:[[70,10],[125,45]], layers:[
+      {type:"area",name:"British India",tier:"core",colour:BRIT,around:[[73,8],[78,28],[89,26],[92,20],[82,12]]},
+      {type:"area",name:"Qing China",tier:"influence",colour:ASIA,around:[[95,22],[105,38],[122,42],[123,27],[110,20]]},
+      {type:"route",style:"dashed",colour:BRIT,name:"Company campaigns",path:[[88.36,22.57],[77.21,28.61],[75.89,20.25],[76.68,12.42]]},
+      {type:"point",symbol:"treaty",name:"Macartney embassy",at:[116.40,39.90],tag:{text:"1793",colour:"#f1c75b"}}, {type:"point",symbol:"battle",name:"Seringapatam",at:[76.68,12.42],tag:{text:"1799",colour:"#e8806a"}}, {type:"point",symbol:"battle",name:"Assaye",at:[75.89,20.25]}, {type:"point",symbol:"capital",name:"Delhi",at:[77.21,28.61]}, {type:"point",symbol:"port",name:"Calcutta",at:[88.36,22.57]}
+    ], terms:[{t:"Macartney embassy",wiki:"Macartney Embassy"},{t:"Tipu Sultan",wiki:"Tipu Sultan"},{t:"Wellesley",wiki:"Richard Wellesley, 1st Marquess Wellesley"},{t:"Maratha wars",wiki:"Second Anglo-Maratha War"}]},
+    "ch-africa-atlantic-bases": { caption:"Sierra Leone and the Cape connect abolition to Atlantic and Indian Ocean strategy.", bbox:[[-18,-36],[30,12]], layers:[
+      {type:"area",name:"Cape Colony",tier:"core",colour:BRIT,around:[[16,-35],[20,-34],[20,-32],[17,-31],[15,-33]]},
+      {type:"area",name:"Sierra Leone",tier:"core",colour:AFR,around:[[-14,7],[-12,7],[-12,9],[-14,9]]},
+      {type:"route",style:"dotted",colour:BRIT,name:"route to India",path:[[-0.13,51.51],[-13.23,8.49],[18.42,-33.93],[77.21,28.61]]},
+      {type:"point",symbol:"port",name:"Freetown",at:[-13.23,8.49],tag:{text:"1787 / 1808",colour:"#f1c75b"}}, {type:"point",symbol:"port",name:"Cape Town",at:[18.42,-33.93],tag:{text:"1795 / 1806",colour:"#f1c75b"}}
+    ], terms:[{t:"Sierra Leone",wiki:"Sierra Leone Colony and Protectorate"},{t:"Cape Colony",wiki:"Cape Colony"},{t:"abolition",wiki:"Abolitionism"},{t:"route to India",wiki:"Cape of Good Hope"}]}
   };
 })();
 

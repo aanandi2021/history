@@ -231,6 +231,8 @@
   function focusChapter(ds, t, span, ok = () => true, share = 0.2) {
     const cands = activeChapters(ds, t).filter(ok).sort((a, b) => (a.t1 - a.t0) - (b.t1 - b.t0));
     if (!cands.length) return null;
+    const priority = cands.filter((c) => Number.isFinite(c.focusPriority)).sort((a, b) => b.focusPriority - a.focusPriority || (a.t1 - a.t0) - (b.t1 - b.t0));
+    if (priority.length) return priority[0];
     return (span && cands.find((c) => c.t1 - c.t0 >= span * share)) || cands[0];
   }
 
