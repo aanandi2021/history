@@ -177,6 +177,20 @@ test("e2e: selecting a detail opens its folded parts and shows breadcrumbs; a pa
   await ctx.close();
 });
 
+test("e2e: a deep link to a nested chapter unfolds it, and a child in another region shows in that lane", async () => {
+  const { page, errors, ctx } = await open("#maritime/0800/ch-building-borobudur");
+  await settle();
+  assert.equal(await page.evaluate(() => APP.isFolded("ch-the-monsoon-road")), false);
+  assert.ok(await page.$('#tl g.chapter[data-id="ch-building-borobudur"]'), "the linked chapter is on the timeline");
+  const b = await open("#maritime/0800/ch-abbasid-baghdad");
+  await settle();
+  assert.ok(await b.page.$('#tl g.chapter[data-id="ch-abbasid-baghdad"]'), "Baghdad shows in the Islamic-world lane");
+  assert.equal(await b.page.$eval('#tl .region-chip[data-region="islamic"]', (g) => g.classList.contains("empty")), false);
+  assert.deepEqual(errors.concat(b.errors), []);
+  await b.ctx.close();
+  await ctx.close();
+});
+
 
 
 test("e2e: follow focus prefers the local medieval story over Asia", async () => {

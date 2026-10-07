@@ -382,7 +382,7 @@
   window.DATASETS = window.DATASETS || {};
   window.DATASETS.medieval = {
     id:"medieval", title:"The Middle Ages", subtitle:"AD 500-1500", range:["0500-01-01","1501-01-01"], startAt:"0800", precision:"year",
-    mapNote:"No historical borders. Areas show influence, settlement or claims at the scale of the story. This period deliberately overlaps late antiquity from AD 500 to 700.",
+    mapNote:"The muted backdrop is a period map at the nearest mapped date; its borders are approximate. Coloured areas show influence, settlement or claims at the scale of the story. This period deliberately overlaps late antiquity from AD 500 to 700.",
     lanes:[{id:"canada",label:"Canada & the Americas",pinned:true},{id:"west",label:"Western Europe"},{id:"byz",label:"Byzantium"},{id:"islam",label:"Islamic world"},{id:"steppe",label:"Steppe & Rus"},{id:"asia",label:"Asia"}],
     chapterRegions:{"ch-western-europe":"europe","ch-byzantium":"europe","ch-early-islam":"islamic","ch-steppe-rus":"asia","ch-medieval-asia":"asia"},
     events, leaders, chapters, books,

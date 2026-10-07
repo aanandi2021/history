@@ -1115,7 +1115,7 @@
 
     // Chapters: grouped into regional lanes. Parts are folded by default; selected chapters narrow to their lane.
     section("Chapters");
-    const regionCounts = new Map(TL_REGIONS.map((r) => [r, ds.chapters.filter((c) => (c.children.length || !c.parentId) && chapterRegion(c) === r).length]));
+    const regionCounts = new Map(TL_REGIONS.map((r) => [r, ds.chapters.filter((c) => chapterRegion(c) === r).length]));
     const currentRegion = activeRegionFilter();
     const chipG = root.append("g").attr("class", "region-filters").attr("transform", `translate(8,${y - 4})`);
     chipG.append("text").attr("class", "region-filter-label").attr("x", 0).attr("y", 12).text("Regions");
@@ -1558,7 +1558,7 @@
     const item = p.item && state.ds.byId.get(p.item);
     state.selected = item ? item.id : null;
     state.pinned = !!(item || /^#[^/]+\/[^/]+/.test(location.hash));
-    if (item && item.kind === "chapter") zoomChapter(item.id);
+    if (item && item.kind === "chapter") { unfoldTo(item); zoomChapter(item.id); }
     else keepInView(p.date, 0.5);
     tlSvg.selectAll("g.item").classed("sel", (d) => d && d.id === state.selected);
     setCursor(p.date);

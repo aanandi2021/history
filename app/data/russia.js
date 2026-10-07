@@ -311,7 +311,7 @@
     range: ["1450-01-01", "1946-01-01"],
     startAt: "1480-11",
     note: "Amit's Notes of the History of the World/Russia — Muscovy to Stalin (1480–1941)",
-    mapNote: "No historical borders yet. The map uses today's countries as a backdrop; pins show where things happened and chapters zoom to the region.",
+    mapNote: "The muted backdrop is a period map at the nearest mapped date; its borders are approximate. Pins show where things happened and chapters zoom to the region.",
     lanes: [
       { id: "canada", label: "Canada & the Americas", pinned: true },
       { id: "russia", label: "Russia" },

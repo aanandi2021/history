@@ -586,6 +586,12 @@ window.ARTIFACTS = {
    "date": "2026-10-07",
    "subject": "Improve historical underlay contrast",
    "stat": "2 files changed, 127 insertions(+), 27 deletions(-)"
+  },
+  {
+   "hash": "48e5294",
+   "date": "2026-10-07",
+   "subject": "Link the manual from help; refresh README viewer section; add smoke sweep",
+   "stat": "4 files changed, 332 insertions(+), 6 deletions(-)"
   }
  ]
 };

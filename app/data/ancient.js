@@ -186,7 +186,7 @@
     range: ["-1800-01-01", "0701-01-01"],
     startAt: "-0218",
     precision: "year",
-    mapNote: "No historical borders. Today's countries are a backdrop. Dates before about 500 BC are often approximate; Hammurabi follows the middle chronology.",
+    mapNote: "The muted backdrop is a period map at the nearest mapped date; its borders are approximate. Dates before about 500 BC are often approximate; Hammurabi follows the middle chronology.",
     lanes: [
       { id: "canada", label: "Canada & the Americas", pinned: true },
       { id: "neareast", label: "Mesopotamia & the Near East" },

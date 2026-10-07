@@ -210,7 +210,7 @@
     startAt: "0755",
     precision: "year",
     note: "Amit's Notes of the History of the World/Maritime Asia — Bengal, Srivijaya and Java (750–850)",
-    mapNote: "No historical borders. Today's countries are a backdrop. Most dates before 900 are approximate, and the green lane is Amit's fiction, not history.",
+    mapNote: "The muted backdrop is a period map at the nearest mapped date; its borders are approximate. Most dates before 900 are approximate, and the green lane is Amit's fiction, not history.",
     lanes: [
       { id: "canada", label: "Canada & the Americas", pinned: true },
       { id: "india", label: "Bengal & India" },
@@ -219,7 +219,7 @@
       { id: "west", label: "Baghdad & Europe" },
       { id: "unseen", label: "The Unseen Tomorrow (Amit's fiction)", fiction: true }
     ],
-    chapterRegions:{"ch-the-monsoon-road":"asia","ch-charlemagne-s-europe":"europe","ch-turtle-island":"americas"},
+    chapterRegions:{"ch-the-monsoon-road":"asia","ch-abbasid-baghdad":"islamic","ch-charlemagne-s-europe":"europe","ch-turtle-island":"americas"},
     events, leaders, chapters, books,
     plates: [{ id: "maritime-monsoon", title: "The monsoon road", start: "0750", end: "0850" }],
     colours: {

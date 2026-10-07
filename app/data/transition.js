@@ -138,7 +138,7 @@
   window.DATASETS = window.DATASETS || {};
   window.DATASETS.transition = {
     id:"transition", title:"The age of transition", subtitle:"1450-1650", range:["1450-01-01","1651-01-01"], startAt:"1500", precision:"year",
-    mapNote:"No historical borders. Areas show story fields, claims or zones of influence. This period deliberately overlaps medieval, maritime and Russia because the handoffs are the point.",
+    mapNote:"The muted backdrop is a period map at the nearest mapped date; its borders are approximate. Coloured areas show story fields, claims or zones of influence. This period deliberately overlaps medieval, maritime and Russia because the handoffs are the point.",
     lanes:[{id:"canada",label:"Canada & the Americas",pinned:true},{id:"europe",label:"Europe"},{id:"ottoman",label:"Ottomans & Islam"},{id:"atlantic",label:"Africa & the Atlantic"},{id:"asia",label:"Asia & the Indian Ocean"},{id:"russia",label:"Russia"}],
     chapterRegions:{"ch-transition-economy":"europe","ch-renaissance-humanism":"europe","ch-voyages-discovery":"europe","ch-american-civilizations":"americas","ch-reformation":"europe","ch-ottoman-after-1453":"islamic","ch-indian-ocean-asia":"asia","ch-russia-steppe-transition":"asia","ch-canada-contact":"americas","ch-german-reformation":"europe","ch-charles-v-habsburg-valois":"europe","ch-confessional-europe":"europe","ch-dutch-revolt-maritime-empires":"europe","ch-france-england-religious-wars":"europe","ch-baltic-transition":"europe","ch-thirty-years-war-opening":"europe"},
     events, leaders, chapters, books,
