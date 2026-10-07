@@ -4,7 +4,7 @@
   "use strict";
   const M = window.HM;
   const $ = (s) => document.querySelector(s);
-  const DEFAULT_DS = "ww2";
+  const DEFAULT_DS = "ancient";
   const FAMILY = [
     { id: "father", label: "Dr. B. N. Nandi" },
     { id: "mother", label: "Mother" },
@@ -1607,6 +1607,38 @@
     setCursor(carry || M.parseDate(state.ds.startAt) || state.ds.t0, { hover: !!opts.quiet });
   }
 
+  // ---------------------------------------------------------------- orientation splash
+  const ORIENT_SEEN = "history.orientation.seen.v1";
+  const ORIENT_SHOW = "history.orientation.show.v1";
+  function setOrientation(open) {
+    const el = $("#orientation");
+    if (el) el.hidden = !open;
+  }
+  function orientationList(kind) {
+    const el = $("#orientation-list");
+    if (!el) return;
+    if (kind === "tour") {
+      const tours = Object.values(window.TOURS || {});
+      el.innerHTML = tours.map((t) => `<button data-orient-tour="${esc(t.id)}"><b>${esc(t.title)}</b><span class="small">${esc(t.question || t.intro || "")}</span></button>`).join("");
+    } else {
+      el.innerHTML = master.layout.periods.map((p) => `<button data-orient-era="${esc(p.id)}"><b>${esc(p.title)}</b><span class="small">${esc(p.from)} – ${esc(p.to)}</span></button>`).join("");
+    }
+    el.hidden = false;
+  }
+  function closeOrientation() {
+    const show = $("#orientation-show");
+    localStorage.setItem(ORIENT_SEEN, "1");
+    localStorage.setItem(ORIENT_SHOW, show && show.checked ? "1" : "0");
+    setOrientation(false);
+  }
+  function maybeShowOrientation() {
+    const showAtStart = localStorage.getItem(ORIENT_SHOW) === "1";
+    const firstVisit = !localStorage.getItem(ORIENT_SEEN);
+    if (!location.hash && (firstVisit || showAtStart)) setOrientation(true);
+    const cb = $("#orientation-show");
+    if (cb) cb.checked = localStorage.getItem(ORIENT_SHOW) !== "0";
+  }
+
   // ---------------------------------------------------------------- controls
   const dsSel = $("#dataset");
   const eraGroup = document.createElement("optgroup"); eraGroup.label = "Eras";
@@ -1652,6 +1684,18 @@
     if (b) { $("#books").hidden = true; startTour(b.dataset.tour, 0); }
   });
   $("#help-close").addEventListener("click", () => { $("#help").hidden = true; });
+  $("#orientation-help")?.addEventListener("click", () => { setOrientation(true); });
+  $("#orientation-close").addEventListener("click", closeOrientation);
+  $("#orientation-start").addEventListener("click", closeOrientation);
+  $("#orientation-tour").addEventListener("click", () => orientationList("tour"));
+  $("#orientation-era").addEventListener("click", () => orientationList("era"));
+  $("#orientation-books").addEventListener("click", () => { renderBooks(); $("#books").hidden = false; closeOrientation(); });
+  $("#orientation-list").addEventListener("click", (ev) => {
+    const tour = ev.target.closest("[data-orient-tour]");
+    const era = ev.target.closest("[data-orient-era]");
+    if (tour) { closeOrientation(); startTour(tour.dataset.orientTour, 0); }
+    if (era) { closeOrientation(); loadDataset(era.dataset.orientEra, { quiet: true }); scheduleHash(); }
+  });
   let resizeTimer = null;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
@@ -1660,9 +1704,11 @@
 
   // ---------------------------------------------------------------- start
   const p = M.parseHash(location.hash, window.DATASETS, DEFAULT_DS);
-  loadDataset(p.dataset, { cursor: location.hash ? p.date : null, quiet: true });
+  loadDataset(p.dataset, { cursor: location.hash ? p.date : M.parseDate(window.DATASETS[p.dataset].range[0]), quiet: true });
   if (location.hash) applyHash();
   if (p.query && p.query.tour) startTour(p.query.tour, +p.query.stop || 0);
+  if (!location.hash) { const m = $("#tour-menu"); if (m) m.hidden = false; }
+  maybeShowOrientation();
 
   // Hooks for tests and the console.
   window.APP = {

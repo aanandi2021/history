@@ -215,7 +215,7 @@ test("US4: addresses round-trip, switch periods and fall back safely", async () 
   assert.equal(await page.evaluate(() => APP.state.dsId), "russia");
   await context.close();
   ({ page, context } = await open("#atlantis/12345/nothing"));
-  assert.equal(await page.evaluate(() => APP.state.dsId), "ww2");
+  assert.equal(await page.evaluate(() => APP.state.dsId), "ancient");
   assert.equal(await page.evaluate(() => APP.state.selected), null);
   await context.close();
 });

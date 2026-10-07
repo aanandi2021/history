@@ -102,3 +102,28 @@ test("e2e: historical basemap lazy loader works from file URL", async () => {
     await browser.close();
   }
 });
+test("e2e: no-hash landing opens ancient spine, tour menu and orientation splash", async () => {
+  const browser = await puppeteer.launch({ headless: true });
+  try {
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1440, height: 900 });
+    await page.goto(pathToFileURL(path.join(ROOT, "app", "index.html")).href);
+    await page.waitForFunction("window.APP && APP.ready");
+    const info = await page.evaluate(() => ({
+      hash: location.hash,
+      dataset: APP.state.dsId,
+      cursor: document.querySelector("#cursor-date").textContent,
+      tourMenuOpen: !document.querySelector("#tour-menu").hidden,
+      orientationOpen: !document.querySelector("#orientation").hidden,
+      title: document.querySelector("#orientation-title")?.textContent || ""
+    }));
+    assert.equal(info.hash, "");
+    assert.equal(info.dataset, "ancient");
+    assert.equal(info.cursor, "1800 BC");
+    assert.equal(info.tourMenuOpen, true);
+    assert.equal(info.orientationOpen, true);
+    assert.match(info.title, /History of the World/);
+  } finally {
+    await browser.close();
+  }
+});

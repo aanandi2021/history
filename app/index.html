@@ -68,9 +68,26 @@
     <p><b>Drag</b> the timeline to pan. <b>Ctrl + wheel</b> (or pinch) zooms it. The map zooms with the wheel.</p>
     <p>Keys: <kbd>←</kbd> <kbd>→</kbd> previous / next event · <kbd>Space</kbd> play · <kbd>/</kbd> search · <kbd>Esc</kbd> clear.</p>
     <p>The address bar always holds the current period, date and selection, so you can paste it into an Obsidian note.</p>
+    <p><button class="reopen-orientation" id="orientation-help" type="button">Open the orientation card</button></p>
     <button id="help-close">Close</button>
   </div>
   <div id="books" hidden><div id="books-body"></div><button id="books-close">Close</button></div>
+  <div id="orientation" class="orientation" hidden>
+    <div class="orientation-card" role="dialog" aria-modal="true" aria-labelledby="orientation-title">
+      <button id="orientation-close" class="orientation-x" aria-label="Close orientation">×</button>
+      <h2 id="orientation-title">Amit's Notes of the History of the World</h2>
+      <p>This is a personal atlas and timeline, built on the <i>Penguin Atlas of World History</i>. It is for moving through the whole shape of the story, then dropping into the places, books and maps that make a moment make sense.</p>
+      <p>Use the lower timeline to move through a period. Use the master strip across the top to jump between eras. The map pans and zooms; the story layers sit over a quiet world-at-this-date underlay.</p>
+      <div class="orientation-actions">
+        <button id="orientation-tour">Take a tour</button>
+        <button id="orientation-era">Browse an era</button>
+        <button id="orientation-books">Books</button>
+        <button id="orientation-start">Start exploring</button>
+      </div>
+      <div id="orientation-list" class="orientation-list" hidden></div>
+      <label class="orientation-check"><input id="orientation-show" type="checkbox" checked> Show this at start</label>
+    </div>
+  </div>
   <div id="tooltip" hidden></div>
 
   <script src="version.js"></script>
