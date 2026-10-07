@@ -159,6 +159,12 @@
   }
   function histName(d) { return String((d.properties && d.properties.NAME) || "").trim(); }
   function histPrecision(d) { return Math.max(1, Math.min(3, +(d.properties && d.properties.BORDERPRECISION) || 1)); }
+  function histLooksLikePeople(d) { return /hunter|gather|forager|farmer|pastoral|nomad|tribe|people|culture|cultures|ainu|jōmon|jomon|inuit|inu|siberian|berber|khoisan|papuan/i.test(histName(d)); }
+  function histFillOpacity(d) {
+    if (!histName(d)) return 0.06;
+    if (histLooksLikePeople(d)) return histPrecision(d) === 1 ? 0.20 : 0.24;
+    return histPrecision(d) === 1 ? 0.31 : histPrecision(d) === 2 ? 0.35 : 0.39;
+  }
   function histFeatures(date, topology) {
     const k = String(date);
     if (histFeatureCache.has(k)) return histFeatureCache.get(k);
@@ -204,7 +210,7 @@
     const on = !!(state.dsId !== "ww2" && (!cb || cb.checked) && (histDate != null || (window.WORLD_SNAPSHOTS || []).length));
     worldLayer.attr("display", on ? null : "none");
     if (!on) { worldLayer.selectAll("*").remove(); return; }
-    const label = histDate == null ? "" : `(${M.masterYear(histDate)} map${hist && !hist.isLoaded(histDate) ? ", loading" : ""})`;
+    const label = histDate == null ? "" : `(${M.histBasemapYear(histDate)} map${hist && !hist.isLoaded(histDate) ? ", loading" : ""})`;
     if (hist && histDate != null && !hist.isLoaded(histDate)) {
       const seq = ++histLoadSeq;
       hist.load(histDate).then(() => { if (seq === histLoadSeq) drawWorldUnderlay(state.cursor); }).catch((err) => console.warn(err.message));
@@ -222,7 +228,7 @@
     ).attr("d", geoPath)
       .attr("fill", (d) => histColour(d))
       .attr("stroke", (d) => histColour(d))
-      .attr("fill-opacity", (d) => histName(d) ? (histPrecision(d) === 1 ? 0.22 : 0.25) : 0.07)
+      .attr("fill-opacity", histFillOpacity)
       .attr("stroke-opacity", (d) => histName(d) ? (histPrecision(d) === 3 ? 0.48 : histPrecision(d) === 2 ? 0.28 : 0.03) : 0.02)
       .attr("stroke-dasharray", (d) => histPrecision(d) === 2 ? "3 3" : null)
       .attr("filter", (d) => histPrecision(d) === 1 ? "url(#hist-soft-edge)" : null);

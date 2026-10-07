@@ -17,6 +17,12 @@ test("parseDate handles full, month and year precision", () => {
   assert.equal(d("nonsense"), null);
 });
 
+
+test("historical basemap source years label BC without year zero", () => {
+  assert.equal(HM.histBasemapYear(-1), "1 BC");
+  assert.equal(HM.histBasemapYear(-1000), "1000 BC");
+  assert.equal(HM.histBasemapYear(1), "AD 1");
+});
 test("fmtDate respects precision and approx", () => {
   assert.equal(HM.fmtDate("1942-08-19"), "19 Aug 1942");
   assert.equal(HM.fmtDate("1649-02"), "Feb 1649");

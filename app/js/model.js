@@ -728,6 +728,7 @@
   const MASTER_BREAKS = [-1499, -499, 500, 1000, 1500, 1800, 1939, 1946];
   /** Years on the master strip: "1800 BC", "AD 500", "1945". */
   const masterYear = (Y) => (Y <= 0 ? `${1 - Y} BC` : Y < 1000 ? `AD ${Y}` : String(Y));
+  const histBasemapYear = (Y) => (Y < 0 ? `${Math.abs(Y)} BC` : Y < 1000 ? `AD ${Y}` : String(Y));
   function yearOf(t) {
     const y = t.getUTCFullYear(), a = utc(y, 0, 1), b = utc(y + 1, 0, 1);
     return y + (t - a) / (b - a);
@@ -763,7 +764,7 @@
   }
 
   return {
-    yearOf, masterLayout, masterX, masterYear, histBasemapDateAtOrBefore, snapshotAt, validateWorldSnapshots,
+    yearOf, masterLayout, masterX, masterYear, histBasemapYear, histBasemapDateAtOrBefore, snapshotAt, validateWorldSnapshots,
     plateContext,
     sceneKey,
     sceneFor, visibleAt, liveAt, itineraryAt, stopLabel, sceneLadder, dateStart, dateEnd, linkTerms, termUrl, validateScene, SCENE_SYMBOLS,
