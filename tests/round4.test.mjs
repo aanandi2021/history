@@ -119,7 +119,7 @@ test("e2e: Muscovy's growth ladder lights up tier by tier", async () => {
   await page.evaluate(() => APP.setCursor(new Date(Date.UTC(1600, 0, 1))));
   await new Promise((r) => setTimeout(r, 300));
   assert.deepEqual(await ladder(), ["1478*", "1552*", "1582*"]);
-  assert.ok((await page.evaluate(() => APP.sceneLayers())).includes("Muscovy by 1613"));
+  assert.ok(!(await page.evaluate(() => APP.sceneLayers())).includes("Muscovy by 1613"), "chapters without atlas plates no longer draw hand area polygons");
   assert.deepEqual(errors, []);
   await ctx.close();
 });

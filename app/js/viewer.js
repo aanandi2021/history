@@ -140,6 +140,90 @@
     const f = polityFeature(P);
     return f ? geoPath(f) : "";
   }
+  function closeRing(points) {
+    if (!points || !points.length) return [];
+    const first = points[0], last = points[points.length - 1];
+    return first[0] === last[0] && first[1] === last[1] ? points : [...points, first];
+  }
+  function normalisePolygonRing(points) {
+    const ring = closeRing(points);
+    const area = d3.geoArea({ type: "Polygon", coordinates: [ring] });
+    return area > Math.PI * 2 ? [...points].reverse() : points;
+  }
+  function atlasPolygonD(points, smoothFlag = true) {
+    const pts = normalisePolygonRing(points).map((p) => projection(p)).filter(Boolean);
+    const curve = smoothFlag === false ? d3.curveLinearClosed : d3.curveCatmullRomClosed.alpha(0.5);
+    return pts.length ? d3.line().curve(curve)(pts) : null;
+  }
+  function atlasRegionD(L) {
+    if (!L.regions) return null;
+    const idx = regionIndex();
+    const geoms = (L.regions || []).map((c) => idx.get(c)).filter(Boolean);
+    if (!geoms.length) return null;
+    let d = geoPath(topojson.merge(REGIONS, geoms)) || "";
+    if (L.polygon) d += atlasPolygonD(L.polygon, L.smooth == null ? false : L.smooth) || "";
+    const minus = (L.minus || []).map((c) => idx.get(c)).filter(Boolean);
+    if (minus.length) d += geoPath(topojson.merge(REGIONS, minus)) || "";
+    return d;
+  }
+  function atlasZoneD(L) {
+    if (L.polygon) return atlasPolygonD(L.polygon, L.smooth == null ? true : L.smooth);
+    if (!L.around) return null;
+    const padDeg = L.pad != null ? L.pad : 1.2;
+    const pts = [];
+    for (const [lon, lat] of L.around) {
+      for (let a = 0; a < 360; a += 30) {
+        const r = (a * Math.PI) / 180;
+        pts.push(projection([lon + padDeg * Math.cos(r) / Math.cos((lat * Math.PI) / 180), lat + padDeg * Math.sin(r)]));
+      }
+    }
+    const hull = d3.polygonHull(pts.filter(Boolean));
+    return hull ? d3.line().curve(d3.curveCatmullRomClosed.alpha(0.5))(hull) : null;
+  }
+  function plateIdFromHref(href) { return String(href || "").replace(/^#/, "").split("#").pop(); }
+  function chapterPlateSpec(ch) {
+    const ids = M.linksFor(state.ds, ch || {}).filter((l) => l.kind === "plate").map((l) => plateIdFromHref(l.href));
+    return ids.map((id) => (window.PLATES || {})[id]).find(Boolean) || null;
+  }
+  function plateAreaLayers(ch) {
+    const plate = chapterPlateSpec(ch);
+    if (!plate) return [];
+    const all = (plate.figures || []).filter((fig) => !(fig.base && fig.base.map === false) && fig.projection !== "plan").flatMap((fig) => fig.layers || []);
+    return all.filter((L) => L.type === "area").map((L) => ({ ...L, source: "plate" }));
+  }
+  function areaClipToLand(L) { return L.clipToLand == null ? (L.clip !== "none" && L.clip !== false) : L.clipToLand; }
+  function drawPlateArea(g, L, colour, ghost) {
+    const d = atlasRegionD(L) || atlasZoneD(L);
+    if (!d) return;
+    const tier = L.tier || "core";
+    const opacity = ghost ? 0.13 : (tier === "influence" ? 0.15 : 0.26);
+    const fill = L.pattern && L.pattern !== "solid" ? stripeFill(colour) : colour;
+    const strokeDash = L.edge === "dashed" || tier === "conquest" ? "3 2" : null;
+    if (!L.regions) {
+      const id = `scene-clip-${Math.random().toString(36).slice(2)}`;
+      sceneDefs.append("clipPath").attr("id", id).attr("clipPathUnits", "userSpaceOnUse").append("path").attr("d", d);
+      const cg = g.append("g").attr("clip-path", `url(#${id})`);
+      countryPaths.each(function (f) { cg.append("path").attr("d", geoPath(f)).attr("class", `s-fill ${tier}`).attr("data-source", "plate").style("fill", fill).style("fill-opacity", opacity).style("stroke", "none"); });
+      cg.append("path").attr("d", d).attr("fill", "none").attr("data-source", "plate").style("stroke", L.edge === false ? "none" : colour).style("stroke-dasharray", strokeDash);
+    } else {
+      g.append("path").attr("d", d).attr("class", `s-fill ${tier}`).attr("data-source", "plate")
+        .attr("fill-rule", L.minus ? "evenodd" : null).attr("clip-rule", L.minus ? "evenodd" : null)
+        .style("fill", fill).style("fill-opacity", opacity).style("stroke", L.edge === false ? "none" : colour).style("stroke-dasharray", strokeDash);
+    }
+    if (L.name && !ghost) {
+      const at = L.labelAt || (L.polygon && d3.geoCentroid({ type: "Polygon", coordinates: [closeRing(normalisePolygonRing(L.polygon))] }));
+      if (at) {
+        const [x, y] = projection(at);
+        sceneText(screenSized(g, x, y), [{ text: L.name, cls: "s-realm" }], "middle").style("fill", L.labelColour || d3.color(colour).darker(1.2));
+      }
+    }
+  }
+  function sceneLayersForChapter(ch, scene) {
+    if (!scene) return [];
+    const plateAreas = plateAreaLayers(ch);
+    const rest = scene.layers.filter((L) => L.type !== "area");
+    return plateAreas.length ? [...plateAreas, ...rest] : rest;
+  }
   const HIST_PALETTE = ["#9f7d56", "#8a9a72", "#7d8ea8", "#a87970", "#8e7aa3", "#b0925d", "#6f9a8f", "#a06f87", "#87966a", "#9b8267"];
   const histFeatureCache = new Map();
   let histLoadSeq = 0;
@@ -390,16 +474,7 @@
       const g = root.append("g").attr("class", `s-L s-${L.type}`).datum(L);
       const colour = L.colour || "#8a7a5a";
       if (L.type === "area") {
-        const ring = [...L.around, L.around[0]];
-        let f = { type: "Polygon", coordinates: [ring] };
-        if (d3.geoArea(f) > 2 * Math.PI) f = { type: "Polygon", coordinates: [ring.slice().reverse()] };
-        const tier = L.tier || "core";
-        g.append("path").attr("d", geoPath(f)).attr("class", `s-fill ${tier}`)
-          .style("fill", tier === "conquest" ? stripeFill(colour) : colour).style("stroke", colour);
-        if (L.name && !ghost) {
-          const [x, y] = projection(L.labelAt || d3.geoCentroid(f));
-          sceneText(screenSized(g, x, y), [{ text: L.name, cls: "s-realm" }], "middle").style("fill", L.labelColour || d3.color(colour).darker(1.2));
-        }
+        if (L.source === "plate") drawPlateArea(g, L, colour, ghost);
       } else if (L.type === "boundary") {
         g.append("path").attr("d", geoPath({ type: "LineString", coordinates: L.path })).attr("class", `s-line ${L.style || "dashed"}`).style("stroke", L.colour || null);
       } else if (L.type === "front") {
@@ -497,6 +572,7 @@
     sceneKey = key;
     sceneLayer.selectAll("*").remove();
     sceneDefs.selectAll("linearGradient").remove();
+    sceneDefs.selectAll("clipPath[id^=scene-clip-]").remove();
     if (state.tour) {
       if (focus) drawSceneLayers(sceneLayer.append("g").attr("class", "focus tour-scene").attr("data-ch", focus.id), withScene(focus).layers.filter((L) => L.type === "point"), false);
       state.sceneFocus = focus ? focus.id : null;
@@ -505,8 +581,8 @@
       scaleScene();
       return;
     }
-    for (const c of ghosts) drawSceneLayers(sceneLayer.append("g").attr("class", "ghost").attr("data-ch", c.id), withScene(c).layers.filter((L) => L.type === "area"), true);
-    if (focus) drawSceneLayers(sceneLayer.append("g").attr("class", "focus").attr("data-ch", focus.id), withScene(focus).layers, false);
+    for (const c of ghosts) drawSceneLayers(sceneLayer.append("g").attr("class", "ghost").attr("data-ch", c.id), sceneLayersForChapter(c, withScene(c)).filter((L) => L.type === "area"), true);
+    if (focus) drawSceneLayers(sceneLayer.append("g").attr("class", "focus").attr("data-ch", focus.id), sceneLayersForChapter(focus, withScene(focus)), false);
     state.sceneFocus = focus ? focus.id : null;
     const cap = focus && withScene(focus).caption;
     $("#scene-cap").textContent = cap || "";

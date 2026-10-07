@@ -98,7 +98,7 @@ test("e2e: selecting Abbasid Baghdad draws its scene, links its names, and offer
   const { page, errors, ctx } = await open("#maritime/0790-01-01/ch-abbasid-baghdad");
   await settle();
   const layers = await page.evaluate(() => APP.sceneLayers());
-  for (const want of ["Abbasid Caliphate", "Baghdad", "Siraf", "to India", "to China"]) assert.ok(layers.includes(want), want);
+  for (const want of ["Baghdad", "Siraf", "to India", "to China"]) assert.ok(layers.includes(want), want);
   assert.equal(await page.evaluate(() => APP.state.sceneFocus), "ch-abbasid-baghdad");
   assert.match(await page.$eval("#scene-cap", (e) => e.textContent), /around 800/);
   assert.equal(await page.$eval("#map .chapter-box", (e) => e.getAttribute("d")), null, "no dashed box when a scene draws the map");
@@ -108,6 +108,16 @@ test("e2e: selecting Abbasid Baghdad draws its scene, links its names, and offer
   assert.ok(await page.$$eval("#now a.term", (as) => as.length) > 0, "the Now paragraph links terms too");
   assert.equal(await page.$$eval("#card-terms .ask", (a) => a.length), 2);
   assert.match(await page.$eval("#card-terms li.starred a", (a) => a.href), /wikipedia/);
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+
+test("e2e: chapter story fields use atlas plate areas when available", async () => {
+  const { page, ctx, errors } = await open("#medieval/1096/ch-crusades");
+  await settle(500);
+  assert.ok(await page.$$eval(".scene .focus [data-source=plate]", (els) => els.length) > 0, "selected chapter draws plate-derived area fields");
+  assert.equal(await page.$$eval(".scene .focus .s-area path:not([data-source=plate])", (els) => els.length), 0, "hand-drawn area polygons are not used");
   assert.deepEqual(errors, []);
   await ctx.close();
 });
