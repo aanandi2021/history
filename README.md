@@ -7,7 +7,7 @@ The notes are the source of truth. This repo turns their frontmatter into timeli
 
 ## The viewer
 
-Open `app/index.html` in a browser (double-click is fine). It works from `file://`, offline, with no server or build.
+Open `app/index.html` in a browser (double-click is fine). It works from `file://`, offline, with no server or build. The full user manual is [docs/manual.md](docs/manual.md).
 
 - **Very top:** a thin status line naming whatever is selected (chapter, person, event or book) with its path. Every
   step is a link, and × clears it. Under it, one fixed row: the title *is* the period picker (click it), then the
@@ -18,8 +18,8 @@ Open `app/index.html` in a browser (double-click is fine). It works from `file:/
   gets the same width, so a six-year war isn't a hairline next to two thousand years of antiquity.
 - **Controls where they act:** Play, speed, Follow chapters and Whole period sit on a bar above the timeline (with
   "Showing …" for the stretch in view); World sits on the map.
-- **Top:** a world map. Countries are coloured at a few snapshot dates (WW2 only); pins mark events near the date you're looking at.
-- **Bottom:** the timeline. Chapters across the top, then lanes (Canada always first), who was in power, books, and your family.
+- **Top:** a world map. A muted period map ("World at this date", from historical-basemaps) shows states, peoples and nations at the nearest mapped date; the followed chapter's shapes come from its atlas plate; pins mark events near the date.
+- **Bottom:** the timeline. Chapters in region lanes with filter chips and Expand all, then event lanes (Canada always first), who was in power, books, and your family.
 - **Right:** what was happening everywhere around that date, and a card for whatever you click.
 
 Hover the timeline to move through time, click empty space to pin the date, click anything to open its card.
