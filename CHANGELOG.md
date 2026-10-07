@@ -12,6 +12,7 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 - Added Penguin Atlas Vol. 2 round 1: the age of revolution period, chapter scenes, five plates, Canada-first War of 1812 coverage, Haiti and abolition, and the master-strip gap moved to 1815-1939.
 - Revised the Vol. 2 round 1 plates with fuller historical geography for 1812 Europe, Vienna, Haiti, the War of 1812 and the American/French revolutionary campaigns, plus a Minard-style Russian campaign figure.
 - Added atlas historical-basemap `hist` area layers and rebuilt the Vienna and Napoleonic Europe maps around 1815 period polygons and a true variable-width Russian campaign band.
+- Polished the remaining Vol. 2 round 1 plates: corrected the War of 1812 United States fill and Gulf route, cleared American Revolution labels, and redrew the 1791 French constitution as a two-stage election diagram.
 - Books button opens reading shelves (`app/data/reading.js`): the Western lens, comparing colonial powers, after empire, the Atlantic slave trade, slavery to Obama and the backlash; tour shelves pull their reading from the tour and link to it.
 
 ## 1.1.0 (7 Oct 2026)
