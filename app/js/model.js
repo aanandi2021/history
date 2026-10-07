@@ -139,6 +139,9 @@
       kind: "chapter", id: uid(c.id || `ch-${slug(c.title)}`), t0: parseDate(c.start), t1: parseDate(c.end)
     }));
     linkChapters(ds.chapters);
+    const chapterRegions = raw.chapterRegions || {};
+    for (const c of ds.chapters) c.region = c.region || chapterRegions[c.id] || null;
+    for (const c of ds.chapters) if (!c.region && c.parentId) c.region = ds.chapters.find((p) => p.id === c.parentId)?.region || null;
     ds.books = (raw.books || []).map((b) => Object.assign({}, b, {
       kind: "book", id: uid(b.id || `bk-${slug(b.title)}`), t0: parseDate(b.start), t1: parseDate(b.end)
     }));

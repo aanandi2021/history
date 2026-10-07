@@ -194,6 +194,7 @@
       { id: "india", label: "India & Persia" },
       { id: "china", label: "China" }
     ],
+    chapterRegions:{"ch-hammurabi":"islamic","ch-han-china":"asia","ch-rome":"europe"},
     events, leaders, chapters, books,
     plates: [
       { id: "hammurabi", title: "Mesopotamia in the age of Hammurabi", start: "-1792", end: "-1750" },

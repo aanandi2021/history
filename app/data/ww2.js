@@ -90,6 +90,7 @@ window.DATASETS.ww2 = {
     {"name":"Hideki Tojo","country":"Japan","side":"axis","born":"1884-12-30","died":"1948-12-23","start":"1941-10-18","end":"1944-07-22"},
     {"name":"Emperor Hirohito","country":"Japan","side":"axis","born":"1901-04-29","died":"1989-01-07","start":"1926-12-25","end":"1989-01-07"},
   ],
+  chapterRegions:{"ch-war-in-the-west":"europe","ch-mediterranean":"islamic","ch-eastern-front":"europe","ch-asia-pacific":"asia"},
   chapters: [
     {"id":"ch-war-in-the-west","title":"War in the West","start":"1938-03-12","end":"1945-05-08","bbox":[[-75,30],[30,64]],"text":"Hitler takes Austria and the Sudetenland without a fight, then invades Poland in September 1939, and Britain and France declare war. Canada follows a week later, by its own decision. France falls in six weeks in 1940, Britain holds on through the Blitz, and the Atlantic becomes the lifeline that the Royal Canadian Navy helps keep open. The Allies land in France in June 1944, Canadians at Juno Beach, and reach Germany by the spring of 1945."},
     {"id":"ch-mediterranean","title":"The Mediterranean","start":"1940-09-13","end":"1945-05-02","bbox":[[-10,28],[36,47]],"text":"Mussolini's invasion of Egypt in 1940 drags Germany into North Africa. The desert war swings back and forth until El Alamein and the Torch landings in late 1942 push the Axis out of Africa. The Allies then invade Sicily and Italy in 1943, and Canadians fight through Ortona and up the peninsula in a long, hard campaign."},

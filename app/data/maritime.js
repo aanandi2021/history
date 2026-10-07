@@ -219,6 +219,7 @@
       { id: "west", label: "Baghdad & Europe" },
       { id: "unseen", label: "The Unseen Tomorrow (Amit's fiction)", fiction: true }
     ],
+    chapterRegions:{"ch-the-monsoon-road":"asia","ch-charlemagne-s-europe":"europe","ch-turtle-island":"americas"},
     events, leaders, chapters, books,
     plates: [{ id: "maritime-monsoon", title: "The monsoon road", start: "0750", end: "0850" }],
     colours: {

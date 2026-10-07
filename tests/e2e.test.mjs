@@ -90,6 +90,8 @@ test("US2: a chapter zooms the map and the timeline together; World resets the m
   await settle(300);
   const k0 = (await page.evaluate(() => APP.mapTransform())).k;
   const d0 = await page.evaluate(() => APP.domain());
+  await page.evaluate(() => APP.setAllFolds(false));
+  await settle(200);
   const id = await page.evaluate(() => APP.state.ds.chapters.find((c) => c.title === "Barbarossa to Stalingrad").id);
   const t0 = Date.now();
   await page.click(`#tl g.item.chapter[data-id="${id}"] rect`);

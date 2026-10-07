@@ -18,7 +18,7 @@
     cursor: null, pinned: false, selected: null,
     playing: false, follow: true, followed: undefined,
     mapK: 1, flying: false,
-    showWorld: true, tour: null, tourStop: 0
+    showWorld: true, tour: null, tourStop: 0, regionOverride: null
   };
 
   // ---------------------------------------------------------------- helpers
@@ -908,21 +908,45 @@
     }
   }
 
+  const TL_REGIONS = ["europe", "islamic", "asia", "africa", "americas"];
+  const TL_REGION_LABEL = { europe: "Europe", islamic: "Islamic world", asia: "Asia", africa: "Africa", americas: "Americas" };
+  function chapterRegion(c) { return c && (c.region || (c.parentId && chapterRegion(state.ds.byId.get(c.parentId))) || "europe"); }
+  function topPart(c) { let p = c; while (p && p.parentId) p = state.ds.byId.get(p.parentId); return p || c; }
+  function selectedChapter() { const it = state.selected && state.ds && state.ds.byId.get(state.selected); return it && it.kind === "chapter" ? it : null; }
+  function activeRegionFilter() {
+    if (state.regionOverride === "all") return null;
+    if (state.regionOverride) return state.regionOverride;
+    const ch = selectedChapter();
+    return ch ? chapterRegion(ch) : null;
+  }
+  function selectedPartFilter(region) {
+    if (state.regionOverride) return null;
+    const ch = selectedChapter();
+    return ch && chapterRegion(ch) === region ? topPart(ch) : null;
+  }
   // ---------------------------------------------------------------- folding chapters (▾ open, ▸ folded)
   const FOLD_KEY = "history.folds.v1", AUTO_FOLD_PX = 70;
   function loadFolds() {
     try { return JSON.parse(localStorage.getItem(FOLD_KEY)) || {}; } catch (e) { return {}; }
   }
-  /** Folded if you said so; otherwise folded automatically while the part is too narrow on screen to hold its children. */
+  /** Folded if you said so; otherwise folded by default so regional lanes start calm. */
   function isFolded(c) {
     if (!c.children || !c.children.length) return false;
     const pref = (loadFolds()[state.dsId] || {})[c.id];
     if (pref != null) return pref;
-    return !!xs && xs(c.t1) - xs(c.t0) < AUTO_FOLD_PX;
+    return true;
   }
   function setFold(id, folded) {
     const all = loadFolds();
     all[state.dsId] = Object.assign(all[state.dsId] || {}, { [id]: folded });
+    if (!folded && state.ds) {
+      const opened = state.ds.byId.get(id);
+      const reg = chapterRegion(opened);
+      for (const c of state.ds.chapters) {
+        if (c.id !== id && c.children.length && chapterRegion(c) === reg) all[state.dsId][c.id] = true;
+      }
+      all[state.dsId][id] = false;
+    }
     localStorage.setItem(FOLD_KEY, JSON.stringify(all));
   }
   function setAllFolds(folded) {
@@ -938,7 +962,13 @@
   }
   /** Open every part above a chapter, so selecting it never leaves it hidden. */
   function unfoldTo(c) {
-    for (const p of M.ancestors(state.ds, c)) if (isFolded(p)) setFold(p.id, false);
+    const all = loadFolds();
+    all[state.dsId] = all[state.dsId] || {};
+    const ancestors = M.ancestors(state.ds, c);
+    const reg = chapterRegion(c);
+    for (const p of state.ds.chapters) if (p.children.length && chapterRegion(p) === reg) all[state.dsId][p.id] = true;
+    for (const p of ancestors) all[state.dsId][p.id] = false;
+    localStorage.setItem(FOLD_KEY, JSON.stringify(all));
   }
   function twisty(el, c, glyph) {
     return el.attr("class", "twisty").attr("data-twisty", c.id).text(glyph)
@@ -993,27 +1023,51 @@
       y += hgt;
     };
 
-    // Chapters: one lane per level of the chapter tree. Parts with children carry a ▾/▸ to fold them.
+    // Chapters: grouped into regional lanes. Parts are folded by default; selected chapters narrow to their lane.
     section("Chapters");
-    if (ds.chapters.some((c) => c.children.length)) {
-      labels.append("text").attr("class", "fold-all").attr("data-fold-all", "open").attr("x", 76).attr("y", y - 4).text("▾ open all")
-        .on("click", (ev) => { ev.stopPropagation(); setAllFolds(false); });
-      labels.append("text").attr("class", "fold-all").attr("data-fold-all", "fold").attr("x", 126).attr("y", y - 4).text("▸ fold")
-        .on("click", (ev) => { ev.stopPropagation(); setAllFolds(true); });
+    const regionCounts = new Map(TL_REGIONS.map((r) => [r, ds.chapters.filter((c) => (c.children.length || !c.parentId) && chapterRegion(c) === r).length]));
+    const currentRegion = activeRegionFilter();
+    const chipG = root.append("g").attr("class", "region-filters").attr("transform", `translate(8,${y - 4})`);
+    chipG.append("text").attr("class", "region-filter-label").attr("x", 0).attr("y", 12).text("Regions");
+    let cx = 58;
+    for (const r of TL_REGIONS) {
+      const empty = !regionCounts.get(r), on = currentRegion === r || (!currentRegion && state.regionOverride === "all");
+      const g = chipG.append("g").attr("class", `region-chip${on ? " on" : ""}${empty ? " empty" : ""}`).attr("data-region", r).attr("transform", `translate(${cx},0)`);
+      const label = TL_REGION_LABEL[r] + (empty ? " (none yet)" : "");
+      const wChip = Math.max(54, label.length * 6.2 + 14);
+      g.append("rect").attr("width", wChip).attr("height", 18).attr("rx", 8);
+      g.append("text").attr("x", 7).attr("y", 12).text(label);
+      if (!empty) g.on("click", (ev) => { ev.stopPropagation(); state.regionOverride = r; refold(); });
+      cx += wChip + 6;
     }
+    chipG.append("text").attr("class", "expand-all").attr("x", cx + 6).attr("y", 12).text("Expand all").on("click", (ev) => { ev.stopPropagation(); state.regionOverride = "all"; setAllFolds(false); });
+    y += 24;
+    labels.append("text").attr("class", "fold-all").attr("data-fold-all", "open").attr("x", 76).attr("y", y - 4).text("▾ open all")
+      .on("click", (ev) => { ev.stopPropagation(); setAllFolds(false); });
+    labels.append("text").attr("class", "fold-all").attr("data-fold-all", "fold").attr("x", 126).attr("y", y - 4).text("▸ fold")
+      .on("click", (ev) => { ev.stopPropagation(); setAllFolds(true); });
     const open = M.openChapters(ds, isFolded);
-    const maxDepth = Math.max(0, ...open.map((c) => c.depth));
-    const depthName = (d) => (maxDepth === 0 ? "click to zoom" : ["Parts", "Chapters", "Details"][d] || `Level ${d + 1}`);
-    for (let d = 0; d <= maxDepth; d++) {
-      const chEntries = open.filter((c) => c.depth === d).sort((a, b) => a.t0 - b.t0).map((c) => {
-        const twisty = c.children.length ? (isFolded(c) ? "▸" : "▾") : null;
-        const label = c.title + (twisty === "▸" ? ` · ${c.children.length}` : "");
-        return { ref: c, t0: c.t0, t1: c.t1, label: twisty ? `${twisty} ${label}` : label, twisty, text: label };
+    let ri = 0;
+    for (const r of TL_REGIONS) {
+      const allRegion = ds.chapters.filter((c) => chapterRegion(c) === r);
+      const part = selectedPartFilter(r);
+      const visible = open.filter((c) => chapterRegion(c) === r && (!part || c.id === part.id || M.within(ds, part, c))).sort((a, b) => a.t0 - b.t0);
+      const filteredOut = currentRegion && currentRegion !== r;
+      if (filteredOut || !allRegion.length) {
+        const hgt = 17;
+        bg.append("rect").attr("class", `lane-bg collapsed${ri % 2 ? " alt" : ""}`).attr("x", 0).attr("y", y).attr("width", tlW).attr("height", hgt);
+        labels.append("text").attr("class", `region-lane-label${!allRegion.length ? " empty" : ""}`).attr("x", 12).attr("y", y + 12).text(TL_REGION_LABEL[r] + (!allRegion.length ? " (none yet)" : ""));
+        y += hgt; ri++;
+        continue;
+      }
+      const entries = visible.map((c) => {
+        const glyph = c.children.length ? (isFolded(c) ? "▸" : "▾") : null;
+        const label = c.title + (glyph === "▸" ? ` · ${c.children.length}` : "");
+        return { ref: c, t0: c.t0, t1: c.t1, label: glyph ? `${glyph} ${label}` : label, twisty: glyph, text: label };
       });
-      const chLaid = layoutRows(chEntries, 4);
-      lane(depthName(d), null, chLaid, (y0) => drawEntries(body, chLaid, y0, { cls: `chapter depth-${d}`, h: 14, alwaysBar: true, darkText: true, fill: () => null }), d);
+      const laid = layoutRows(entries, 4);
+      lane(TL_REGION_LABEL[r], null, laid, (y0) => drawEntries(body, laid, y0, { cls: `chapter region-${r}`, h: 14, alwaysBar: true, darkText: true, fill: () => null }), ri++);
     }
-
     // Event lanes
     section("Events");
     ds.lanes.forEach((ln, i) => {

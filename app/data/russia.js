@@ -318,6 +318,7 @@
       { id: "europe", label: "Europe" },
       { id: "asia", label: "Asia & the Middle East" }
     ],
+    chapterRegions:{"ch-muscovy":"europe","ch-romanov-empire":"europe","ch-great-power":"europe","ch-revolution":"europe"},
     events, leaders, chapters, books,
     colours: {
       lanes: { canada: "#b22d2d", russia: "#b36b2e", europe: "#3f6e8c", asia: "#6b4f8c" },

@@ -55,6 +55,13 @@ for (const id of ids) {
   test(`${id}: changelog exists (Principle II)`, () => {
     assert.ok(Array.isArray(raw.changelog) && raw.changelog.length >= 1);
   });
+  test(`${id}: chapter parts have timeline regions`, () => {
+    const allowed = new Set(["europe", "islamic", "asia", "africa", "americas"]);
+    assert.ok(raw.chapterRegions && Object.keys(raw.chapterRegions).length, "dataset declares chapterRegions");
+    for (const c of ds.chapters.filter((ch) => ch.children.length || !ch.parentId)) {
+      assert.ok(allowed.has(c.region), `${c.id}: ${c.region}`);
+    }
+  });
 }
 
 const VAULT = "A:\\Obsidian External Vaults\\Fourth Vault July 2023";

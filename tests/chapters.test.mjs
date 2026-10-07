@@ -177,6 +177,24 @@ test("e2e: selecting a detail opens its folded parts and shows breadcrumbs; a pa
   await ctx.close();
 });
 
+
+test("e2e: region chips filter timeline lanes and expand all restores them", async () => {
+  const { page, errors, ctx } = await open("#medieval/1300-01-01/ch-baltic-orders-kalmar");
+  await settle();
+  assert.ok(await page.$('#tl .region-chip[data-region="asia"].on'), "selection follows the Asia lane");
+  assert.equal(await page.$('#tl g.chapter[data-id="ch-western-europe"]'), null, "other regions collapse under the selection filter");
+  await page.click('#tl .region-chip[data-region="europe"]');
+  await settle(250);
+  assert.ok(await page.$('#tl .region-chip[data-region="europe"].on'), "clicking a chip overrides the selection-following filter");
+  assert.ok(await page.$('#tl g.chapter[data-id="ch-western-europe"]'), "Europe lane is expanded after chip click");
+  await page.click('#tl .expand-all');
+  await settle(250);
+  assert.ok(await page.$('#tl g.chapter[data-id="ch-western-europe"]'));
+  assert.ok(await page.$('#tl g.chapter[data-id="ch-steppe-rus"]'));
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
 test("e2e: zoom-aware focus and a colour key that names who is who", async () => {
   const { page, errors, ctx } = await open("#ww2/1942-06-01/ch-barbarossa-to-stalingrad");
   await settle();
@@ -187,6 +205,8 @@ test("e2e: zoom-aware focus and a colour key that names who is who", async () =>
   await page.click("#scene-key .sk-toggle");
   assert.ok(await page.$("#scene-key .sk-body"));
   await page.click("#card .close");
+  await page.evaluate(() => APP.setAllFolds(false));
+  await settle(200);
   await page.evaluate(() => APP.zoomTimeline("1937-01-01", "1946-01-01"));
   await settle(300);
   await page.evaluate(() => APP.setCursor(new Date(Date.UTC(1942, 5, 1))));
