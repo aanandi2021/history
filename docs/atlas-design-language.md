@@ -383,6 +383,8 @@ For state-like areas, prefer Natural Earth building blocks over hand polygons. `
 
 An area can now use `regions:[...]`, with optional `minus:[...]` and optional `polygon` additions. The renderer merges the listed regions and draws them as one SVG path, so adjacent provinces fill once instead of creating muddy overlap stripes. Use `minus` for a modern country minus provinces that were not yet in the state. Hand polygons remain appropriate for war zones, spheres of influence and vanished frontiers with no modern analogue, but snap them to region edges where possible and keep them subordinate to real administrative shapes.
 
+For Vol. 2 state borders, prefer the historical basemap where it exists. An `area` can use `hist:{ year:1815, names:["Austrian Empire","Lombardy","Venetia"] }`; the atlas loads `app/data/hist/world_<year>.js` over a normal script tag, matches `NAME`, `SUBJECTO` or `PARTOF`, merges the matched TopoJSON geometries, and draws them with the usual tier/pattern/legend grammar. Use `hist.except:["..."]` to omit matching pieces when a source polity is broader than the plate's subject. Use these period polygons before modern `regions` for 1783, 1800, 1815 and later basemap years; use hand polygons with `clipToLand:true` only for intermediate frontiers or campaign zones the basemap cannot carry.
+
 ## 18. Round 9: late-medieval networks and two-state war maps (PDF pp. 174–193)
 
 This batch covers Byzantium under Basil II and after Manzikert, the Mongol and Chinese context pages, late-medieval towns and trade, England, France, the Hundred Years War, Switzerland and Burgundy. Analyses are in `study/analysis/spread-p174…p192.json` and `round9-findings.md`.

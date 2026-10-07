@@ -156,6 +156,10 @@
     return pts.length ? d3.line().curve(curve)(pts) : null;
   }
   function atlasRegionD(L) {
+    if (L.hist) {
+      const f = histLayerFeature(L.hist);
+      return f ? geoPath(f) : null;
+    }
     if (!L.regions) return null;
     const idx = regionIndex();
     const geoms = (L.regions || []).map((c) => idx.get(c)).filter(Boolean);
@@ -188,7 +192,7 @@
     const plate = chapterPlateSpec(ch);
     if (!plate) return [];
     const all = (plate.figures || []).filter((fig) => !(fig.base && fig.base.map === false) && fig.projection !== "plan").flatMap((fig) => fig.layers || []);
-    return all.filter((L) => L.type === "area" && L.regions).map((L) => ({ ...L, source: "plate" }));
+    return all.filter((L) => L.type === "area" && (L.regions || L.hist)).map((L) => ({ ...L, source: "plate" }));
   }
   function areaClipToLand(L) { return L.clipToLand == null ? (L.clip !== "none" && L.clip !== false) : L.clipToLand; }
   function drawPlateArea(g, L, colour, ghost) {
@@ -241,6 +245,19 @@
     const features = obj ? topojson.feature(topology, obj).features : [];
     histFeatureCache.set(k, features);
     return features;
+  }
+  function histLayerFeature(query) {
+    const topology = window.HIST_BASEMAPS && window.HIST_BASEMAPS[String(query && query.year)];
+    const obj = histTopoObject(topology);
+    if (!topology || !obj || !Array.isArray(query.names)) return null;
+    const want = new Set(query.names.map((s) => String(s).trim().toLowerCase()));
+    const except = new Set((query.except || []).map((s) => String(s).trim().toLowerCase()));
+    const geoms = (obj.geometries || []).filter((g) => {
+      const p = g.properties || {};
+      const names = [p.NAME, p.SUBJECTO, p.PARTOF].filter(Boolean).map((s) => String(s).trim().toLowerCase());
+      return names.some((n) => want.has(n)) && !names.some((n) => except.has(n));
+    });
+    return geoms.length ? { type: "Feature", properties: {}, geometry: topojson.merge(topology, geoms) } : null;
   }
   function histColourDistance(a, b) {
     const ca = d3.hsl(a), cb = d3.hsl(b);

@@ -32,6 +32,59 @@
     }
     return errs;
   }
+  function histTopo(year) {
+    return window.HIST_BASEMAPS && window.HIST_BASEMAPS[String(year)] || null;
+  }
+  function histObject(topology) {
+    return topology && topology.objects && (topology.objects.world || Object.values(topology.objects)[0]);
+  }
+  function histText(g) {
+    const p = g && g.properties || {};
+    return [p.NAME, p.SUBJECTO, p.PARTOF].filter(Boolean).map((s) => String(s).trim().toLowerCase());
+  }
+  function histGeoms(query) {
+    if (!query || query.year == null || !Array.isArray(query.names)) return [];
+    const topology = histTopo(query.year), obj = histObject(topology);
+    if (!topology || !obj) return [];
+    const want = new Set(query.names.map((s) => String(s).trim().toLowerCase()));
+    const except = new Set((query.except || []).map((s) => String(s).trim().toLowerCase()));
+    return (obj.geometries || []).filter((g) => {
+      const names = histText(g);
+      return names.some((n) => want.has(n)) && !names.some((n) => except.has(n));
+    });
+  }
+  function histErrors(spec) {
+    const errs = [];
+    for (const fig of spec && spec.figures || []) for (const L of fig.layers || []) {
+      if (L.type !== "area" || !L.hist) continue;
+      const topology = histTopo(L.hist.year), obj = histObject(topology), geoms = histGeoms(L.hist);
+      if (!topology || !obj) errs.push(`${spec.id}: layer ${L.id || L.legend || "area"}: historical basemap ${L.hist.year} is not loaded`);
+      else if (!geoms.length) errs.push(`${spec.id}: layer ${L.id || L.legend || "area"}: no historical basemap match for ${L.hist.names.join(", ")}`);
+    }
+    return errs;
+  }
+  function histYearsForSpec(spec) {
+    return [...new Set((spec && spec.figures || []).flatMap((fig) => fig.layers || []).filter((L) => L.type === "area" && L.hist && L.hist.year != null).map((L) => +L.hist.year).filter(Number.isFinite))];
+  }
+  function loadHistYear(year) {
+    if (histTopo(year)) return Promise.resolve(histTopo(year));
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector(`script[data-atlas-hist="${year}"]`);
+      if (existing) {
+        existing.addEventListener("load", () => resolve(histTopo(year)), { once: true });
+        existing.addEventListener("error", () => reject(new Error(`Could not load historical basemap ${year}`)), { once: true });
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = `../app/data/hist/world_${year}.js`;
+      script.async = true;
+      script.dataset.atlasHist = String(year);
+      script.onload = () => resolve(histTopo(year));
+      script.onerror = () => reject(new Error(`Could not load historical basemap ${year}`));
+      document.head.appendChild(script);
+    });
+  }
+  function ensureHistForSpec(spec) { return Promise.all(histYearsForSpec(spec).map(loadHistYear)); }
   const LANDF = topojson.feature(BASE, BASE.objects.land);
   const LAND_FEATURES = LANDF.type === "FeatureCollection" ? LANDF.features : [LANDF];
   const RIVERS = topojson.feature(BASE, BASE.objects.rivers);
@@ -130,6 +183,32 @@
   function weightedWidth(L, fallback) {
     return L.width || (L.weight ? Math.max(1.4, Math.min(7, 1.2 + L.weight * 0.9)) : fallback);
   }
+  const xyPoint = (p) => [p[0], p[1]];
+  function routeStrengths(L, seg) {
+    if (Array.isArray(L.strengths)) return L.strengths;
+    return seg.map((p) => Array.isArray(p) && Number.isFinite(p[2]) ? p[2] : null);
+  }
+  function strengthBandD(seg, proj, strengths, opts = {}) {
+    const pts = seg.map((p) => proj(xyPoint(p))).filter(Boolean);
+    if (pts.length < 2) return null;
+    const vals = strengths && strengths.length === seg.length ? strengths : seg.map((p) => p[2]);
+    const max = Math.max(...vals.filter(Number.isFinite), 1);
+    const minW = opts.minWidth != null ? opts.minWidth : 1.1, maxW = opts.maxWidth != null ? opts.maxWidth : 15;
+    const side = opts.side === "right" ? -1 : 1;
+    const gap = opts.gap || 0;
+    const left = [], right = [];
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+      const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len, ny = dx / len;
+      const val = Number.isFinite(vals[i]) ? vals[i] : max;
+      const half = (minW + (Math.sqrt(val / max) * (maxW - minW))) / 2;
+      const shift = gap * side;
+      left.push([pts[i][0] + nx * (shift + half * side), pts[i][1] + ny * (shift + half * side)]);
+      right.push([pts[i][0] + nx * (shift - half * side), pts[i][1] + ny * (shift - half * side)]);
+    }
+    return d3.line().curve(d3.curveCatmullRom.alpha(0.45))(left) + "L" + right.reverse().map((p) => p.join(",")).join("L") + "Z";
+  }
 
   function areaFill(defs, L) {
     L = areaLook(L);
@@ -156,6 +235,13 @@
     const minus = (L.minus || []).map((c) => idx.get(c)).filter(Boolean);
     if (minus.length) d += geo(topojson.merge(REGIONS, minus)) || "";
     return d;
+  }
+
+  function histPath(L, geo) {
+    if (!L.hist) return null;
+    const topology = histTopo(L.hist.year), geoms = histGeoms(L.hist);
+    if (!topology || !geoms.length) return null;
+    return geo(topojson.merge(topology, geoms)) || null;
   }
 
   function zonePath(L, proj) {
@@ -454,10 +540,10 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
     let areaSeq = 0;
     const drawArea = (L0) => {
       const L = areaLook(L0);
-      const d = regionPath(L, geo, proj) || zonePath(L, proj);
+      const d = histPath(L, geo) || regionPath(L, geo, proj) || zonePath(L, proj);
       if (!d) return;
       const g = layerG(L_AREA, L);
-      const clipToLand = areaClipToLand(L) && !L.regions;
+      const clipToLand = areaClipToLand(L) && !L.regions && !L.hist;
       const { fill, op } = areaFill(defs, L);
       if (clipToLand && base.map !== false) {
         const areaClip = `${uid}-area-${fi}-${safeId(L.id || "area")}-${areaSeq++}`;
@@ -517,7 +603,19 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
       const c = L.colour || "#b0753a";
       const rw = weightedWidth(L, L.style === "road" ? 2.4 : L.style === "dashed" ? 2 : 3);
       const segs = L.segments || [L.path];
-      const ds = L.geo ? segs.map((seg) => geo({ type: "LineString", coordinates: seg })) : segs.map((seg) => d3.line().curve(d3.curveCatmullRom.alpha(0.5))(seg.map(proj)));
+      if (L.style === "band") {
+        for (const seg of segs) {
+          const d = strengthBandD(seg, proj, routeStrengths(L, seg), { minWidth: L.minWidth, maxWidth: L.maxWidth, side: L.side, gap: L.gap });
+          if (!d) continue;
+          g.append("path").attr("d", d).attr("fill", c).attr("fill-opacity", L.opacity || 0.78).attr("stroke", shade(c, -0.85)).attr("stroke-width", L.edgeWidth || 0.8).attr("stroke-linejoin", "round");
+        }
+        const labelSeg = L.labelSegment != null ? segs[L.labelSegment] : segs[0];
+        if (L.label && labelSeg) alongLabel(g, svg, readable(labelSeg.map(xyPoint), proj), L.label, { size: 8.5, fill: shade(c, -1.2), dy: -5, italic: true });
+        lineDates(g, svg, Object.assign({}, L, { path: (L.path || []).map(xyPoint), segments: L.segments && L.segments.map((s) => s.map(xyPoint)) }), proj, c);
+        continue;
+      }
+      const lineSegs = segs.map((seg) => seg.map(xyPoint));
+      const ds = L.geo ? lineSegs.map((seg) => geo({ type: "LineString", coordinates: seg })) : lineSegs.map((seg) => d3.line().curve(d3.curveCatmullRom.alpha(0.5))(seg.map(proj)));
       for (const d of ds) {
         if (!d) continue;
         if (L.style === "road") {
@@ -529,9 +627,9 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
       }
       const headPath = ds.filter(Boolean).at(-1);
       if (L.head && headPath) arrowHead(svg, g, headPath, rw, c, 6);
-      const labelSeg = L.labelSegment != null ? segs[L.labelSegment] : segs.reduce((best, seg) => (seg.length > best.length ? seg : best), segs[0]);
+      const labelSeg = L.labelSegment != null ? lineSegs[L.labelSegment] : lineSegs.reduce((best, seg) => (seg.length > best.length ? seg : best), lineSegs[0]);
       if (L.label && labelSeg) alongLabel(g, svg, L.geo ? (geo({ type: "LineString", coordinates: labelSeg }) || readable(labelSeg, proj)) : readable(labelSeg, proj), L.label, { size: 8.5, fill: shade(c, -1.2), dy: -5, italic: true });
-      lineDates(g, svg, L, proj, c);
+      lineDates(g, svg, Object.assign({}, L, { path: (L.path || []).map(xyPoint), segments: L.segments && L.segments.map((s) => s.map(xyPoint)) }), proj, c);
     }
 
     for (const L of layers.filter((l) => l.type === "arrow")) {
@@ -732,6 +830,8 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
       const wd = Math.min(7, L.width || 5);
       g.append("path").attr("d", `M0,0L${sw - 7},0`).attr("stroke", c || "#c0392b").attr("stroke-width", wd);
       g.append("path").attr("d", `M${sw - 8},${-wd}L${sw},0L${sw - 8},${wd}Z`).attr("fill", c || "#c0392b");
+    } else if (L.type === "route" && L.style === "band") {
+      g.append("path").attr("d", `M1,-5L${sw - 1},-2L${sw - 1},2L1,5Z`).attr("fill", c || "#b0753a").attr("fill-opacity", 0.78).attr("stroke", shade(c || "#b0753a", -0.85)).attr("stroke-width", 0.5);
     } else if (L.type === "route" && L.style === "road") {
       g.append("path").attr("d", `M1,0L${sw - 1},0`).attr("stroke", L.bed || "#f0d27a").attr("stroke-width", 4).attr("stroke-linecap", "round");
       g.append("path").attr("d", `M1,0L${sw - 1},0`).attr("stroke", c || "#b0753a").attr("stroke-width", 2.4).attr("stroke-dasharray", "6 4");
@@ -751,7 +851,7 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
   // ---- the spread
   function render(spec, host) {
     host.innerHTML = "";
-    const errs = P.validate(spec).concat(regionErrors(spec));
+    const errs = P.validate(spec).concat(regionErrors(spec), histErrors(spec));
     if (errs.length) { host.innerHTML = `<div class="errors"><h2>This plate has problems</h2><ul>${errs.map((e) => `<li>${esc(e)}</li>`).join("")}</ul></div>`; return { errors: errs }; }
     warnings = [];
     const spread = document.createElement("div");
@@ -914,14 +1014,24 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
     }
     renderContext(spec, id);
     if (id === "key") { renderKey(host); window.ATLAS.current = { id, errors: [] }; document.title = "Symbol key · Amit's Atlas"; window.ATLAS.ready = true; return; }
-        if (!spec) { host.innerHTML = `<p class="empty">${ids.length ? `No plate called “${esc(id)}”.` : "No plates yet."}</p>`; window.ATLAS.current = { id, errors: [`no plate ${id}`] }; window.ATLAS.ready = true; return; }
-        const res = render(spec, host);
-    window.ATLAS.current = { id, ...res };
-    document.title = `${spec.title} · Amit's Atlas`;
-    window.ATLAS.ready = true;
+    if (!spec) { host.innerHTML = `<p class="empty">${ids.length ? `No plate called “${esc(id)}”.` : "No plates yet."}</p>`; window.ATLAS.current = { id, errors: [`no plate ${id}`] }; window.ATLAS.ready = true; return; }
+    window.ATLAS.ready = false;
+    host.innerHTML = `<p class="empty">Loading historical basemap polygons…</p>`;
+    ensureHistForSpec(spec).then(() => {
+      if (location.hash && decodeURIComponent(location.hash.replace(/^#/, "")) !== id) return;
+      const res = render(spec, host);
+      const histErrs = histErrors(spec);
+      window.ATLAS.current = { id, ...res, errors: [...(res.errors || []), ...histErrs] };
+      document.title = `${spec.title} · Amit's Atlas`;
+      window.ATLAS.ready = true;
+    }).catch((err) => {
+      host.innerHTML = `<p class="empty">${esc(err.message)}</p>`;
+      window.ATLAS.current = { id, errors: [err.message] };
+      window.ATLAS.ready = true;
+    });
   }
 
-  window.ATLAS = { render, figureSVG, show, drawSymbol, ready: false, test: { normalisePolygonRing, regionErrors } };
+  window.ATLAS = { render, figureSVG, show, drawSymbol, ready: false, test: { normalisePolygonRing, regionErrors, histErrors, histYearsForSpec } };
 
   document.addEventListener("DOMContentLoaded", () => {
     const pick = () => decodeURIComponent(location.hash.replace(/^#/, "")) || plateIds()[0];

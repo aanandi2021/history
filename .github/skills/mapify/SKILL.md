@@ -105,6 +105,11 @@ Grammar to follow (design language §4–8):
 - **Degrees of control** (round 2, from the China, India and Persia plates): `tier: "core"` for the heartland,
   `"conquest"` (upright stripes) for newly taken land, `"influence"` (pale, dashed edge) for loose overlordship.
   Use one hue for all three tiers of one power.
+- **Period borders**: for Vol. 2 and later years with `app/data/hist/world_<year>.js`, use historical-basemap
+  polygons before modern admin units: `hist:{ year:1815, names:["Austrian Empire","Lombardy","Venetia"] }`.
+  The renderer matches `NAME`, `SUBJECTO` and `PARTOF`, merges the matched pieces, and loads the year over
+  `file://` with a script tag. Add `hist.except:[...]` only when the named polity includes pieces the plate should
+  omit; otherwise use a hand polygon with `clipToLand:true` for intermediate frontiers such as 1812 Napoleon.
 - **Fortified frontiers** are `boundary` with `style: "wall"`. When the text is date-led, print the dates on the line
   (`dates: [[t, "214 B.C."]]`, `t` from 0 to 1 along the path as drawn) rather than in a tag.
 - **Built roads** (`route`, `style: "road"`) must never look like a journey (`dashed`) or trade (dotted).

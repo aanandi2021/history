@@ -67,10 +67,13 @@ test("validate catches the mistakes a generator is likely to make", () => {
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "arrow", path: [[1, 1]] }); }), /at least two/);
   // round 2 grammar (PDF pp. 34–53)
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "area", around: [[1, 1]], tier: "vassal" }); }), /unknown tier vassal/);
+  assert.doesNotMatch(bad((s) => { s.figures[0].layers.push({ type: "area", hist: { year: 1815, names: ["Austrian Empire", "Lombardy"] } }); }), /needs around|hist must/);
+  assert.match(bad((s) => { s.figures[0].layers.push({ type: "area", hist: { year: 1815, names: [] } }); }), /hist must/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "zigzag", path: [[1, 1], [2, 2]] }); }), /unknown boundary style/);
   assert.doesNotMatch(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "partition", path: [[1, 1], [2, 2]] }); }), /unknown boundary style/);
   assert.doesNotMatch(bad((s) => { s.figures[0].layers.push({ type: "boundary", style: "meridian", path: [[1, -5], [1, 5]] }); }), /unknown boundary style/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "route", style: "highway", path: [[1, 1], [2, 2]] }); }), /unknown route style/);
+  assert.doesNotMatch(bad((s) => { s.figures[0].layers.push({ type: "route", style: "band", path: [[1, 1, 100], [2, 2, 50]], strengths: [100, 50] }); }), /unknown route style|needs path|strengths/);
   assert.match(bad((s) => { s.figures[0].layers.push({ type: "route", weight: 0, path: [[1, 1], [2, 2]] }); }), /route weight/);
   assert.doesNotMatch(bad((s) => { s.figures[0].layers.push({ type: "route", segments: [[[1, 1], [2, 2]], [[3, 3], [4, 4]]] }); }), /needs path/);
   assert.doesNotMatch(bad((s) => { s.figures[0].layers.push({ type: "route", geo: true, path: [[170, 1], [-170, 2]] }); }), /geo/);

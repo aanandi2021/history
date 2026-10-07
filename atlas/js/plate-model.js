@@ -30,10 +30,11 @@
   // degrees of control, from round 2 (China, Asoka, Persia): solid core, striped conquest, pale influence
   const TIERS = ["core", "conquest", "influence"];
   const BOUNDARY_STYLES = ["dashed", "solid", "dashdot", "wall", "partition", "meridian"];
-  const ROUTE_STYLES = ["dotted", "dashed", "road"];
+  const ROUTE_STYLES = ["dotted", "dashed", "road", "band"];
   const LABEL_STYLES = ["region", "people", "water", "date", "note", "realm"];
 
   const isLonLat = (p) => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite) && p[0] >= -180 && p[0] <= 180 && p[1] >= -90 && p[1] <= 90;
+  const hasStrengthPath = (p) => Array.isArray(p) && p.length >= 2 && p.every((q) => Array.isArray(q) && q.length === 3 && Number.isFinite(q[0]) && q[0] >= -180 && q[0] <= 180 && Number.isFinite(q[1]) && q[1] >= -90 && q[1] <= 90 && Number.isFinite(q[2]) && q[2] > 0);
   const isColour = (c) => typeof c === "string" && /^(#[0-9a-f]{3}|#[0-9a-f]{6}|[a-z]+)$/i.test(c);
 
   /** Return a list of human-readable problems; empty means the plate can be drawn. */
@@ -78,8 +79,11 @@
         if (L.type === "area") {
           const pts = L.around || L.polygon;
           const hasRegions = Array.isArray(L.regions) && L.regions.length && L.regions.every((x) => typeof x === "string");
-          if ((!Array.isArray(pts) || !pts.length || !pts.every(isLonLat)) && !hasRegions) bad(`${lw}: needs around:[[lon,lat],...], polygon or regions:[code,...]`);
+          const hasHist = L.hist && Number.isFinite(+L.hist.year) && Array.isArray(L.hist.names) && L.hist.names.length && L.hist.names.every((x) => typeof x === "string");
+          if ((!Array.isArray(pts) || !pts.length || !pts.every(isLonLat)) && !hasRegions && !hasHist) bad(`${lw}: needs around:[[lon,lat],...], polygon, regions:[code,...] or hist:{year,names}`);
           if (L.regions != null && !hasRegions) bad(`${lw}: regions must be non-empty string codes`);
+          if (L.hist != null && !hasHist) bad(`${lw}: hist must be { year, names:[...] }`);
+          if (L.hist && L.hist.except != null && (!Array.isArray(L.hist.except) || !L.hist.except.every((x) => typeof x === "string"))) bad(`${lw}: hist.except must be string names`);
           if (L.minus != null && (!Array.isArray(L.minus) || !L.minus.every((x) => typeof x === "string"))) bad(`${lw}: minus must be string region codes`);
           if (L.pattern && !PATTERNS.includes(L.pattern)) bad(`${lw}: unknown pattern ${L.pattern}`);
           if (L.tier && !TIERS.includes(L.tier)) bad(`${lw}: unknown tier ${L.tier} (core, conquest or influence)`);
@@ -89,11 +93,12 @@
         }
         if (L.type === "arrow" || L.type === "route" || L.type === "boundary") {
           const paths = L.segments || (L.path ? [L.path] : []);
-          if (!Array.isArray(paths) || !paths.length || !paths.every((p) => Array.isArray(p) && p.length >= 2 && p.every(isLonLat))) bad(`${lw}: needs path of at least two [lon,lat]`);
+          if (!Array.isArray(paths) || !paths.length || !paths.every((p) => Array.isArray(p) && p.length >= 2 && (p.every(isLonLat) || (L.type === "route" && hasStrengthPath(p))))) bad(`${lw}: needs path of at least two [lon,lat]`);
           if (L.segments && L.type !== "route") bad(`${lw}: segments are only supported for routes`);
           if (L.type === "boundary" && L.style && !BOUNDARY_STYLES.includes(L.style)) bad(`${lw}: unknown boundary style ${L.style}`);
           if (L.type === "route" && L.style && !ROUTE_STYLES.includes(L.style)) bad(`${lw}: unknown route style ${L.style}`);
           if (L.type === "route" && L.weight != null && (!Number.isFinite(L.weight) || L.weight <= 0)) bad(`${lw}: route weight must be a positive number`);
+          if (L.type === "route" && L.strengths != null && (!Array.isArray(L.strengths) || L.strengths.length !== (L.path || []).length || !L.strengths.every((x) => Number.isFinite(x) && x > 0))) bad(`${lw}: strengths must be positive numbers, one per path point`);
           if (L.geo != null && (L.type !== "route" || typeof L.geo !== "boolean")) bad(`${lw}: geo must be true or false on a route`);
           for (const dt of L.dates || []) {
             if (!Array.isArray(dt) || typeof dt[0] !== "number" || dt[0] < 0 || dt[0] > 1 || !dt[1]) bad(`${lw}: dates must be [[0..1, "text"], ...]`);
