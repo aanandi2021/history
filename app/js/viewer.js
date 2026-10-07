@@ -212,38 +212,98 @@
     const rest = scene.layers.filter((L) => L.type !== "area");
     return plateAreas.length ? [...plateAreas, ...rest] : rest;
   }
-  const HIST_PALETTE = ["#9f7d56", "#8a9a72", "#7d8ea8", "#a87970", "#8e7aa3", "#b0925d", "#6f9a8f", "#a06f87", "#87966a", "#9b8267"];
+  const HIST_PALETTE = [
+    "#8f5d4a", "#5f8a6a", "#657eaa", "#b08345", "#8a5b89", "#829a4f", "#a05f68", "#4f8d91",
+    "#b09a56", "#735a44", "#9a7351", "#607b4f", "#5e83a1", "#a5684b", "#7d669c", "#92843e",
+    "#a65d84", "#4e947b", "#b58265", "#6c6f47", "#93626a", "#4d7396", "#987148", "#7b8d68"
+  ];
   const histFeatureCache = new Map();
+  const histStyleCache = new Map();
   let histLoadSeq = 0;
   function hashText(text) {
     let h = 2166136261;
     for (const ch of String(text || "")) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
     return h >>> 0;
   }
-  function histColour(d) {
-    const p = d.properties || {};
-    const group = p.PARTOF || p.SUBJECTO || p.NAME || "unnamed";
-    const base = d3.hsl(HIST_PALETTE[hashText(group) % HIST_PALETTE.length]);
-    base.h = (base.h + (hashText(p.NAME || group) % 19) - 9 + 360) % 360;
-    base.s = Math.max(0.24, base.s * 0.72);
-    base.l = Math.min(0.68, Math.max(0.48, base.l * 1.02));
-    return base.formatHex();
-  }
   function histName(d) { return String((d.properties && d.properties.NAME) || "").trim(); }
   function histPrecision(d) { return Math.max(1, Math.min(3, +(d.properties && d.properties.BORDERPRECISION) || 1)); }
   function histLooksLikePeople(d) { return /hunter|gather|forager|farmer|pastoral|nomad|tribe|people|culture|cultures|ainu|jōmon|jomon|inuit|inu|siberian|berber|khoisan|papuan/i.test(histName(d)); }
   function histFillOpacity(d) {
-    if (!histName(d)) return 0.06;
-    if (histLooksLikePeople(d)) return histPrecision(d) === 1 ? 0.20 : 0.24;
-    return histPrecision(d) === 1 ? 0.31 : histPrecision(d) === 2 ? 0.35 : 0.39;
+    if (!histName(d)) return 0.055;
+    if (histLooksLikePeople(d)) return histPrecision(d) === 1 ? 0.24 : 0.28;
+    return histPrecision(d) === 1 ? 0.38 : histPrecision(d) === 2 ? 0.42 : 0.46;
   }
+  function histTopoObject(topology) { return topology && topology.objects && (topology.objects.world || Object.values(topology.objects)[0]); }
   function histFeatures(date, topology) {
     const k = String(date);
     if (histFeatureCache.has(k)) return histFeatureCache.get(k);
-    const obj = topology && topology.objects && (topology.objects.world || Object.values(topology.objects)[0]);
+    const obj = histTopoObject(topology);
     const features = obj ? topojson.feature(topology, obj).features : [];
     histFeatureCache.set(k, features);
     return features;
+  }
+  function histColourDistance(a, b) {
+    const ca = d3.hsl(a), cb = d3.hsl(b);
+    const dh = Math.min(Math.abs(ca.h - cb.h), 360 - Math.abs(ca.h - cb.h)) / 180;
+    return dh * 1.45 + Math.abs(ca.s - cb.s) * 0.7 + Math.abs(ca.l - cb.l) * 1.25;
+  }
+  function histStrokeColour(fill) {
+    const c = d3.hsl(fill);
+    c.s = Math.min(0.56, c.s * 1.18);
+    c.l = Math.max(0.24, c.l - 0.20);
+    return c.formatHex();
+  }
+  function histFeatureStyles(date, topology, features) {
+    const key = String(date);
+    if (histStyleCache.has(key)) return histStyleCache.get(key);
+    const obj = histTopoObject(topology);
+    const geoms = (obj && obj.geometries) || [];
+    const neighbours = geoms.length ? topojson.neighbors(geoms) : features.map(() => []);
+    const styles = features.map((f, i) => ({ fill: "#c6b99b", stroke: "none", labelCandidates: [], priority: 0, neighbours: neighbours[i] || [] }));
+    const order = features.map((f, i) => ({ i, area: d3.geoArea(f), name: histName(f) }))
+      .sort((a, b) => (b.name ? 1 : 0) - (a.name ? 1 : 0) || b.area - a.area);
+    const assigned = new Map();
+    for (const { i } of order) {
+      const f = features[i], name = histName(f);
+      if (!name) continue;
+      const seed = hashText(`${(f.properties && (f.properties.PARTOF || f.properties.SUBJECTO)) || ""}|${name}`);
+      let best = HIST_PALETTE[seed % HIST_PALETTE.length], bestScore = -Infinity;
+      for (let c = 0; c < HIST_PALETTE.length; c++) {
+        const colour = HIST_PALETTE[(seed + c * 7) % HIST_PALETTE.length];
+        const used = (neighbours[i] || []).map((n) => assigned.get(n)).filter(Boolean);
+        const separation = used.length ? Math.min(...used.map((u) => histColourDistance(colour, u))) : 1;
+        const preference = 1 - (c / HIST_PALETTE.length) * 0.08;
+        const score = separation * 5 + preference;
+        if (score > bestScore) { bestScore = score; best = colour; }
+      }
+      assigned.set(i, best);
+      styles[i].fill = best;
+      styles[i].stroke = histStrokeColour(best);
+    }
+    histStyleCache.set(key, styles);
+    return styles;
+  }
+  function histFeatureIndex(d) { return Number.isFinite(d.__histIndex) ? d.__histIndex : 0; }
+  function histStyle(d) { return (d.__histStyles && d.__histStyles[histFeatureIndex(d)]) || { fill: "#c6b99b", stroke: "none", priority: 0, labelCandidates: [] }; }
+  function histLabelCandidates(d) {
+    const candidates = [];
+    const add = (p) => {
+      if (!p || !Number.isFinite(p[0]) || !Number.isFinite(p[1])) return;
+      if (!candidates.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 6)) candidates.push(p);
+    };
+    const b = geoPath.bounds(d), w = b[1][0] - b[0][0], h = b[1][1] - b[0][1];
+    let best = null, bestScore = -Infinity;
+    for (let ix = 1; ix <= 7; ix++) for (let iy = 1; iy <= 5; iy++) {
+      const p = [b[0][0] + w * ix / 8, b[0][1] + h * iy / 6];
+      const ll = projection.invert(p);
+      if (!ll || !d3.geoContains(d, ll)) continue;
+      const score = Math.min(p[0] - b[0][0], b[1][0] - p[0], p[1] - b[0][1], b[1][1] - p[1]);
+      if (score > bestScore) { bestScore = score; best = p; }
+    }
+    add(best);
+    add(geoPath.centroid(d));
+    add([(b[0][0] + b[1][0]) / 2, (b[0][1] + b[1][1]) / 2]);
+    return candidates;
   }
   function ensureHistSoftFilter() {
     if (!sceneDefs.select("#hist-soft-edge").empty()) return;
@@ -286,7 +346,7 @@
     if (hist && histDate != null && !hist.isLoaded(histDate)) {
       const seq = ++histLoadSeq;
       hist.load(histDate).then(() => { if (seq === histLoadSeq) drawWorldUnderlay(state.cursor); }).catch((err) => console.warn(err.message));
-      worldLayer.selectAll("path.polity,g.world-label").remove();
+      worldLayer.selectAll("path.polity,path.hist-soft-polity,g.world-label").remove();
       const el = $("#world-date-label");
       if (el) el.textContent = label;
       return;
@@ -295,28 +355,47 @@
     if (!topology) { drawLegacyWorldUnderlay(t, label); return; }
     ensureHistSoftFilter();
     const features = histFeatures(histDate, topology);
-    worldLayer.selectAll("path.polity").data(features, (d, i) => (d.properties && `${d.properties.NAME}|${d.properties.SUBJECTO}|${d.properties.PARTOF}|${i}`) || i).join(
+    const styles = histFeatureStyles(histDate, topology, features);
+    features.forEach((f, i) => { f.__histIndex = i; f.__histStyles = styles; });
+    const keyFor = (d, i) => (d.properties && `${d.properties.NAME}|${d.properties.SUBJECTO}|${d.properties.PARTOF}|${i}`) || i;
+    worldLayer.selectAll("path.hist-soft-polity").data(features.filter((d) => histName(d) && histPrecision(d) === 1), keyFor).join(
+      (e) => e.append("path").attr("class", "hist-soft-polity"),
+      (u) => u,
+      (x) => x.remove()
+    ).attr("d", geoPath)
+      .attr("fill", (d) => histStyle(d).fill)
+      .attr("fill-opacity", (d) => histLooksLikePeople(d) ? 0.12 : 0.16)
+      .attr("stroke", "none")
+      .attr("filter", "url(#hist-soft-edge)");
+    worldLayer.selectAll("path.polity").data(features, keyFor).join(
       (e) => e.append("path").attr("class", "polity hist-polity"),
       (u) => u,
       (x) => x.remove()
     ).attr("d", geoPath)
       .attr("data-name", histName)
-      .attr("fill", (d) => histColour(d))
-      .attr("stroke", (d) => histColour(d))
+      .attr("fill", (d) => histStyle(d).fill)
+      .attr("stroke", (d) => histName(d) ? histStyle(d).stroke : "none")
       .attr("fill-opacity", histFillOpacity)
-      .attr("stroke-opacity", (d) => histName(d) ? (histPrecision(d) === 3 ? 0.48 : histPrecision(d) === 2 ? 0.28 : 0.03) : 0.02)
-      .attr("stroke-dasharray", (d) => histPrecision(d) === 2 ? "3 3" : null)
-      .attr("filter", (d) => histPrecision(d) === 1 ? "url(#hist-soft-edge)" : null);
+      .attr("stroke-opacity", (d) => histName(d) ? (histPrecision(d) === 3 ? 0.78 : histPrecision(d) === 2 ? 0.70 : 0.62) : 0)
+      .attr("stroke-width", (d) => histName(d) ? (histPrecision(d) === 3 ? 0.75 : 0.7) : 0)
+      .attr("vector-effect", "non-scaling-stroke")
+      .attr("stroke-linejoin", "round")
+      .attr("stroke-linecap", "round")
+      .attr("stroke-dasharray", (d) => !histName(d) || histPrecision(d) === 3 ? null : histPrecision(d) === 2 ? "1.4 2.2" : "3.2 3")
+      .attr("filter", null);
     worldLayer.selectAll("g.world-label").data(features.filter(histName), (d, i) => `${histName(d)}|${i}`).join(
       (e) => { const g = e.append("g").attr("class", "world-label sc hist-label"); g.append("text").attr("class", "polity-label"); return g; },
       (u) => u,
       (x) => x.remove()
     ).each(function (d) {
-      const c = geoPath.centroid(d);
+      const candidates = histLabelCandidates(d);
+      const c = candidates[0] || geoPath.centroid(d);
       d.x = Number.isFinite(c[0]) ? c[0] : 0; d.y = Number.isFinite(c[1]) ? c[1] : 0;
+      d.labelCandidates = candidates.length ? candidates : [[d.x, d.y]];
       const b = geoPath.bounds(d);
       d.screenArea0 = Math.max(0, b[1][0] - b[0][0]) * Math.max(0, b[1][1] - b[0][1]);
-      d.priority = d.screenArea0 * (histPrecision(d) === 3 ? 1.15 : 1);
+      const precisionBoost = histPrecision(d) === 3 ? 1.30 : histPrecision(d) === 2 ? 1.15 : 1;
+      d.priority = d.screenArea0 * precisionBoost * (histLooksLikePeople(d) ? 0.48 : 1);
       d3.select(this).datum(d).select("text").text(histName(d));
     });
     const el = $("#world-date-label");
@@ -338,9 +417,16 @@
       const d = d3.select(n).datum();
       n.style.display = null;
       if ((d.screenArea0 || 0) * k * k < 950) { n.style.display = "none"; continue; }
-      const r = n.getBoundingClientRect();
-      if (occupied.some((o) => overlapsRect(r, o, 4)) || kept.some((o) => overlapsRect(r, o, 6))) n.style.display = "none";
-      else kept.push(r);
+      const candidates = d.labelCandidates && d.labelCandidates.length ? d.labelCandidates : [[d.x, d.y]];
+      let placed = null;
+      for (const p of candidates) {
+        d.x = p[0]; d.y = p[1];
+        n.setAttribute("transform", `translate(${d.x},${d.y}) scale(${1 / k})`);
+        const r = n.getBoundingClientRect();
+        if (!occupied.some((o) => overlapsRect(r, o, 4)) && !kept.some((o) => overlapsRect(r, o, 6))) { placed = r; break; }
+      }
+      if (!placed) n.style.display = "none";
+      else kept.push(placed);
     }
   }
 

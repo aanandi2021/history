@@ -140,11 +140,25 @@ test("e2e: AD 1 historical underlay draws a visible Roman Empire", async () => {
     const roman = await page.$$eval("#map .world-underlay path.hist-polity", (paths) => paths.map((p) => ({
       name: p.getAttribute("data-name") || "",
       d: p.getAttribute("d") || "",
-      fillOpacity: Number(p.getAttribute("fill-opacity") || getComputedStyle(p).fillOpacity || 0)
+      fillOpacity: Number(p.getAttribute("fill-opacity") || getComputedStyle(p).fillOpacity || 0),
+      stroke: p.getAttribute("stroke") || getComputedStyle(p).stroke || "",
+      strokeOpacity: Number(p.getAttribute("stroke-opacity") || getComputedStyle(p).strokeOpacity || 0),
+      strokeWidth: Number(p.getAttribute("stroke-width") || getComputedStyle(p).strokeWidth || 0)
     })).find((p) => /Roman/i.test(p.name)) || null);
     assert.ok(roman, "Roman Empire feature is present");
     assert.ok(roman.d.length > 100, "Roman Empire feature has real geometry");
     assert.ok(roman.fillOpacity >= 0.25, `fill-opacity ${roman.fillOpacity}`);
+    assert.ok(roman.stroke && roman.stroke !== "none", "Roman Empire has a visible stroke colour");
+    assert.ok(roman.strokeOpacity >= 0.5, `stroke-opacity ${roman.strokeOpacity}`);
+    assert.ok(roman.strokeWidth >= 0.6, `stroke-width ${roman.strokeWidth}`);
+    const romanLabel = await page.$$eval("#map .world-underlay g.hist-label", (labels) => labels.map((g) => ({
+      text: g.textContent || "",
+      display: g.style.display || getComputedStyle(g).display,
+      box: (() => { const r = g.getBoundingClientRect(); return { width: r.width, height: r.height }; })()
+    })).find((g) => /Roman Empire/i.test(g.text)) || null);
+    assert.ok(romanLabel, "Roman Empire label exists");
+    assert.notEqual(romanLabel.display, "none", "Roman Empire label is rendered");
+    assert.ok(romanLabel.box.width > 0 && romanLabel.box.height > 0, "Roman Empire label has screen size");
   } finally {
     await browser.close();
   }
