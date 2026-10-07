@@ -1083,10 +1083,44 @@
   }
 
   /** A plate as a picture, not a button: thumbnail, title, and where it goes. */
-  function plateTile(p) {
-    return `<a class="plate-tile" data-link="plate" data-plate="${esc(p.id)}" href="${esc(M.plateUrl(p.id))}">` +
+  function plateTile(p, mini = false) {
+    return `<a class="plate-tile${mini ? " mini" : ""}" href="../atlas/index.html#${esc(p.id)}" title="Open atlas plate: ${esc(p.title)}">` +
       `<img src="plates/${esc(p.id)}.jpg" alt="" loading="lazy" onerror="this.remove()">` +
-      `<span class="pt-k">Atlas plate</span><span class="pt-t">${esc(p.title)}</span><span class="pt-go">Open the map →</span></a>`;
+      (mini ? `<span class="pt-t">${esc(p.title)}</span>` : `<span class="pt-k">Atlas plate</span><span class="pt-t">${esc(p.title)}</span><span class="pt-go">Open the map →</span>`) + `</a>`;
+  }
+  function panelPlateTiles(plates, now) {
+    if (!plates.length) return "";
+    const plateIds = new Set(M.linksFor(state.ds, now || {}).filter((l) => l.kind === "plate").map((l) => String(l.href).replace(/^#/, "").split("#").pop()));
+    const best = plates.find((p) => plateIds.has(p.id)) || plates[0];
+    const rest = plates.filter((p) => p !== best);
+    return `<div class="plate-tiles panel-plate-tiles" id="panel-plates">${plateTile(best)}${rest.length ? `<div class="plate-mini-row">${rest.map((p) => plateTile(p, true)).join("")}</div>` : ""}</div>`;
+  }
+  function laneRegion(lane, ds) {
+    const ln = ds.lanes.find((l) => l.id === lane) || { id: lane, label: lane };
+    const x = `${ln.id} ${ln.label}`.toLowerCase();
+    if (/canada|america|atlantic/.test(x)) return "Americas";
+    if (/asia|china|india|pacific/.test(x)) return "Asia";
+    if (/islam|ottoman|near east|middle east/.test(x)) return "Islamic world";
+    if (/africa/.test(x)) return "Africa";
+    return "Europe";
+  }
+  function isOutsideEurope(lane, ds) { return laneRegion(lane, ds) !== "Europe"; }
+  function widenedOutsideEuropeGroup(ds, t, currentW, existingGroups) {
+    if (existingGroups.some((g) => isOutsideEurope(g.lane, ds) && g.events.length)) return null;
+    const outside = ds.events.filter((e) => isOutsideEurope(e.lane, ds));
+    if (!outside.length) return { gap: true };
+    for (const years of [50, 100, 250, 500, 1000]) {
+      const w = years * 365.25 * M.DAY;
+      if (w <= currentW) continue;
+      const a = new Date(+t - w), b = new Date(+t + w);
+      const hits = outside.filter((e) => e.t0 <= b && e.t1 >= a).sort((a, b) => Math.abs(a.t0 - t) - Math.abs(b.t0 - t));
+      if (hits.length) {
+        const lane = hits[0].lane;
+        return { lane, label: `Meanwhile in ${laneRegion(lane, ds)} (±${years} yr)`, events: hits.filter((e) => e.lane === lane).slice(0, 4), widened: true };
+      }
+    }
+    const nearest = outside.slice().sort((a, b) => Math.abs(a.t0 - t) - Math.abs(b.t0 - t))[0];
+    return { lane: nearest.lane, label: `Meanwhile in ${laneRegion(nearest.lane, ds)} (nearest recorded)`, events: [nearest], widened: true };
   }
 
   function renderPanel() {
@@ -1106,15 +1140,18 @@
       const now = picked || (shown && shown.text ? shown : null) || chapters.filter((c) => c.text).sort((a, b) => (a.t1 - a.t0) - (b.t1 - b.t0))[0];
       if (now) h += `<div class="now" id="now"><div class="now-h">Now · <a class="it" href="#" data-id="${esc(now.id)}">${esc(now.title)}</a></div><p>${richText(now)}</p></div>`;
       const plates = (ds.plates || []).filter((p) => t >= p.t0 && t <= p.t1);
-      if (plates.length) h += `<div class="plate-tiles" id="panel-plates">${plates.map(plateTile).join("")}</div>`;
+      if (plates.length) h += panelPlateTiles(plates, now);
       h += `<h3>Chapter</h3><div>${chapters.map((c) => `<span class="chip${c === now ? " on" : ""}" data-id="${esc(c.id)}">${esc(c.title)}</span>`).join("")}</div>`;
     }
     h += `<h3>Meanwhile</h3><div id="meanwhile-groups">`;
-    for (const g of groups) {
-      const ln = ds.lanes.find((l) => l.id === g.lane);
-      h += `<div class="lane-h" data-lane="${esc(g.lane)}"><span class="sw" style="background:${laneColour(g.lane)}"></span>${esc(ln.label)}</div><ul>`;
-      h += g.events.length ? g.events.map((e) => `<li data-event="${esc(e.id)}">${itemLink(e, `<span class="d">${esc(itemWhen(e))}</span>`)}</li>`).join("")
-        : `<li class="empty">nothing recorded</li>`;
+    const shownGroups = groups.filter((g) => g.events.length);
+    const extraGroup = widenedOutsideEuropeGroup(ds, t, w, shownGroups);
+    if (extraGroup && extraGroup.gap) h += `<p class="empty outside-gap">Nothing outside Europe recorded here yet.</p>`;
+    const panelGroups = extraGroup && !extraGroup.gap ? [...shownGroups, extraGroup] : shownGroups;
+    for (const g of panelGroups) {
+      const ln = ds.lanes.find((l) => l.id === g.lane) || { label: g.lane };
+      h += `<div class="lane-h${g.widened ? " widened" : ""}" data-lane="${esc(g.lane)}"><span class="sw" style="background:${laneColour(g.lane)}"></span>${esc(g.label || ln.label)}</div><ul>`;
+      h += g.events.map((e) => `<li data-event="${esc(e.id)}">${itemLink(e, `<span class="d">${esc(itemWhen(e))}</span>`)}</li>`).join("");
       h += `</ul>`;
     }
     h += `</div><h3>In power</h3><ul id="in-power">`;

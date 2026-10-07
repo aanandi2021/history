@@ -295,6 +295,10 @@ test("the side panel tells the story of the moment and shows plates as pictures"
     assert.equal(tile.title, "The monsoon road");
   }
   assert.equal(await page.$$eval("#card .links a[data-link=plate]", (a) => a.length), 0, "no plain plate button any more");
+  await page.evaluate(() => APP.loadDataset("early-modern", { cursor: new Date(Date.UTC(1715, 6, 2)) }));
+  await settle(400);
+  assert.ok(await page.$$eval("#panel-plates .plate-tile.mini", (a) => a.length) >= 1, "extra active plates are small thumbnails");
+  assert.equal(await page.$eval("#meanwhile-groups", (el) => el.textContent.includes("nothing recorded")), false, "empty meanwhile rows are hidden");
   // outside any plate's span: no tile
   await page.evaluate(() => APP.loadDataset("russia"));
   await settle(400);
