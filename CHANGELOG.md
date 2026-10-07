@@ -7,7 +7,7 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
-## 1.1.0 (Unreleased / 1.1.0-dev)
+## 1.1.0 (7 Oct 2026)
 
 - Reframed the top spine as eras only: Russia and Maritime Asia are now threads in the period dropdown, while preserving their existing datasets. Switching eras or threads carries the current year and clamps to the nearest edge.
 - Marked the 1800-1939 Penguin Vol. 2 gap on the master strip.
