@@ -28,7 +28,7 @@ test("Vol. 2 round 2 registers the restoration period and plates", () => {
   assert.ok(DS.restoration);
   assert.equal(DS.restoration.lanes[0].id, "canada");
   assert.equal(DS.restoration.lanes[0].pinned, true);
-  assert.equal(DS.restoration.gapAfter, "1850-1939 not yet built (Penguin Vol. 2)");
+  assert.equal(DS.restoration.gapAfter, undefined);
   assert.equal(DS.revolution.gapAfter, undefined);
   for (const id of ROUND2) {
     assert.ok(PLATES[id], id);

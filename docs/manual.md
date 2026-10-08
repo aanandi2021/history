@@ -39,7 +39,7 @@ Untick **Show this at start** to stop it appearing. You can reopen it from the *
 ### Master strip
 This is the whole of history on one strip, from 1800 BC to 1945. Each era is a bar; the open one is red. Click an era to jump to it. **The year comes with you.** If you're at 1500 and switch eras, you stay at 1500, or the nearest year that era covers.
 
-The scale stretches toward the present, so a six-year war isn't a hairline next to two thousand years of antiquity. The hatched stretch from 1850 to 1939 is not built yet; Penguin Atlas Vol. 2 now runs through the age of revolution, Napoleon, Restoration Europe and 1848.
+The scale stretches toward the present, so a six-year war isn't a hairline next to two thousand years of antiquity. The hatched stretch from 1890 to 1939 is not built yet; Penguin Atlas Vol. 2 now runs through the age of revolution, Napoleon, Restoration Europe, 1848 and the age of national states.
 
 ### Map
 - **World at this date.** A quiet political map underneath everything, showing who held what at the nearest mapped date. The label says which date's map you're seeing. It shows states, and also peoples, nomads and Indigenous nations.

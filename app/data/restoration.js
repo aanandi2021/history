@@ -126,7 +126,7 @@
   ];
   window.DATASETS = window.DATASETS || {};
   window.DATASETS.restoration = {
-    id:"restoration", title:"Restoration and revolution", subtitle:"1815-1850", range:["1810-01-01","1850-12-31"], gapAfter:"1850-1939 not yet built (Penguin Vol. 2)", startAt:"1830", precision:"year",
+    id:"restoration", title:"Restoration and revolution", subtitle:"1815-1850", range:["1810-01-01","1850-12-31"], startAt:"1830", precision:"year",
     note:"Amit's Notes of the History of the World/The age of restoration and revolution",
     mapNote:"The quiet underlay uses the nearest historical-basemaps state map, usually 1815. Story layers use historical-basemap polygons where they exist, and hand-traced fields only for intermediate revolutionary or colonial frontiers.",
     lanes:[{id:"canada",label:"Canada and British North America",colour:"#b22d2d",pinned:true},{id:"ideas",label:"Political thought",colour:"#6b6b6b"},{id:"britain",label:"Britain and industry",colour:"#2f5f93"},{id:"europe",label:"Restoration Europe",colour:"#7a5a8c"},{id:"germany",label:"Germany and Zollverein",colour:"#4f7f4f"},{id:"france",label:"France",colour:"#8c3b3b"},{id:"latin",label:"Latin America",colour:"#b36b2e"},{id:"islamic",label:"Islamic world",colour:"#9a6a32"},{id:"asia",label:"Asia",colour:"#387a5b"},{id:"africa",label:"Africa and abolition",colour:"#7a6b42"},{id:"america",label:"United States",colour:"#2f7f86"}],
@@ -143,4 +143,3 @@
     changelog:["Added in v1.3.0-dev for Penguin Atlas Vol. 2 round 2: Restoration Europe, Latin American independence, Britain, Canada, Greece, the Opium War, abolition and 1848."]
   };
 })();
-

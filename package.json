@@ -1,6 +1,6 @@
 {
   "name": "amits-world-history",
-  "version": "1.3.0",
+  "version": "1.4.0-dev",
   "private": true,
   "description": "Amit's Notes of the History of the World: a static timeline and map viewer.",
   "scripts": {
@@ -24,3 +24,4 @@
     "world-atlas": "^2.0.2"
   }
 }
+
