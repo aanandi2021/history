@@ -1,6 +1,6 @@
 (function(){
  const RUS="#6b8c3f", GER="#8c3b3b", AUS="#d8a84f", PEACE="#7a5a8c", ROAD="#5b4a3f";
- const frontier1914=[[20.0,54.6],[21.6,53.8],[22.8,52.8],[23.7,51.4],[22.7,49.2],[25.4,48.3]];
+ const frontier1914=[[21.07,55.87],[22.3,55.1],[22.9,54.65],[22.75,54.3],[22.5,53.75],[21.5,53.3],[20.6,53.2],[19.9,53.15],[19.3,53.0],[18.9,52.9],[18.6,52.5],[18.1,51.9],[18.4,51.2],[19.2,50.3],[19.9,50.15],[20.6,50.25],[21.7,50.6],[22.3,50.6],[23.0,50.4],[24.1,50.5],[25.2,50.2],[26.1,49.4],[26.5,48.6],[26.6,48.3]];
  const front1915=[[24.11,56.95],[25.3,55.2],[25.6,53.7],[26.1,52.12],[26.1,50.5],[25.94,48.29]];
  window.PLATES["eastern-front-russia-1914-1918"]={id:"eastern-front-russia-1914-1918",title:"The Eastern Front and Russia, 1914-1918",head:"First World War / Eastern theatre",folio:"124-129",viewer:"ww1/1917/ch-eastern-front-russia",figures:[{caption:"Eastern Front: Tannenberg, retreat, Brusilov and Brest-Litovsk",share:0.74,extent:[[12,42],[43,61]],projection:"conic",layers:[
   {id:"russia-1914",type:"area",hist:{year:1914,names:["Russian Empire"]},colour:RUS,tier:"influence",legend:"Russian Empire, 1914"},
@@ -13,11 +13,11 @@
   {id:"masurian",type:"point",symbol:"battle",at:[21.9,54.25],name:"Masurian Lakes",labelPos:"e"},
   {id:"gorlice",type:"point",symbol:"battle",at:[21.16,49.66],name:"Gorlice-Tarnów",labelPos:"w",tag:{text:"1915",colour:"#f1c75b"}},
   {id:"warsaw",type:"point",symbol:"city",at:[21.0,52.23],name:"Warsaw",labelPos:"w"},
-  {id:"pinsk",type:"point",symbol:"city",at:[26.10,52.12],name:"Pinsk",labelPos:"ne"},
+  {id:"pinsk",type:"point",symbol:"city",at:[26.10,52.12],name:"Pinsk",labelPos:"n"},
   {id:"czernowitz",type:"point",symbol:"city",at:[25.94,48.29],name:"Czernowitz",labelPos:"e"},
   {id:"riga",type:"point",symbol:"port",at:[24.11,56.95],name:"Riga",labelPos:"n",tag:{text:"1917",colour:"#e8806a"}},
-  {id:"brusilov",type:"arrow",colour:RUS,width:9,path:[[25.33,50.75],[24.71,51.22],[24.03,49.84]],label:"Brusilov",legend:"Brusilov offensive west from Lutsk toward Kovel and Lemberg"},
-  {id:"lutsk",type:"point",symbol:"battle",at:[25.33,50.75],name:"Lutsk",labelPos:"e"},
+  {id:"brusilov",type:"arrow",colour:RUS,width:9,path:[[26.6,50.85],[25.3,50.55],[23.6,50.2]],label:"1916",legend:"Brusilov offensive west from Lutsk toward Kovel and Lemberg"},
+  {id:"lutsk",type:"point",symbol:"battle",at:[25.33,50.75],name:"Lutsk",labelPos:"ne"},
   {id:"kovel",type:"point",symbol:"city",at:[24.71,51.22],name:"Kovel",labelPos:"w"},
   {id:"lemberg",type:"point",symbol:"city",at:[24.03,49.84],name:"Lemberg",labelPos:"s"},
   {id:"petrograd",type:"point",symbol:"insurrection",at:[30.34,59.93],name:"Petrograd",labelPos:"w",tag:{text:"1917",colour:"#f1c75b"}},
