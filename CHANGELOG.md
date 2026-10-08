@@ -9,6 +9,8 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 
 ## 1.5.0 (Unreleased / 1.5.0-dev)
 
+- Added Penguin Atlas Vol. 2 round 7: the inter-war world, part II (1929-1939), with Stalin’s USSR, the Great Depression, Nazi expansion, Spain, Italy/Ethiopia, Japan/China, Europe’s road to war, scenes and seven plates.
+
 - Added Penguin Atlas Vol. 2 round 6: the inter-war world, part I (1918-1929), with a Russia-centred civil-war and early-USSR spine, Poland, Turkey, mandates, Canada/Commonwealth autonomy, China/Japan, League/loan machinery, scenes and eight plates.
 
 ## 1.4.0 (8 Oct 2026)

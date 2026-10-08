@@ -2,8 +2,8 @@
 // Schema: specs/001-world-viewer/contracts/dataset.schema.json
 window.DATASETS = window.DATASETS || {};
 window.DATASETS.ww2 = {
-  id: "ww2", title: "The Second World War", subtitle: "1937–1945",
-  range: ["1937-01-01", "1946-01-01"], startAt: "1939-09-01",
+  id: "ww2", title: "The Second World War", subtitle: "1939–1945",
+  range: ["1939-09-01", "1946-01-01"], startAt: "1939-09-01",
   mapNote: "Countries are coloured whole, using modern borders, at a handful of snapshot dates. It is a rough picture of who controlled what, not a front line.",
   lanes: [{"id":"canada","label":"Canada","pinned":true},{"id":"west","label":"Western Europe & Atlantic"},{"id":"east","label":"Eastern Front"},{"id":"med","label":"Mediterranean & Africa"},{"id":"pacific","label":"Asia & Pacific"}],
   events: [
@@ -22,10 +22,6 @@ window.DATASETS.ww2 = {
     {"lane":"canada","date":"1944-11-22","title":"Conscription crisis","text":"King agrees to send conscripts overseas.","at":[-75.7,45.42],"wiki":"Conscription Crisis of 1944"},
     {"lane":"canada","date":"1945-05-05","title":"Netherlands liberated","text":"German forces in the Netherlands surrender to the First Canadian Army.","at":[5.66,51.97],"wiki":"Liberation of the Netherlands"},
     {"lane":"canada","date":"1945-09-05","title":"Gouzenko defects","text":"A Soviet cipher clerk in Ottawa walks out with evidence of a spy ring.","at":[-75.7,45.42],"wiki":"Igor Gouzenko"},
-    {"lane":"west","date":"1938-03-12","title":"Anschluss","text":"Germany absorbs Austria.","at":[16.37,48.2]},
-    {"lane":"west","date":"1938-09-30","title":"Munich Agreement","text":"Britain and France let Germany take the Sudetenland from Czechoslovakia.","at":[11.58,48.14]},
-    {"lane":"west","date":"1938-11-09","title":"Kristallnacht","text":"A night of state-organised attacks on Jews across Germany and Austria.","at":[13.4,52.52]},
-    {"lane":"west","date":"1939-03-15","title":"Germany occupies Prague","at":[14.42,50.08],"wiki":"German occupation of Czechoslovakia"},
     {"lane":"west","date":"1939-09-01","title":"Germany invades Poland","text":"Britain and France declare war two days later.","at":[18.67,54.4],"wiki":"Invasion of Poland"},
     {"lane":"west","date":"1939-09-03","title":"Britain and France declare war","at":[-0.13,51.5],"wiki":"Phoney War"},
     {"lane":"west","date":"1940-04-09","title":"Denmark and Norway invaded","at":[10.75,59.91],"wiki":"Operation Weserübung"},
@@ -40,7 +36,6 @@ window.DATASETS.ww2 = {
     {"lane":"west","date":"1944-12-16","end":"1945-01-25","title":"Battle of the Bulge","at":[5.8,50.1]},
     {"lane":"west","date":"1945-04-30","title":"Hitler's suicide","at":[13.4,52.52],"wiki":"Death of Adolf Hitler"},
     {"lane":"west","date":"1945-05-08","title":"VE Day","at":[4.03,49.25],"wiki":"Victory in Europe Day"},
-    {"lane":"east","date":"1939-08-23","title":"Molotov–Ribbentrop Pact","text":"Secretly divides Eastern Europe between Germany and the USSR.","at":[37.62,55.75]},
     {"lane":"east","date":"1939-09-17","title":"USSR invades Poland","at":[24,52.5],"wiki":"Soviet invasion of Poland"},
     {"lane":"east","date":"1939-11-30","end":"1940-03-13","title":"Winter War","text":"Finland holds off the Red Army, then cedes territory.","at":[29,61.5]},
     {"lane":"east","date":"1941-06-22","title":"Operation Barbarossa","text":"About 3.8 million Axis troops invade the USSR.","at":[23.7,52.1]},
@@ -60,8 +55,6 @@ window.DATASETS.ww2 = {
     {"lane":"med","date":"1943-07-25","title":"Mussolini deposed","at":[12.5,41.9],"wiki":"Fall of the Fascist regime in Italy"},
     {"lane":"med","date":"1943-09-08","title":"Italy's armistice announced","at":[12.5,41.9],"wiki":"Armistice of Cassibile"},
     {"lane":"med","date":"1944-06-04","title":"Rome liberated","at":[12.6,41.95],"wiki":"Liberation of Rome"},
-    {"lane":"pacific","date":"1937-07-07","title":"Marco Polo Bridge","text":"Full-scale war between Japan and China begins.","at":[116.2,39.85],"wiki":"Marco Polo Bridge incident"},
-    {"lane":"pacific","date":"1937-12-13","title":"Nanjing massacre begins","at":[118.8,32.06],"wiki":"Nanjing Massacre"},
     {"lane":"pacific","date":"1940-09-27","title":"Tripartite Pact","text":"Germany, Italy and Japan.","at":[13.4,52.52]},
     {"lane":"pacific","date":"1941-12-07","title":"Pearl Harbor","text":"Plus near-simultaneous attacks on Malaya, Hong Kong and the Philippines.","at":[-157.95,21.35],"wiki":"Attack on Pearl Harbor"},
     {"lane":"pacific","date":"1942-02-15","title":"Fall of Singapore","at":[103.82,1.35],"wiki":"Fall of Singapore"},

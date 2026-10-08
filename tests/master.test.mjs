@@ -15,7 +15,7 @@ test("masterLayout: every period, in order, with readable from/to years and no o
   assert.equal(anc.from, "1800 BC");
   assert.equal(anc.to, "AD 700");
   const ww2 = L.periods.find((p) => p.id === "ww2");
-  assert.equal(`${ww2.from} – ${ww2.to}`, "1937 – 1945");
+  assert.equal(`${ww2.from} – ${ww2.to}`, "1939 – 1945");
   for (const a of L.periods) for (const b of L.periods) {
     if (a !== b && a.row === b.row) assert.ok(a.y1 <= b.y0 || b.y1 <= a.y0, `${a.id} and ${b.id} share a row but overlap`);
   }
@@ -60,7 +60,7 @@ test("e2e: the strip highlights the open period, follows the dropdown, and opens
   s = await on();
   assert.equal(s.dropdown, "ww2", "strip → dropdown");
   assert.deepEqual(s.on, ["ww2"]);
-  assert.deepEqual(s.years, ["1937", "1945"]);
+  assert.deepEqual(s.years, ["1939", "1945"]);
   await page.waitForFunction(() => location.hash.startsWith("#ww2/"), { timeout: 3000 });
   const before = s.cursor;
   await page.evaluate(() => APP.setCursor(new Date(Date.UTC(1945, 0, 1))));
