@@ -30,7 +30,7 @@ test("Vol. 2 round 4 registers the imperial period and plates", () => {
   assert.ok(DS.imperial);
   assert.equal(DS.imperial.lanes[0].id, "canada");
   assert.equal(DS.imperial.lanes[0].pinned, true);
-  assert.equal(DS.imperial.gapAfter, "1914-1939 not yet built (Penguin Vol. 2)");
+  assert.equal(DS.imperial.gapAfter, undefined);
   assert.equal(DS.national.gapAfter, undefined);
   for (const id of ROUND4) {
     assert.ok(PLATES[id], id);
