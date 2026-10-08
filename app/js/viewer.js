@@ -199,10 +199,19 @@
     const d = atlasRegionD(L);
     if (!d) return;
     const tier = L.tier || "core";
-    const opacity = ghost ? 0.13 : (tier === "influence" ? 0.15 : 0.26);
+    const opacity = ghost ? 0.13 : (L.opacity != null ? L.opacity : (tier === "influence" ? 0.15 : 0.26));
     const fill = L.pattern && L.pattern !== "solid" ? stripeFill(colour) : colour;
     const strokeDash = L.edge === "dashed" || tier === "conquest" ? "3 2" : null;
-    g.append("path").attr("d", d).attr("class", `s-fill ${tier}`).attr("data-source", "plate")
+    let target = g;
+    if (L.clipPolygon) {
+      const cp = atlasPolygonD(L.clipPolygon, L.clipSmooth == null ? false : L.clipSmooth);
+      if (cp) {
+        const id = `scene-clip-area-${(L.id || "area").replace(/[^a-zA-Z0-9_-]/g, "-")}-${sceneDefs.selectAll("clipPath").size()}`;
+        sceneDefs.append("clipPath").attr("id", id).attr("clipPathUnits", "userSpaceOnUse").append("path").attr("d", cp);
+        target = g.append("g").attr("clip-path", `url(#${id})`);
+      }
+    }
+    target.append("path").attr("d", d).attr("class", `s-fill ${tier}`).attr("data-source", "plate")
       .attr("fill-rule", L.minus ? "evenodd" : null).attr("clip-rule", L.minus ? "evenodd" : null)
       .style("fill", fill).style("fill-opacity", opacity).style("stroke", L.edge === false ? "none" : colour).style("stroke-dasharray", strokeDash);
     if (L.name && !ghost && L.labelAt) {

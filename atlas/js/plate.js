@@ -551,7 +551,16 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
         g.attr("clip-path", `url(#${areaClip})`);
         for (const f of LAND_FEATURES) g.append("path").attr("d", geo(f)).attr("fill", fill).attr("fill-opacity", op).attr("stroke", "none");
       } else {
-        g.append("path").attr("d", d).attr("fill", fill).attr("fill-opacity", op).attr("fill-rule", L.minus ? "evenodd" : null).attr("clip-rule", L.minus ? "evenodd" : null)
+        let target = g;
+        if (L.clipPolygon) {
+          const cp = polygonD(L.clipPolygon, proj, L.clipSmooth == null ? false : L.clipSmooth);
+          if (cp) {
+            const clipId = `${uid}-clip-poly-${fi}-${safeId(L.id || "area")}-${areaSeq++}`;
+            defs.append("clipPath").attr("id", clipId).attr("clipPathUnits", "userSpaceOnUse").append("path").attr("d", cp);
+            target = g.append("g").attr("clip-path", `url(#${clipId})`);
+          }
+        }
+        target.append("path").attr("d", d).attr("fill", fill).attr("fill-opacity", op).attr("fill-rule", L.minus ? "evenodd" : null).attr("clip-rule", L.minus ? "evenodd" : null)
           .attr("stroke", L.edge === false ? "none" : shade(L.colour || AREA_DEFAULT, 0.6)).attr("stroke-width", L.edge === "strong" ? 1.6 : 0.8)
           .attr("stroke-dasharray", L.edge === "dashed" ? "5 3" : null);
       }
