@@ -10,7 +10,7 @@
   {id:"gallipoli",type:"point",symbol:"battle",at:[26.35,40.15],name:"Gallipoli",labelPos:"e",tag:{text:"1915",colour:"#f1c75b"}},
   {id:"kut",type:"point",symbol:"siege",at:[45.82,32.51],name:"Kut",labelPos:"e",tag:{text:"1916",colour:"#e8806a"}},
   {id:"baghdad",type:"point",symbol:"capital",at:[44.37,33.32],name:"Baghdad",labelPos:"ne",tag:{text:"Mar 1917",colour:"#f1c75b"}},
-  {id:"mesopotamia",type:"route",style:"dashed",colour:BRIT,weight:2.4,path:[[47.78,30.51],[45.82,32.51],[44.37,33.32]],legend:"British-Indian Mesopotamia campaign"},
+  {id:"mesopotamia",type:"route",style:"dashed",colour:BRIT,weight:4.2,path:[[47.78,30.51],[45.82,32.51],[44.37,33.32]],legend:"British-Indian Mesopotamia campaign"},
   {id:"palestine",type:"route",style:"dashed",colour:BRIT,weight:2.4,path:[[32.55,30.0],[34.47,31.50],[35.21,31.77],[35.18,32.58]],legend:"Palestine campaign"},
   {id:"jerusalem",type:"point",symbol:"capital",at:[35.21,31.77],name:"Jerusalem",labelPos:"e",tag:{text:"Dec 1917",colour:"#f1c75b"}},
   {id:"megiddo",type:"point",symbol:"battle",at:[35.18,32.58],name:"Megiddo",labelPos:"w",tag:{text:"1918",colour:"#e8806a"}},
