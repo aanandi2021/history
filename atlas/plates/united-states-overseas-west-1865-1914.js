@@ -1,15 +1,15 @@
 (function(){
  const USA="#2f7f86", IND="#d8a84f", WAR="#8c3b3b", ROAD="#5b4a3f";
  const plains=[[-112,49],[-96,49],[-96,34],[-105,34],[-112,40],[-112,49]];
- window.PLATES["united-states-overseas-west-1865-1914"]={id:"united-states-overseas-west-1865-1914",title:"The United States: West, 1898 and Panama, 1865-1914",head:"Imperialism / United States",folio:"116-117",viewer:"imperial/1898/ch-united-states-overseas",figures:[{caption:"Continental consolidation and overseas empire",share:0.76,extent:[[-170,5],[-60,62]],projection:"conic",layers:[
+ window.PLATES["united-states-overseas-west-1865-1914"]={id:"united-states-overseas-west-1865-1914",title:"The United States: West, 1898 and Panama, 1865-1914",head:"Imperialism / United States",folio:"116-117",viewer:"imperial/1898/ch-united-states-overseas",figures:[{caption:"Continental consolidation and overseas empire",share:0.76,extent:[[-162,5],[-58,60]],projection:"conic",layers:[
   {id:"usa",type:"area",hist:{year:1914,names:["United States"]},colour:USA,tier:"core",legend:"United States, 1914"},
   {id:"alaska",type:"point",symbol:"port",at:[-149.90,61.22],name:"Alaska",labelPos:"e",tag:{text:"1867",colour:"#f1c75b"}},
   {id:"plains",type:"area",polygon:plains,smooth:false,clipToLand:true,pattern:"hatch",colour:IND,legend:"Plains wars / reservation pressure zone"},
   {id:"rail1",type:"route",style:"road",weight:2.5,colour:ROAD,legend:"Transcontinental railways",path:[[-95.94,41.26],[-105.0,41.2],[-112.55,41.62],[-121.49,38.58],[-122.42,37.77]]},
   {id:"rail2",type:"route",style:"dotted",weight:2.2,colour:ROAD,path:[[-90.05,29.95],[-97.74,30.27],[-112.07,33.45],[-118.24,34.05]]},
-  {id:"overseas",type:"route",style:"dashed",weight:2.4,colour:USA,legend:"1898 and canal power",path:[[-77.04,38.90],[-82.37,23.11],[-66.10,18.45],[-79.52,8.98],[120.98,14.60]]},
-  {id:"little-bighorn",type:"point",symbol:"battle",at:[-107.43,45.57],name:"Little Bighorn",labelPos:"n",tag:{text:"1876",colour:"#e8806a"}},
-  {id:"wounded",type:"point",symbol:"battle",at:[-102.36,43.14],name:"Wounded Knee",labelPos:"s",tag:{text:"1890",colour:"#e8806a"}},
+  {id:"overseas",type:"route",style:"dashed",weight:2.4,colour:USA,legend:"1898 and canal power",path:[[-77.04,38.90],[-82.37,23.11],[-66.10,18.45],[-79.52,8.98]]},
+  {id:"little-bighorn",type:"point",symbol:"battle",at:[-107.43,45.57],name:"Little Bighorn",labelPos:"w",tag:{text:"1876",colour:"#e8806a"}},
+  {id:"wounded",type:"point",symbol:"battle",at:[-102.36,43.14],name:"Wounded Knee",labelPos:"e",tag:{text:"1890",colour:"#e8806a"}},
   {id:"hawaii",type:"point",symbol:"port",at:[-157.86,21.31],name:"Hawaii",labelPos:"e",tag:{text:"1898",colour:"#f1c75b"}},
   {id:"cuba",type:"point",symbol:"battle",at:[-82.37,23.11],name:"Cuba",labelPos:"w",tag:{text:"1898",colour:"#e8806a"}},
   {id:"puerto-rico",type:"point",symbol:"port",at:[-66.10,18.45],name:"Puerto Rico",labelPos:"e",tag:{text:"1898",colour:"#f1c75b"}},

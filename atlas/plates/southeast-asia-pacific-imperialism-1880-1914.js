@@ -5,8 +5,12 @@
  window.PLATES["southeast-asia-pacific-imperialism-1880-1914"]={id:"southeast-asia-pacific-imperialism-1880-1914",title:"Southeast Asia and the Pacific, 1880-1914",head:"Imperialism / Southeast Asia",folio:"114-117",viewer:"imperial/1901/ch-southeast-asia-pacific",figures:[{caption:"French, Dutch, British, U.S. and German holdings",share:0.76,extent:[[92,-13],[165,24]],projection:"mercator",layers:[
   {id:"french-indo",type:"area",hist:{year:1914,names:["French Indochina"]},colour:FRA,tier:"core",legend:"French Indochina"},
   {id:"dutch-indies",type:"area",hist:{year:1914,names:["Netherlands Indies"]},colour:DUT,tier:"core",legend:"Dutch East Indies"},
+  {id:"dutch-java",type:"area",polygon:[[104.8,-5.6],[114.7,-6.4],[114.7,-9],[104.8,-7.3]],smooth:false,clipToLand:true,colour:DUT,tier:"core"},
+  {id:"dutch-sundas",type:"area",polygon:[[114.3,-7.9],[124.1,-7.9],[124.1,-10.6],[114.3,-10.6]],smooth:false,clipToLand:true,colour:DUT,tier:"core"},
+  {id:"dutch-celebes-moluccas",type:"area",polygon:[[118.6,2.6],[131.2,2.6],[131.2,-8],[118.6,-8]],smooth:false,clipToLand:true,colour:DUT,tier:"core"},
   {id:"british",type:"area",hist:{year:1914,names:["Malaya","British Protectorate"]},colour:BRIT,tier:"core",legend:"British Malaya and Borneo protectorates"},
   {id:"philippines",type:"area",hist:{year:1914,names:["Philippines"]},colour:USA,tier:"core",legend:"U.S. Philippines after 1898"},
+  {id:"philippines-all",type:"area",polygon:[[116.8,21.2],[126.8,21.2],[126.8,4.5],[119.6,4.5],[119.6,7.6],[116.8,7.6]],smooth:false,clipToLand:true,colour:USA,tier:"core"},
   {id:"german-ng",type:"area",hist:{year:1914,names:["Papua New Guinea"]},clipPolygon:germanNg,colour:GER,tier:"core",legend:"German New Guinea / Kaiser-Wilhelmsland"},
   {id:"british-papua",type:"area",hist:{year:1914,names:["Papua New Guinea"]},clipPolygon:britishPapua,colour:BRIT,tier:"core",legend:"British Papua"},
   {id:"aceh-zone",type:"area",polygon:[[95.0,6.0],[97.0,5.5],[97.5,4.0],[96.6,2.8],[95.0,3.2],[94.7,5.0],[95.0,6.0]],smooth:false,clipToLand:true,pattern:"hatch",colour:DUT,legend:"Aceh War zone"},
