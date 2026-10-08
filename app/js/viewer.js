@@ -1181,6 +1181,33 @@
       const laid = layoutRows(entries, 4);
       lane(TL_REGION_LABEL[r], null, laid, (y0) => drawEntries(body, laid, y0, { cls: `chapter region-${r}`, h: 14, alwaysBar: true, darkText: true, fill: () => null }), ri++);
     }
+    // Atlas plates: a clickable square at the middle of each plate's date range, title on hover.
+    const plateMarks = (ds.plates || []).filter((p) => p.t1 >= tlDomain()[0] && p.t0 <= tlDomain()[1])
+      .map((p) => ({ p, x: Math.min(W - 6, Math.max(GUTTER + 6, xs(new Date((+p.t0 + +p.t1) / 2)))) }))
+      .sort((a, b) => a.x - b.x);
+    if (plateMarks.length) {
+      const SQ = 10, GAP = 3, rowEnds = [];
+      for (const m of plateMarks) {
+        let r = rowEnds.findIndex((end) => m.x - SQ / 2 >= end + GAP);
+        if (r < 0) { r = rowEnds.length; rowEnds.push(0); }
+        rowEnds[r] = m.x + SQ / 2; m.row = r;
+      }
+      const hgt = rowEnds.length * (SQ + 4) + 8, yy = y;
+      bg.append("rect").attr("class", "lane-bg plates-lane").attr("x", 0).attr("y", yy).attr("width", tlW).attr("height", hgt);
+      labels.append("text").attr("class", "lane-label").attr("x", 12).attr("y", yy + 15).text("Atlas plates");
+      const pg = body.append("g").attr("class", "plate-marks");
+      for (const m of plateMarks) {
+        const span = esc(M.fmtRange(m.p.start, m.p.end));
+        pg.append("rect").datum(m.p).attr("class", "plate-mark").attr("data-plate", m.p.id)
+          .attr("x", m.x - SQ / 2).attr("y", yy + 4 + m.row * (SQ + 4)).attr("width", SQ).attr("height", SQ).attr("rx", 1.5)
+          .on("mouseenter", (ev) => showTip(ev, `<b>${esc(m.p.title)}</b><br>${span}<br><span class="small">Atlas plate · click to open</span>`))
+          .on("mousemove", (ev) => moveTip(ev))
+          .on("mouseleave", hideTip)
+          .on("click", (ev) => { ev.stopPropagation(); hideTip(); window.location.href = M.plateUrl(m.p.id); });
+      }
+      y += hgt;
+    }
+
     // Event lanes
     section("Events");
     ds.lanes.forEach((ln, i) => {

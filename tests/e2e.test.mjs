@@ -284,6 +284,25 @@ test("no two bars overlap on the timeline, so every chapter, ruler and book can 
   }
 });
 
+test("the chapter timeline marks each atlas plate with a clickable square", async () => {
+  const { page, errors, context } = await open("#interwar1");
+  await settle(400);
+  const marks = await page.$$eval("#tl rect.plate-mark", (rs) => rs.map((r) => ({ id: r.dataset.plate, x: +r.getAttribute("x"), w: +r.getAttribute("width") })));
+  const want = await page.evaluate(() => APP.state.ds.plates.map((p) => p.id));
+  assert.deepEqual(marks.map((m) => m.id).sort(), want.slice().sort(), "one square per plate in the period");
+  assert.ok(marks.every((m) => m.w >= 8 && m.w <= 14), "small squares");
+  const id = marks[0].id;
+  await page.hover(`#tl rect.plate-mark[data-plate="${id}"]`);
+  const tip = await page.$eval("#tooltip", (el) => ({ hidden: el.hidden, text: el.textContent }));
+  const title = await page.evaluate((i) => APP.state.ds.plates.find((p) => p.id === i).title, id);
+  assert.equal(tip.hidden, false);
+  assert.ok(tip.text.includes(title), "hover shows the plate title");
+  await Promise.all([page.waitForNavigation(), page.click(`#tl rect.plate-mark[data-plate="${id}"]`)]);
+  assert.ok(page.url().endsWith(`#${encodeURIComponent(id)}`), "click opens the plate");
+  assert.deepEqual(errors, []);
+  await context.close();
+});
+
 test("the side panel tells the story of the moment and shows plates as pictures", async () => {
   const { page, errors, context } = await open("#maritime/0800/ut-first-gift");
   await settle(400);

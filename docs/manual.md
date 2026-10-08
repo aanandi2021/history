@@ -53,6 +53,7 @@ The scale stretches toward the present, so a six-year war isn't a hairline next 
 - **Region chips:** Europe, Islamic world, Asia, Africa, Americas. Click a chip to show only that region's chapters. Greyed chips mean there are no chapters there yet. That gap is deliberate information, not a bug.
 - **Lanes.** Chapters sit in region lanes. **Parts** (big groupings) start folded; click ▸ to open one, and the other open part in the lane closes.
 - **Expand all** clears the filters and opens everything.
+- **Atlas plates** lane, just under the chapters: a small gold square for each plate in the period, placed at the middle of its date range. Hover for the title and dates; click to open the plate. Plates that share a date stack upward.
 - **Events** run below in their own lanes, with Canada always first.
 - To move through time:
   - **Hover** to scrub through time.

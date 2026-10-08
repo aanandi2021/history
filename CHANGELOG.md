@@ -9,6 +9,10 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 
 ## 1.6.0 (Unreleased / 1.6.0-dev)
 
+- Added an Atlas plates lane to the chapter timeline: a clickable square for each plate at roughly its place in time, with the plate title on hover.
+
+- Added Penguin Atlas Vol. 2 round 8: eight Second World War plates covering Blitzkrieg, the Atlantic, Barbarossa/Stalingrad, Axis Europe and the Holocaust, the Mediterranean, the Pacific, northwest Europe and the 1945 settlement/human cost.
+
 ## 1.5.0 (8 Oct 2026)
 
 - Added Penguin Atlas Vol. 2 round 7: the inter-war world, part II (1929-1939), with Stalin’s USSR, the Great Depression, Nazi expansion, Spain, Italy/Ethiopia, Japan/China, Europe’s road to war, scenes and seven plates.

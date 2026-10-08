@@ -343,4 +343,6 @@ ul.terms .copy-ask { margin-left: 6px; font-size: 11px; padding: 1px 6px; }
 .region-chip.empty text, .region-lane-label.empty { fill: #aaa095; }
 .expand-all { cursor: pointer; fill: var(--accent) !important; text-decoration: underline; }
 .lane-bg.collapsed { fill: #f7f2e8; opacity: .78; }
-.region-lane-label { font-size: 11px; fill: var(--muted); font-weight: 700; }
+.region-lane-label { font-size: 11px; fill: var(--muted); font-weight: 700; }#tl .plate-mark { fill: #c9a24a; stroke: #6b5320; stroke-width: 1; cursor: pointer; }
+#tl .plate-mark:hover { fill: var(--accent); stroke: #3d2a12; }
+
