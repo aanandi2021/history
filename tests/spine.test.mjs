@@ -33,13 +33,13 @@ test("spine: Russia and Maritime are threads, not master-strip eras", () => {
   const L = HM.masterLayout(DS);
   assert.equal(L.periods.some((p) => p.id === "russia"), false);
   assert.equal(L.periods.some((p) => p.id === "maritime"), false);
-  assert.deepEqual(L.periods.map((p) => p.id), ["ancient", "medieval", "transition", "early-modern", "revolution", "restoration", "national", "imperial", "ww1", "ww2"]);
+  assert.deepEqual(L.periods.map((p) => p.id), ["ancient", "medieval", "transition", "early-modern", "revolution", "restoration", "national", "imperial", "ww1", "interwar1", "ww2"]);
 });
 
 test("spine: Vol. 2 gap, world snapshots and historical basemap date selection", () => {
   const L = HM.masterLayout(DS);
-  const ww1 = L.periods.find((p) => p.id === "ww1");
-  assert.equal(ww1.gapAfter, "1920-1939 not yet built (Penguin Vol. 2)");
+  const interwar1 = L.periods.find((p) => p.id === "interwar1");
+  assert.equal(interwar1.gapAfter, "1929-1939 not yet built (Penguin Vol. 2 round 7)");
   const snaps = loadSnapshots();
   assert.equal(HM.snapshotAt(snaps, 1301).year, 1300);
   assert.equal(HM.snapshotAt(snaps, 1715).year, 1715);

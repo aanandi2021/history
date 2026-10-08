@@ -29,7 +29,7 @@ test("Vol. 2 round 5 registers the WW1 period and plates", () => {
   assert.ok(DS.ww1);
   assert.equal(DS.ww1.lanes[0].id, "canada");
   assert.equal(DS.ww1.lanes[0].pinned, true);
-  assert.equal(DS.ww1.gapAfter, "1920-1939 not yet built (Penguin Vol. 2)");
+  assert.equal(DS.ww1.gapAfter, undefined);
   assert.equal(DS.imperial.gapAfter, undefined);
   for (const id of ROUND5) {
     assert.ok(PLATES[id], id);
