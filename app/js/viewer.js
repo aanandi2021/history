@@ -1323,8 +1323,8 @@
   }
   function panelPlateTiles(plates, now) {
     if (!plates.length) return "";
-    const plateIds = new Set(M.linksFor(state.ds, now || {}).filter((l) => l.kind === "plate").map((l) => String(l.href).replace(/^#/, "").split("#").pop()));
-    const best = plates.find((p) => plateIds.has(p.id)) || plates[0];
+    const linkedIds = M.linksFor(state.ds, now || {}).filter((l) => l.kind === "plate").map((l) => String(l.href).replace(/^#/, "").split("#").pop());
+    const best = linkedIds.map((id) => plates.find((p) => p.id === id)).find(Boolean) || plates[0];
     const rest = plates.filter((p) => p !== best);
     return `<div class="plate-tiles panel-plate-tiles" id="panel-plates">${plateTile(best)}${rest.length ? `<div class="plate-mini-row">${rest.map((p) => plateTile(p, true)).join("")}</div>` : ""}</div>`;
   }
@@ -1761,7 +1761,7 @@
       svg.append("text").attr("class", "m-gap m-gap-label").attr("x", gx0 + gw / 2).attr("y", axisY + 24).attr("text-anchor", "middle").text(q.gapAfter);
     });
     const n = L.breaks.length - 1;
-    if (n > 1) svg.append("text").attr("class", "m-scale").attr("x", x(L.breaks[n - 1]) - 4).attr("y", top - 4).attr("text-anchor", "end")
+    if (n > 1) svg.append("text").attr("class", "m-scale").attr("x", x(L.breaks[n - 1]) - 4).attr("y", 4).attr("text-anchor", "end")
       .text("scale stretches toward the present ›").append("title").text("Each stretch between the marked years gets the same width, so short modern periods stay visible.");
     const p = state.ds && L.periods.find((q) => q.id === state.dsId);
     const g = svg.selectAll("g.m-period").data(L.periods).join("g")
