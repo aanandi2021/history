@@ -7,9 +7,10 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
-## 1.3.0 (Unreleased / 1.3.0-dev)
+## 1.3.0 (7 Oct 2026)
 
 - Added Penguin Atlas Vol. 2 round 2: Restoration and revolution period, scenes, five plates, Canada-first responsible-government coverage, Latin American independence, Greek independence, the Opium War, abolition and 1848.
+- Plates for the Americas, Germany and 1848 now use historical boundaries (Canada, Rupert's Land, New Spain, the South American viceroyalties, the Austrian Empire) in place of hand-drawn fields.
 
 ## 1.2.0 (7 Oct 2026)
 
