@@ -10,6 +10,7 @@ Work in progress lives on the `next` branch, checked out in a second folder (`A:
 ## 1.4.0 (Unreleased / 1.4.0-dev)
 
 - Added Penguin Atlas Vol. 2 round 3: the Age of National States period, scenes, seven plates, Canada-first Confederation/CPR coverage, the U.S. Civil War and Reconstruction arc, Italian and German unification, the Balkans, India, China, Japan and Africa before partition.
+- Added Penguin Atlas Vol. 2 round 4: the Age of Imperialism period, scenes and seven plates covering 1914 empires, the Scramble for Africa, South Africa, Russia/Japan in Asia, Southeast Asia/Pacific, U.S. overseas power and the Balkan crises.
 
 ## 1.3.0 (7 Oct 2026)
 

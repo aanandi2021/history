@@ -96,7 +96,7 @@
   ];
   window.DATASETS=window.DATASETS||{};
   window.DATASETS.national={
-    id:"national",title:"The age of national states",subtitle:"1850-1890",range:["1850-01-01","1890-12-31"],gapAfter:"1890-1939 not yet built (Penguin Vol. 2)",startAt:"1871",precision:"year",
+    id:"national",title:"The age of national states",subtitle:"1850-1890",range:["1850-01-01","1890-12-31"],startAt:"1871",precision:"year",
     note:"Amit's Notes of the History of the World/The age of national states",
     mapNote:"The underlay uses the nearest historical-basemaps state map (1815 before 1878, then 1878/1880). Story fields prefer those historical polygons; intermediate war fronts, treaty zones and railway/treaty corridors are labelled overlays rather than modern borders.",
     lanes:[{id:"canada",label:"Canada",colour:"#b22d2d",pinned:true},{id:"us",label:"United States",colour:"#2f7f86"},{id:"ideas",label:"Ideas, science and labour",colour:"#6b6b6b"},{id:"russia",label:"Russia",colour:"#6b8c3f"},{id:"france",label:"France",colour:"#8c3b3b"},{id:"italy",label:"Italy",colour:"#3f8f5b"},{id:"germany",label:"Germany",colour:"#4f7f4f"},{id:"balkans",label:"Austria-Hungary and Balkans",colour:"#d8a84f"},{id:"ottoman",label:"Ottoman / Middle East",colour:"#9a6a32"},{id:"india",label:"India",colour:"#b36b2e"},{id:"asia",label:"China and Japan",colour:"#387a5b"},{id:"latin",label:"Latin America",colour:"#c06b3e"},{id:"africa",label:"Africa",colour:"#7a6b42"}],
