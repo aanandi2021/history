@@ -41,7 +41,7 @@ for (const id of info.ds.map((d) => d.id)) {
   }
 }
 for (const t of info.tours) {
-  for (let s = 0; s <= t.n; s++) {
+  for (let s = 0; s < t.n; s++) {
     await page.goto(`${appUrl}#ancient?tour=${t.id}&stop=${s}`);
     await page.waitForFunction("window.APP && window.APP.ready", { timeout: 15000 });
     await new Promise((r) => setTimeout(r, 400));

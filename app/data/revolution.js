@@ -154,7 +154,7 @@ E("islamic","1798-07-21","Bonaparte wins the Battle of the Pyramids",L.CAIRO,{se
   ];
   window.DATASETS = window.DATASETS || {};
   window.DATASETS["revolution"] = {
-    id:"revolution", title:"The age of revolution", subtitle:"1763-1815", range:["1748-01-01","1815-12-31"], gapAfter:"1815-1939 not yet built (Penguin Vol. 2)", startAt:"1789", precision:"year",
+    id:"revolution", title:"The age of revolution", subtitle:"1763-1815", range:["1748-01-01","1815-12-31"], startAt:"1789", precision:"year",
     note:"Amit's Notes of the History of the World/The age of revolution",
     mapNote:"The quiet underlay is the nearest historical-basemaps state map. The story layers are schematic fields and routes from the Penguin Atlas spreads; Canada is kept first, and Indigenous nations are shown as political actors where the period data supports it.",
     lanes:[{id:"canada",label:"Canada, Indigenous nations and Loyalists",colour:"#b22d2d",pinned:true},{id:"ideas",label:"Ideas and political economy",colour:"#6b6b6b"},{id:"america",label:"United States",colour:"#2f7f86"},{id:"france",label:"France and revolution",colour:"#8c3b3b"},{id:"europe",label:"Napoleonic Europe",colour:"#7a5a8c"},{id:"britain",label:"Britain and empire",colour:"#2f5f93"},{id:"germany",label:"Germany and reform",colour:"#6b8c3f"},{id:"atlantic",label:"Haiti, slavery and Latin America",colour:"#b36b2e"},{id:"india",label:"Egypt and India",colour:"#8c6d3f"},{id:"islamic",label:"Ottoman world and Egypt",colour:"#9a6a32"},{id:"asia",label:"India and Qing China",colour:"#387a5b"},{id:"africa",label:"Africa and Atlantic bases",colour:"#7a6b42"}],

@@ -7,6 +7,10 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
+## 1.3.0 (Unreleased / 1.3.0-dev)
+
+- Added Penguin Atlas Vol. 2 round 2: Restoration and revolution period, scenes, five plates, Canada-first responsible-government coverage, Latin American independence, Greek independence, the Opium War, abolition and 1848.
+
 ## 1.2.0 (7 Oct 2026)
 
 - Prep round: a period-borders map under every era (historical-basemaps, about 50 dates, peoples as well as states, feathered edges where borders were vague); opens on the whole-history view with an orientation card; right panel with one big plate tile and a non-European Meanwhile; story fields drawn from plates; region lanes with folding, filter chips and Expand all; a user manual (docs/manual.md); deep links now unfold nested chapters; a smoke sweep script.

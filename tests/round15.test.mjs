@@ -29,7 +29,7 @@ test("Vol. 2 round 1 registers the revolution period and plates", () => {
   assert.ok(DS.revolution);
   assert.equal(DS.revolution.lanes[0].id, "canada");
   assert.equal(DS.revolution.lanes[0].pinned, true);
-  assert.equal(DS.revolution.gapAfter, "1815-1939 not yet built (Penguin Vol. 2)");
+  assert.equal(DS.revolution.gapAfter, undefined);
   for (const id of ROUND1) {
     assert.ok(PLATES[id], id);
     assert.ok(DS.revolution.plates.some((p) => p.id === id), `${id} missing from revolution dataset`);
