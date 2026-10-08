@@ -7,7 +7,7 @@ for the branch, commit and time it was stamped. `npm run stamp` rewrites `app/ve
 Work in progress lives on the `next` branch, checked out in a second folder (`A:\coding\history-next`) and served at
 <http://127.0.0.1:8766/app/>, so it never disturbs the copy in `A:\coding\history` that you open from disk.
 
-## 1.5.0 (Unreleased / 1.5.0-dev)
+## 1.5.0 (8 Oct 2026)
 
 - Added Penguin Atlas Vol. 2 round 7: the inter-war world, part II (1929-1939), with Stalin’s USSR, the Great Depression, Nazi expansion, Spain, Italy/Ethiopia, Japan/China, Europe’s road to war, scenes and seven plates.
 
