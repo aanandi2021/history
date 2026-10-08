@@ -637,7 +637,7 @@
     scene.layers.forEach((L, i) => {
       const w = `layer ${i + 1} (${L.name || L.text || L.type})`;
       if (!SCENE_TYPES.includes(L.type)) return bad(`${w}: unknown type ${L.type}`);
-      if (L.type === "area" && !(Array.isArray(L.around) && L.around.length >= 3 && L.around.every(ll))) bad(`${w}: area needs around of 3+ [lon,lat]`);
+      if (L.type === "area" && !(Array.isArray(L.around) && L.around.length >= 3 && L.around.every(ll)) && !(Array.isArray(L.regions) && L.regions.length) && !(L.hist && Number.isFinite(+L.hist.year) && Array.isArray(L.hist.names) && L.hist.names.length)) bad(`${w}: area needs around of 3+ [lon,lat], regions, or hist names`);
       if (L.type === "area" && L.tier && !SCENE_TIERS.includes(L.tier)) bad(`${w}: unknown tier ${L.tier}`);
       if (["arrow", "route", "boundary"].includes(L.type) && !(Array.isArray(L.path) && L.path.length >= 2 && L.path.every(ll))) bad(`${w}: needs a path of 2+ [lon,lat]`);
       if (L.type === "point" && !ll(L.at)) bad(`${w}: point needs at`);

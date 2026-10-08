@@ -212,9 +212,10 @@
   }
   function sceneLayersForChapter(ch, scene) {
     if (!scene) return [];
-    const plateAreas = plateAreaLayers(ch);
+    const plateAreas = scene.usePlateAreas === false ? [] : plateAreaLayers(ch);
     const rest = scene.layers.filter((L) => L.type !== "area");
-    return plateAreas.length ? [...plateAreas, ...rest] : rest;
+    if (plateAreas.length) return [...plateAreas, ...rest];
+    return scene.usePlateAreas === false ? scene.layers : rest;
   }
   const HIST_PALETTE = [
     "#8f5d4a", "#5f8a6a", "#657eaa", "#b08345", "#8a5b89", "#829a4f", "#a05f68", "#4f8d91",
@@ -568,7 +569,7 @@
       const g = root.append("g").attr("class", `s-L s-${L.type}`).datum(L);
       const colour = L.colour || "#8a7a5a";
       if (L.type === "area") {
-        if (L.source === "plate") drawPlateArea(g, L, colour, ghost);
+        if (L.source === "plate" || L.hist || L.regions) drawPlateArea(g, L, colour, ghost);
       } else if (L.type === "boundary") {
         g.append("path").attr("d", geoPath({ type: "LineString", coordinates: L.path })).attr("class", `s-line ${L.style || "dashed"}`).style("stroke", L.colour || null);
       } else if (L.type === "front") {
@@ -1761,7 +1762,7 @@
       svg.append("text").attr("class", "m-gap m-gap-label").attr("x", gx0 + gw / 2).attr("y", axisY + 24).attr("text-anchor", "middle").text(q.gapAfter);
     });
     const n = L.breaks.length - 1;
-    if (n > 1) svg.append("text").attr("class", "m-scale").attr("x", x(L.breaks[n - 1]) - 4).attr("y", 4).attr("text-anchor", "end")
+    if (n > 1 && W >= 1600) svg.append("text").attr("class", "m-scale").attr("x", x(L.breaks[n - 1]) - 4).attr("y", 4).attr("text-anchor", "end")
       .text("scale stretches toward the present ›").append("title").text("Each stretch between the marked years gets the same width, so short modern periods stay visible.");
     const p = state.ds && L.periods.find((q) => q.id === state.dsId);
     const g = svg.selectAll("g.m-period").data(L.periods).join("g")

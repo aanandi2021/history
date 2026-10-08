@@ -420,7 +420,7 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
     const all = [...(fig.layers || []), ...(panel.layers || [])];
     let panelAreaSeq = 0;
     const drawPanelArea = (L0) => {
-      const L = areaLook(L0), d = regionPath(L, geo, proj) || zonePath(L, proj);
+      const L = areaLook(L0), d = histPath(L, geo) || regionPath(L, geo, proj) || zonePath(L, proj);
       if (!d) return;
       const lg = areaLayer.append("g").attr("class", `layer ${L.type}`).attr("data-layer", L.id || null);
       const clipToLand = areaClipToLand(L) && !L.regions;
@@ -1049,3 +1049,4 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
     show(pick());
   });
 })();
+

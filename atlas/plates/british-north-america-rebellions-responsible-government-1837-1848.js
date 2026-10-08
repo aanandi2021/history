@@ -1,8 +1,8 @@
 (function(){
  const CAN="#b22d2d", BRIT="#2f5f93", HBC="#9a855f", REFORM="#b36b2e", USA="#2f7f86", ROAD="#5b4a3f";
  window.PLATES["british-north-america-rebellions-responsible-government-1837-1848"]={id:"british-north-america-rebellions-responsible-government-1837-1848",title:"British North America: rebellions and responsible government, 1837-1848",head:"Restoration / Canada",folio:"synthesis with pp. 42-61",viewer:"restoration/1839/ch-bna-rebellions-responsible",figures:[{caption:"Rebellion, union and responsible government in British North America",share:0.68,extent:[[-86,41],[-51,53]],projection:"conic",layers:[
- {id:"canada",type:"area",hist:{year:1815,names:["Canada"]},colour:CAN,tier:"core",legend:"Canada: Upper and Lower Canada"},
  {id:"hbc",type:"area",hist:{year:1800,names:["Rupert's Land"]},colour:HBC,tier:"core",opacity:0.78,legend:"Rupert's Land / Hudson's Bay Company"},
+ {id:"canada",type:"area",hist:{year:1815,names:["Canada"]},colour:CAN,tier:"core",legend:"Canada: Upper and Lower Canada"},
  {id:"maritimes",type:"area",regions:["CA-NS","CA-NB","CA-PE","CA-NL"],colour:BRIT,tier:"core",legend:"Maritime colonies and Newfoundland"},
  {id:"us-border",type:"area",regions:["US-ME","US-VT","US-NY","US-MI","US-OH"],colour:USA,tier:"influence",legend:"United States border pressure"},
  {id:"rideau",type:"route",style:"road",colour:BRIT,weight:2.4,legend:"Rideau Canal, opened 1832",path:[[-76.49,44.23],[-76.0,44.8],[-75.69,45.42]]},
