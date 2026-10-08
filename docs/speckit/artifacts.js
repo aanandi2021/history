@@ -598,6 +598,36 @@ window.ARTIFACTS = {
    "date": "2026-10-07",
    "subject": "Deep links unfold nested chapters; Baghdad in the Islamic lane; map notes describe the period map",
    "stat": "8 files changed, 28 insertions(+), 8 deletions(-)"
+  },
+  {
+   "hash": "2a6f0ff",
+   "date": "2026-10-07",
+   "subject": "Add revolution atlas round one",
+   "stat": "21 files changed, 433 insertions(+), 9 deletions(-)"
+  },
+  {
+   "hash": "1bf75d8",
+   "date": "2026-10-07",
+   "subject": "Revise revolution atlas plates",
+   "stat": "15 files changed, 161 insertions(+), 86 deletions(-)"
+  },
+  {
+   "hash": "c010b97",
+   "date": "2026-10-07",
+   "subject": "Add historical basemap atlas areas",
+   "stat": "9 files changed, 184 insertions(+), 37 deletions(-)"
+  },
+  {
+   "hash": "ebc8f95",
+   "date": "2026-10-07",
+   "subject": "Polish revolution round one plates",
+   "stat": "4 files changed, 12 insertions(+), 11 deletions(-)"
+  },
+  {
+   "hash": "31520ad",
+   "date": "2026-10-07",
+   "subject": "Finish revolution atlas plate geography",
+   "stat": "2 files changed, 6 insertions(+), 6 deletions(-)"
   }
  ]
 };
