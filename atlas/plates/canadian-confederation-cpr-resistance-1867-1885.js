@@ -2,19 +2,19 @@
  const C1867="#b22d2d", C1870="#c45a3c", C1871="#3f8f5b", C1873="#8c5aa3", NWT="#d8a84f", TREATY="#6b5b2e", NL="#b8b1a1", ROAD="#5b4a3f";
  const height=[[-86,48.6],[-84,48.9],[-81,48.7],[-79.5,48.4],[-76,48.3],[-73,49.4],[-70,50.2],[-66,50.4],[-60,50.6],[-57.1,51.4]];
  const onQcClip=[...height,[-57.1,45.2],[-70,45.0],[-76,43.5],[-79,43.0],[-83,41.6],[-86,41.6],[-86,48.6]];
- const nwtClip=[[-141,49],[-123,49],[-115,54.5],[-100,55],[-95,51],[-86,49],[-86,62],[-141,62],[-141,49]];
+ const nwtClip=[[-141,49],[-123,49],[-95,49],[-95,62],[-141,62],[-141,49]];
  const manitoba=[[-99.0,49.0],[-96.5,49.0],[-96.5,50.2],[-99.0,50.2],[-99.0,49.0]];
  const treaties=[[-97.2,49.0],[-101.5,49.0],[-105.5,49.2],[-110.8,49.6],[-114.6,50.8],[-115.5,51.6],[-113.5,52.5],[-108.8,53.6],[-103.5,52.6],[-99.5,51.0],[-96.7,50.0],[-97.2,49.0]];
  window.PLATES["canadian-confederation-cpr-resistance-1867-1885"]={id:"canadian-confederation-cpr-resistance-1867-1885",title:"Canadian Confederation, CPR and resistance, 1867-1885",head:"National states / Canada",folio:"Canadian synthesis",viewer:"national/1885/ch-canada-confederation-west",figures:[{caption:"Confederation by joining date, treaties and the CPR",share:1,extent:[[-140,40],[-50,62]],projection:"conic",layers:[
   {id:"nwt",type:"area",hist:{year:1880,names:["Canada"]},clipPolygon:nwtClip,colour:NWT,tier:"influence",legend:"North-West Territories after 1870"},
   {id:"on-qc",type:"area",regions:["CA-ON","CA-QC"],clipPolygon:onQcClip,colour:C1867,tier:"core",legend:"1867: Ontario and Quebec (southern settled extent)"},
   {id:"ns-nb",type:"area",regions:["CA-NS","CA-NB"],colour:C1867,tier:"core",legend:"1867: Nova Scotia and New Brunswick"},
-  {id:"manitoba",type:"area",around:manitoba,clipToLand:true,colour:C1870,tier:"core",legend:"1870: Manitoba postage-stamp province"},
+  {id:"manitoba",type:"area",polygon:manitoba,smooth:false,colour:C1870,tier:"core",legend:"1870: Manitoba postage-stamp province"},
   {id:"bc",type:"area",regions:["CA-BC"],colour:C1871,tier:"core",legend:"1871: British Columbia"},
   {id:"pei",type:"area",regions:["CA-PE"],colour:C1873,tier:"core",legend:"1873: Prince Edward Island"},
   {id:"newfoundland",type:"area",regions:["CA-NL"],colour:NL,tier:"influence",legend:"Newfoundland neutral; joined Canada in 1949"},
   {id:"treaties",type:"area",around:treaties,clipToLand:true,pattern:"hatch",colour:TREATY,legend:"Treaties 1-7 belt, 1871-77"},
-  {id:"cpr",type:"route",style:"road",weight:2.8,colour:ROAD,legend:"Canadian Pacific Railway, completed 1885",path:[[-73.56,45.50],[-75.70,45.42],[-79.46,46.31],[-80.99,46.49],[-84.35,46.52],[-89.25,48.38],[-97.14,49.90],[-104.62,50.45],[-114.07,51.05],[-116.45,51.30],[-118.60,50.98],[-122.85,49.28],[-123.12,49.28]]},
+  {id:"cpr",type:"route",style:"road",weight:2.8,colour:ROAD,legend:"Canadian Pacific Railway, completed 1885",path:[[-73.56,45.50],[-75.70,45.42],[-79.46,46.31],[-81.00,46.50],[-87.30,48.80],[-89.20,48.40],[-94.50,49.80],[-97.14,49.90],[-104.62,50.45],[-114.07,51.05],[-116.45,51.30],[-118.60,50.98],[-122.85,49.28],[-123.12,49.28]]},
   {id:"charlottetown",type:"point",symbol:"conference",at:[-63.13,46.24],name:"Charlottetown",labelPos:"e",tag:{text:"1864",colour:"#f1c75b"}},
   {id:"quebec",type:"point",symbol:"conference",at:[-71.21,46.81],name:"Quebec Conf.",labelPos:"e",tag:{text:"1864",colour:"#f1c75b"}},
   {id:"ottawa",type:"point",symbol:"capital",at:[-75.70,45.42],name:"Ottawa",labelPos:"s",tag:{text:"1867",colour:"#f1c75b"}},
