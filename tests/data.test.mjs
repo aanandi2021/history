@@ -43,7 +43,7 @@ for (const id of ids) {
       for (const l of HM.linksFor(ds, it)) {
         assert.doesNotThrow(() => new URL(l.href, "file:///A:/coding/history/app/index.html"), `${it.id}: ${l.href}`);
         if (l.kind === "plate") assert.match(l.href, /^\.\.\/atlas\/index\.html#[a-z0-9-]+$/);
-        if (l.kind === "wiki") assert.match(l.href, /^https:\/\/en\.wikipedia\.org\/w\/index\.php\?search=[^&]+&title=Special%3ASearch&go=Go$/);
+        if (l.kind === "wiki" || l.kind === "wiki-wide") assert.match(l.href, /^https:\/\/en\.wikipedia\.org\/wiki\/[^?]+$/);
         if (l.kind === "library") assert.match(l.href, /^https:\/\/ottawa\.bibliocommons\.com\/v2\/search\?query=/);
         if (l.kind === "calibre") assert.match(l.href, /^calibre:\/\/show-book\/CalibreLibrary\/\d+$/);
         if (l.kind === "note") assert.match(l.href, /^obsidian:\/\/open\?vault=333bfdd695459a48&file=.+%23.+/);

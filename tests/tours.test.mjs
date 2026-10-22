@@ -15,11 +15,15 @@ function loadTours() {
   return JSON.parse(JSON.stringify(ctx.window.TOURS));
 }
 const TOURS = loadTours();
+const NEW_TOUR_IDS = [
+  "after-empire", "atlantic-slave-trade", "colonial-powers", "indigenous-north-america",
+  "mongols-to-mughals", "south-africa-colony-apartheid", "us-slavery-and-backlash",
+];
 const tourYearDate = (y) => y < 0 ? `-${String(Math.abs(y)).padStart(4, "0")}` : String(y).padStart(4, "0");
 const plateIds = new Set(fs.readdirSync(path.join(ROOT, "atlas", "plates")).filter((f) => f.endsWith(".js")).map((f) => f.replace(/\.js$/, "")));
 
-test("tour schema: two pilot tours with answer cards and plain stops", () => {
-  assert.deepEqual(Object.keys(TOURS).sort(), ["jewish-history", "rome-rise-fall"]);
+test("tour schema: two pilot tours and seven investigations with answer cards and plain stops", () => {
+  assert.deepEqual(Object.keys(TOURS).sort(), [...NEW_TOUR_IDS, "jewish-history", "rome-rise-fall"].sort());
   for (const tour of Object.values(TOURS)) {
     assert.equal(tour.id in TOURS, true);
     assert.ok(tour.title && tour.question && tour.intro);
@@ -39,6 +43,32 @@ test("tour schema: two pilot tours with answer cards and plain stops", () => {
         assert.equal(typeof p.lat, "number", `${tour.id}/${stop.title}/${p.name}: lat`);
       }
     }
+  }
+});
+
+test("new investigation stops provide named Wikipedia context and public citations", () => {
+  for (const id of NEW_TOUR_IDS) {
+    const tour = TOURS[id];
+    assert.ok(tour.stops.length >= 10, `${id}: substantial investigation`);
+    assert.ok(tour.answer.openQuestions?.length >= 2, `${id}: open questions`);
+    assert.ok(tour.answer.sources?.length, `${id}: answer-level citations`);
+    for (const source of tour.answer.sources) {
+      assert.ok(source.label?.trim(), `${id}: named answer source`);
+      assert.match(source.url, /^https:\/\/[^/\s]+\.[^/\s]+\/\S*$/, `${id}: direct answer source URL`);
+    }
+    for (const stop of tour.stops) {
+      assert.ok(stop.wiki?.trim(), `${id}/${stop.title}: exact Wikipedia article`);
+      assert.ok(stop.wideWiki?.trim(), `${id}/${stop.title}: wider Wikipedia article`);
+      assert.ok(stop.sources?.length, `${id}/${stop.title}: public source`);
+      for (const source of stop.sources) {
+        assert.ok(source.label?.trim(), `${id}/${stop.title}: named source`);
+        assert.match(source.url, /^https:\/\/[^/\s]+\.[^/\s]+\/\S*$/, `${id}/${stop.title}: direct public URL`);
+        assert.ok(!source.url.includes("Special:Search"), `${id}/${stop.title}: no Wikipedia search link`);
+      }
+    }
+  }
+  for (const id of ["after-empire", "south-africa-colony-apartheid", "us-slavery-and-backlash"]) {
+    assert.ok(TOURS[id].answer.reading.filter((book) => book.url).length >= 2, `${id}: sources for post-1945 synthesis`);
   }
 });
 

@@ -1,12 +1,21 @@
 /* World Viewer model: pure functions, no DOM.
    Works in the browser (window.HM) and in Node (module.exports) so it can be unit-tested. */
 (function (root, factory) {
-  const api = factory();
+  const api = factory(root);
   if (typeof module === "object" && module.exports) module.exports = api;
   else root.HM = api;
-})(typeof self !== "undefined" ? self : this, function () {
+})(typeof self !== "undefined" ? self : this, function (root) {
   "use strict";
 
+  const WIKI_TITLES = typeof module === "object" && module.exports
+    ? require("../data/wiki-titles.js") : root.WIKI_TITLES;
+  const WIDE_WIKI = {
+    ancient: "Ancient history", medieval: "Middle Ages", maritime: "Age of Discovery",
+    transition: "Early modern period", "early-modern": "Early modern period",
+    revolution: "Age of Revolution", restoration: "19th century", national: "19th century",
+    imperial: "New Imperialism", ww1: "World War I", interwar1: "Interwar period",
+    interwar2: "Interwar period", ww2: "World War II", russia: "History of Russia"
+  };
   const DAY = 86400000;
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   // Dates are YYYY, YYYY-MM or YYYY-MM-DD. BC years take a minus sign and the historian's numbering, with no
@@ -285,8 +294,27 @@
   }
 
   function wikiUrl(topic) {
-    if (!topic) return null;
-    return `https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(topic)}&title=Special%3ASearch&go=Go`;
+    const title = topic && WIKI_TITLES[topic.trim()];
+    return title ? `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}` : null;
+  }
+
+  function wikiPair(subjects, wider) {
+    const subject = [].concat(subjects || []).find((s) => wikiUrl(s));
+    const broad = [].concat(wider || []).find((s) => wikiUrl(s) && wikiUrl(s) !== wikiUrl(subject));
+    if (!subject || !broad) return [];
+    return [
+      { kind: "wiki", label: "Overview", title: WIKI_TITLES[subject], href: wikiUrl(subject) },
+      { kind: "wiki-wide", label: "Wider history", title: WIKI_TITLES[broad], href: wikiUrl(broad) }
+    ];
+  }
+
+  function wikiLinks(ds, item) {
+    const chapters = ds.chapters.filter((c) => c.id !== item.id && c.t0 <= item.t0 && c.t1 >= item.t0)
+      .sort((a, b) => (a.t1 - a.t0) - (b.t1 - b.t0));
+    return wikiPair(
+      [item.wiki, item.name, item.title, ...chapters.map((c) => c.wiki || c.title), WIDE_WIKI[ds.id]],
+      [WIDE_WIKI[ds.id], "World history"]
+    );
   }
 
   function calibreUrl(id, library = CALIBRE_LIBRARY) {
@@ -322,9 +350,9 @@
     } else if (item.kind === "book") {
       if (item.owned && item.calibreId != null) out.push({ kind: "calibre", label: "Open in Calibre", href: calibreUrl(item.calibreId) });
       out.push({ kind: "library", label: "Ottawa Public Library", href: libraryUrl(item) });
-    } else {
-      const topic = item.wiki || item.name || item.title;
-      out.push({ kind: "wiki", label: "Wikipedia", href: wikiUrl(topic) });
+      if (!item.fiction) out.push(...wikiPair([`book:${item.title} by ${item.author}`], [WIDE_WIKI[ds.id], "World history"]));
+    } else if (!(item.kind === "event" && ds.lanes.find((l) => l.id === item.lane)?.fiction)) {
+      out.push(...wikiLinks(ds, item));
     }
     return out;
   }
@@ -776,6 +804,6 @@
     linkChapters, ancestors, within, openChapters, focusChapter,
     DAY, VAULT, VAULT_ID, parseDate, isPartial, isoDate, fmtDate, fmtYear, fmtRange, slug, normalise, nearWindow,
     nearbyEvents, activeLeaders, activeChapters, activeChapter, mapStateAt, booksFor, fictionFor, ficTarget,
-    BOOKS, obsidianUrl, wikiUrl, calibreUrl, plateUrl, libraryUrl, ahaLinks, linksFor, parseHash, formatHash, search, stepEvent, validate
+    BOOKS, obsidianUrl, wikiUrl, wikiPair, wikiLinks, WIDE_WIKI, calibreUrl, plateUrl, libraryUrl, ahaLinks, linksFor, parseHash, formatHash, search, stepEvent, validate
   };
 });

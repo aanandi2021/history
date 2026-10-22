@@ -29,6 +29,8 @@ body { margin: 0; background: #d9d4c7; color: var(--ink); font-family: var(--san
 .text-page .head, .text-page h1 { column-span: all; }
 .text-page h1 { font-size: 21px; margin: 2px 0 8px; }
 .text-page .intro { font-style: italic; column-span: all; margin: 0 0 10px; }
+.text-page .wiki-context { column-span: all; margin: 0 0 10px; font: 11px var(--sans); }
+.text-page .wiki-context a { color: var(--accent); }
 .text-page h2 { font-size: 14px; margin: 12px 0 4px; break-after: avoid; text-transform: uppercase; letter-spacing: .06em; }
 .entry { margin: 0 0 6px; text-align: justify; hyphens: auto; break-inside: avoid; padding: 1px 3px; border-radius: 2px; }
 .entry .date { font-family: var(--sans); font-size: 12px; }

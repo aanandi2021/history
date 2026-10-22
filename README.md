@@ -16,7 +16,7 @@ Open `app/index.html` in a browser (double-click is fine). It works from `file:/
   its from/to years; a black bracket under it is the stretch the lower timeline shows, and a small triangle is the
   date. Click a period to open it. The scale stretches toward the present: each stretch between the marked years
   gets the same width, so a six-year war isn't a hairline next to two thousand years of antiquity.
-- **Controls where they act:** Play, speed, Follow chapters and Whole period sit on a bar above the timeline (with
+- **Controls where they act:** Play, speed, Follow chapters, Whole period and Investigations sit on a bar above the timeline (with
   "Showing …" for the stretch in view); World sits on the map.
 - **Top:** a world map. A muted period map ("World at this date", from historical-basemaps) shows states, peoples and nations at the nearest mapped date; the followed chapter's shapes come from its atlas plate; pins mark events near the date.
 - **Bottom:** the timeline. Chapters in region lanes with filter chips and Expand all, then event lanes (Canada always first), who was in power, books, and your family.
@@ -28,7 +28,9 @@ Keys: `←` `→` step between events, `Space` play, `/` search, `Esc` clear. `?
 
 The address bar always holds `#period/date/item` (for example `#russia/1812-09-14/moscow-burns-1812`), so any view can be pasted into an Obsidian note.
 
-Cards link to the matching heading in the vault note (`obsidian://`), to Wikipedia, and to books in Calibre (`calibre://`) or the Ottawa Public Library.
+Cards link to the matching heading in the vault note (`obsidian://`), to books in Calibre (`calibre://`) or the Ottawa Public Library, and to two verified direct Wikipedia articles: the closest subject overview and the wider historical period. The NOW chapter, tour stops, atlas spreads and board tiles carry the same progressive-disclosure pair. A book receives it only if there is a suitable article about that book; fiction is not passed off as history. The title catalog in `app/data/wiki-titles.js` is available offline, with no live API requests. Regenerate and recheck it using `scripts/refresh-wiki-titles.ps1` when adding content.
+
+**Investigations** opens a drawer over the lower timeline, keeping the current map, date and card visible. Six standing historical questions and five colonial questions have sourced answers for each of the fourteen datasets. The other tab offers guided routes that use the existing Tour engine. The canonical questions remain in the vault's *History - Interrogations* note; this app holds context-specific answers and source links.
 
 **Amit's Fiction.** A period can list Amit's own writing as a book with `amits: true` and a vault `note`. Any event, ruler or chapter in its years then shows an "Amit's Fiction" section on its card. Items tagged `fic: "<heading>"` (or `fic: { note, heading }` for a sibling research file) also get an "Amit's Fiction" link straight to that heading. A lane with `fiction: true` holds the novel's own storyline. It is labelled as fiction, and each of its events must point into the novel. The first example is *The Unseen Tomorrow* in the Maritime Asia period (`#maritime`), whose research lives in the vault under `Writing/The Unseen Tomorrow/`.
 

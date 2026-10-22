@@ -9,7 +9,10 @@
 
   let board, game, arrows, status, pos, sel, revealed;
 
-  const wiki = (t) => "https://en.wikipedia.org/wiki/" + encodeURIComponent(t.replace(/ /g, "_"));
+  const wikiLinks = (tile) => window.HM.wikiPair(
+    [tile.wiki, tile.title, board.id === "ww1-origins" ? "World War I" : "Mongol Empire"],
+    [board.id === "ww1-origins" ? "World War I" : "Mongol Empire", "World history"]
+  );
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const tileById = (id) => board.tiles.find((t) => t.id === id);
   const load = () => { try { return JSON.parse(localStorage.getItem(STORE + board.id)) || {}; } catch { return {}; } };
@@ -47,7 +50,8 @@
       el.tabIndex = 0;
       el.innerHTML = `<button class="more" title="What happened" aria-label="Details">ⓘ</button>
         <div class="t">${esc(t.title)}</div><div class="d">${esc(t.date)}</div>
-        <div class="x">${esc(t.text || "")}${t.wiki ? ` <a href="${wiki(t.wiki)}" target="_blank" rel="noopener">Wikipedia</a>` : ""}</div>`;
+        <div class="x">${esc(t.text || "")} ${wikiLinks(t).map((l) =>
+          `<a class="${l.kind}" href="${esc(l.href)}" title="${esc(l.title)}" target="_blank" rel="noopener">${esc(l.label)}: ${esc(l.title)}</a>`).join(" · ")}</div>`;
       place(el, t.id);
       el.querySelector(".more").addEventListener("click", (e) => { e.stopPropagation(); el.classList.toggle("open"); draw(); });
       el.querySelector(".x").addEventListener("pointerdown", (e) => { if (e.target.tagName === "A") e.stopPropagation(); });
@@ -182,8 +186,13 @@
       }
     }
     const bk = board.books || [];
+    const wider = board.id === "ww1-origins" ? "World War I" : "Mongol Empire";
     $("#b-books").innerHTML = over && bk.length
-      ? `<h3>To read next</h3><ul>${bk.map((b) => `<li><i>${esc(b.title)}</i>, ${esc(b.author)} (${b.year})</li>`).join("")}</ul>` : "";
+      ? `<h3>To read next</h3><ul>${bk.map((b) => {
+        const links = window.HM.wikiPair([`book:${b.title} by ${b.author}`], [wider, "World history"]);
+        return `<li><i>${esc(b.title)}</i>, ${esc(b.author)} (${b.year}) ${links.map((l) =>
+          `<a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)}: ${esc(l.title)}</a>`).join(" · ")}</li>`;
+      }).join("")}</ul>` : "";
     const s = load();
     $("#b-due").textContent = s.due
       ? `Best ${s.best}%. Next review ${s.due <= today() ? "is due now" : "on " + s.due}.`

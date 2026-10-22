@@ -37,6 +37,54 @@ let browser;
 before(async () => { browser = await puppeteer.launch({ headless: true }); });
 after(async () => { await browser?.close(); });
 
+test("e2e: narrow periods have readable, non-overlapping labels linked to their bars at different widths", async () => {
+  const page = await browser.newPage();
+  await page.goto(pathToFileURL(path.join(ROOT, "app", "index.html")).href + "#ancient/-0216");
+  await page.waitForFunction("window.APP && APP.ready");
+  for (const width of [2000, 1440, 900, 600]) {
+    await page.setViewport({ width, height: 900 });
+    await page.waitForFunction((w) => {
+      const svg = document.querySelector("#master-svg");
+      const axis = document.querySelector("#master .m-axis > line");
+      return Math.abs(svg.clientWidth - (w - 60)) <= 2 && axis
+        && Math.abs(+axis.getAttribute("x2") - (svg.clientWidth - 6)) <= 2;
+    }, {}, width);
+    await new Promise((r) => setTimeout(r, 220));
+    const result = await page.evaluate(() => {
+      const nav = document.querySelector("#master").getBoundingClientRect();
+      const layout = document.querySelector("#layout").getBoundingClientRect();
+      const groups = [...document.querySelectorAll("#master .m-period")];
+      const texts = [...document.querySelectorAll("#master .m-period text, #master .m-from, #master .m-to, #master .m-axis text, #master .m-gap-label")];
+      const box = (el) => {
+        const r = el.getBoundingClientRect();
+        return { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+      };
+      const collide = (a, b) => a.left < b.right - 1 && a.right > b.left + 1 && a.top < b.bottom - 1 && a.bottom > b.top + 1;
+      const overlaps = [];
+      for (let i = 0; i < texts.length; i++) for (let j = i + 1; j < texts.length; j++) {
+        if (collide(box(texts[i]), box(texts[j]))) overlaps.push([texts[i].textContent, texts[j].textContent]);
+      }
+      return {
+        overlaps,
+        outside: texts.filter((el) => { const r = box(el); return r.left < nav.left - 1 || r.right > nav.right + 1 || r.top < nav.top - 1 || r.bottom > nav.bottom + 1; }).map((el) => el.textContent),
+        top: groups.filter((g) => { const t = g.querySelector(".m-callout-label"); return t && box(t).bottom < box(g.querySelector("rect")).top; }).length,
+        bottom: groups.filter((g) => { const t = g.querySelector(".m-callout-label"); return t && box(t).top > box(g.querySelector("rect")).bottom; }).length,
+        callouts: groups.filter((g) => g.querySelector(".m-callout-label")).length,
+        arrows: document.querySelectorAll("#master .m-callout-arrow").length,
+        layoutGap: Math.abs(layout.top - nav.bottom)
+      };
+    });
+    assert.deepEqual(result.overlaps, [], `${width}px: overlapping labels`);
+    assert.deepEqual(result.outside, [], `${width}px: clipped labels`);
+    assert.equal(result.arrows, result.callouts, `${width}px: every outside label has an arrow`);
+    assert.ok(result.top > 0 && result.bottom > 0, `${width}px: arrows point down and up`);
+    assert.ok(result.layoutGap < 2, `${width}px: lower layout follows the taller strip`);
+  }
+  await page.click('#master .m-period[data-id="ww1"] .m-callout-label');
+  assert.equal(await page.evaluate(() => APP.state.dsId), "ww1", "an outside label still opens its period");
+  await page.close();
+});
+
 test("e2e: the strip highlights the open period, follows the dropdown, and opens a period when clicked", async () => {
   const page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 900 });

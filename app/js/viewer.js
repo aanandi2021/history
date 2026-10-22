@@ -23,6 +23,10 @@
 
   // ---------------------------------------------------------------- helpers
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const wikiMarkup = (links) => links.length
+    ? `<span class="wiki-pair">${links.map((l) => `<a class="${l.kind}" href="${esc(l.href)}" title="${esc(l.title)}" target="_blank" rel="noopener">${esc(l.label)}: ${esc(l.title)} ↗</a>`).join(" · ")}</span>` : "";
+  const sourceMarkup = (sources) => sources && sources.length
+    ? `<div class="sources">Sources: ${sources.map((s) => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)} ↗</a>`).join(" · ")}</div>` : "";
   const laneColour = (lane) => state.ds.colours.lanes[lane] || "#888";
   const sideColour = (side) => state.ds.colours.sides[side] || "#888";
   const itemName = (it) => it.title || it.name;
@@ -810,7 +814,8 @@
     return M.linkTerms(it.text, sc.terms).map((r) => {
       if (!r.term) return esc(r.text);
       const ext = !r.term.note;
-      return `<a class="term" data-link="term" href="${esc(M.termUrl(r.term))}"${ext ? ' target="_blank" rel="noopener"' : ""}${r.term.why ? ` title="${esc(r.term.why)}"` : ""}>${esc(r.text)}</a>` +
+      const href = M.termUrl(r.term);
+      return (href ? `<a class="term" data-link="term" href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}${r.term.why ? ` title="${esc(r.term.why)}"` : ""}>${esc(r.text)}</a>` : esc(r.text)) +
         (r.term.star ? `<span class="star" title="Worth asking about">★</span>` : "");
     }).join("");
   }
@@ -1408,11 +1413,13 @@
       const picked = tourChapter() || (state.selected && chapters.find((c) => c.id === state.selected && c.text));
       const shown = focusAt(t);
       const now = picked || (shown && shown.text ? shown : null) || chapters.filter((c) => c.text).sort((a, b) => (a.t1 - a.t0) - (b.t1 - b.t0))[0];
-      if (now) h += `<div class="now" id="now"><div class="now-h">Now · <a class="it" href="#" data-id="${esc(now.id)}">${esc(now.title)}</a></div><p>${richText(now)}</p></div>`;
+      if (now) h += `<div class="now" id="now"><div class="now-h">Now · <a class="it" href="#" data-id="${esc(now.id)}">${esc(now.title)}</a></div><p>${richText(now)}</p><div class="wiki-context">${wikiMarkup(M.wikiLinks(ds, now))}</div></div>`;
+      else h += `<div class="wiki-context">${wikiMarkup(M.wikiLinks(ds, shown || chapters[0]))}</div>`;
       const plates = (ds.plates || []).filter((p) => t >= p.t0 && t <= p.t1);
       if (plates.length) h += panelPlateTiles(plates, now);
       h += `<h3>Chapter</h3><div>${chapters.map((c) => `<span class="chip${c === now ? " on" : ""}" data-id="${esc(c.id)}">${esc(c.title)}</span>`).join("")}</div>`;
     }
+    if (!chapters.length) h += `<div class="wiki-context">${wikiMarkup(M.wikiPair([M.WIDE_WIKI[state.dsId]], ["World history"]))}</div>`;
     h += `<h3>Meanwhile</h3><div id="meanwhile-groups">`;
     const shownGroups = groups.filter((g) => g.events.length);
     const extraGroup = widenedOutsideEuropeGroup(ds, t, w, shownGroups);
@@ -1430,6 +1437,7 @@
     const famLines = FAMILY.filter((m) => fam[m.id] && fam[m.id].born).map((m) => `<li data-family-age="${m.id}">${esc(m.label)}: <b>${esc(familyLine(m, fam[m.id], t))}</b></li>`);
     h += `<h3>Family</h3><ul>${famLines.length ? famLines.join("") : `<li class="empty">Add birth years in the Family row of the timeline.</li>`}</ul>`;
     $("#meanwhile").innerHTML = h;
+    renderInvestigations();
   }
 
   function renderCard() {
@@ -1468,8 +1476,8 @@
     const links = allLinks.filter((l) => l.kind !== "plate");
     h += `<div class="links">`;
     for (const l of links) {
-      const ext = l.kind === "wiki" || l.kind === "library";
-      h += `<a class="${l.kind}" data-link="${l.kind}" href="${esc(l.href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(l.label)}${ext ? " ↗" : ""}</a>`;
+      const ext = l.kind === "wiki" || l.kind === "wiki-wide" || l.kind === "library";
+      h += `<a class="${l.kind}" data-link="${l.kind}" href="${esc(l.href)}"${l.title ? ` title="${esc(l.title)}"` : ""}${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(l.label)}${l.title ? `: ${esc(l.title)}` : ""}${ext ? " ↗" : ""}</a>`;
     }
     if (it.kind === "chapter") h += `<button data-zoom="${esc(it.id)}">Zoom here</button>`;
     h += `<button id="copy-link" title="Copy a link to this moment, for an Obsidian note">Copy link</button><span class="copied" id="copied"></span></div>`;
@@ -1478,7 +1486,8 @@
       const terms = [...sc.terms].sort((a, b) => !!b.star - !!a.star);
       h += `<h3>One move ahead</h3><ul class="terms" id="card-terms">${terms.map((tm) => {
         const ext = !tm.note;
-        return `<li${tm.star ? ' class="starred"' : ""}><a data-link="term" href="${esc(M.termUrl(tm))}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(tm.t)}${ext ? " ↗" : ""}</a>` +
+        const href = M.termUrl(tm);
+        return `<li${tm.star ? ' class="starred"' : ""}>${href ? `<a data-link="term" href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(tm.t)}${ext ? " ↗" : ""}</a>` : `<span>${esc(tm.t)}</span>`}` +
           (tm.why ? ` <span class="d">${esc(tm.why)}</span>` : "") +
           (tm.star ? `<div class="ask">★ ${esc(tm.star)} <button class="copy-ask" data-ask="${esc(tm.star)}" title="Copy this question to ask Copilot">Copy question</button></div>` : "") + `</li>`;
       }).join("")}</ul>`;
@@ -1678,12 +1687,61 @@
   document.addEventListener("keydown", (ev) => {
     if (ev.target.matches("input, select, textarea")) return;
     if (ev.key === "/") { ev.preventDefault(); searchEl.focus(); searchEl.select(); }
-    else if (ev.key === "Escape") { if (!$("#books").hidden) $("#books").hidden = true; else if (!$("#help").hidden) $("#help").hidden = true; else clearSelection(); }
+    else if (ev.key === "Escape") { if (!$("#investigations-drawer").hidden) closeInvestigations(); else if (!$("#books").hidden) $("#books").hidden = true; else if (!$("#help").hidden) $("#help").hidden = true; else clearSelection(); }
     else if ((ev.key === "ArrowRight" || ev.key === "ArrowLeft") && state.tour) { ev.preventDefault(); moveTour(ev.key === "ArrowRight" ? 1 : -1); }
     else if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") {
       const e = M.stepEvent(state.ds, state.cursor, ev.key === "ArrowRight" ? 1 : -1);
       if (e) { ev.preventDefault(); select(e.id); }
     } else if (ev.key === " ") { ev.preventDefault(); setPlaying(!state.playing); }
+  });
+
+  let investigationTab = "lenses", investigationEra = null;
+  function closeInvestigations() {
+    $("#investigations-drawer").hidden = true;
+    $("#investigations-btn").setAttribute("aria-expanded", "false");
+    $("#investigations-btn").focus();
+  }
+  function renderInvestigations() {
+    if ($("#investigations-drawer").hidden || (investigationEra === state.dsId && $("#investigation-body").dataset.tab === investigationTab)) return;
+    investigationEra = state.dsId;
+    $("#investigation-tabs").querySelectorAll("button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.investigationTab === investigationTab)));
+    const body = $("#investigation-body");
+    body.dataset.tab = investigationTab;
+    if (investigationTab === "routes") {
+      body.innerHTML = `<p>Follow one question across places and periods. The map and date move with each stop.</p>` +
+        Object.values(window.TOURS || {}).map((t) => `<button type="button" class="route" data-investigation-tour="${esc(t.id)}"><b>${esc(t.title)}</b><span>${esc(tourSubtitle(t))}</span></button>`).join("");
+      return;
+    }
+    const answers = (window.INTERROGATION_ANSWERS || {})[state.dsId];
+    if (!answers) { body.innerHTML = `<p>No investigation answers for this period.</p>`; return; }
+    const questions = window.INTERROGATION_QUESTIONS || [];
+    const entries = (colonial) => questions.filter((q) => !!q.colonial === colonial).map((q) => {
+      const a = answers[q.id];
+      if (!a) return `<details><summary>${esc(q.label)}</summary><p>Answer not yet researched.</p></details>`;
+      return `<details><summary>${esc(q.label)}</summary><p>${esc(a.answer)}</p>${sourceMarkup(a.sources)}</details>`;
+    }).join("");
+    const canonical = M.obsidianUrl("Amit's Notes of the History of the World/History - Interrogations");
+    body.innerHTML = `<p>${esc(state.ds.title)} · A standing lens, including where a colonial question is anachronistic. Answers are specific to this period. <a href="${esc(canonical)}">Why these questions</a></p><h3>Every era</h3>${entries(false)}<h3>Colonial questions</h3>${entries(true)}`;
+  }
+  $("#investigations-btn").addEventListener("click", () => {
+    if (!$("#investigations-drawer").hidden) { closeInvestigations(); return; }
+    $("#investigations-drawer").hidden = false;
+    $("#investigations-btn").setAttribute("aria-expanded", "true");
+    renderInvestigations();
+    $("#investigation-close").focus();
+  });
+  $("#investigation-close").addEventListener("click", closeInvestigations);
+  $("#investigation-tabs").addEventListener("click", (ev) => {
+    const tab = ev.target.closest("[data-investigation-tab]");
+    if (!tab) return;
+    investigationTab = tab.dataset.investigationTab;
+    renderInvestigations();
+  });
+  $("#investigation-body").addEventListener("click", (ev) => {
+    const route = ev.target.closest("[data-investigation-tour]");
+    if (!route) return;
+    closeInvestigations();
+    startTour(route.dataset.investigationTour);
   });
 
 
@@ -1749,6 +1807,10 @@
     let h = `<button class="exit" data-tour-exit title="Exit tour">×</button><div class="tour-title">${esc(t.title)}</div>`;
     if (atEnd) {
       h += `<h2>Answer</h2><p>${esc(t.answer.pattern)}</p>`;
+      h += sourceMarkup(t.answer.sources);
+      h += `<div class="wiki-context">${wikiMarkup(M.wikiPair(
+        [t.wiki, t.title, M.WIDE_WIKI[state.dsId]], [M.WIDE_WIKI[state.dsId], "World history"]
+      ))}</div>`;
       if (t.answer.openQuestions && t.answer.openQuestions.length) h += `<h3>Open questions</h3><ul>${t.answer.openQuestions.map((q) => `<li>${esc(q)}</li>`).join("")}</ul>`;
       if (t.answer.reading && t.answer.reading.length) h += `<h3>Reading</h3><ul>${t.answer.reading.map((r) => `<li><b>${esc(r.title)}</b>, ${esc(r.author)} <span class="d">${esc(r.note || "")}</span></li>`).join("")}</ul>`;
     } else {
@@ -1759,6 +1821,12 @@
         h += `<div class="plate-tiles tour-plate">${plateTile(p)}</div>`;
       }
       if (stop.meanwhile) h += `<p class="meanwhile">Meanwhile: ${esc(stop.meanwhile)}</p>`;
+      h += sourceMarkup(stop.sources);
+      const ch = stop.chapter && state.ds.byId.get(stop.chapter);
+      h += `<div class="wiki-context">${wikiMarkup(M.wikiPair(
+        [stop.wiki, stop.title, ch && (ch.wiki || ch.title), M.WIDE_WIKI[stop.era]],
+        [stop.wideWiki, M.WIDE_WIKI[stop.era], "World history"]
+      ))}</div>`;
     }
     h += `<div class="tour-actions"><button data-tour-prev ${state.tourStop <= 0 ? "disabled" : ""}>‹ Prev</button><button data-tour-next ${state.tourStop >= t.stops.length ? "disabled" : ""}>Next ›</button></div>`;
     el.innerHTML = h; el.hidden = false;
@@ -1771,13 +1839,39 @@
   const master = { layout: M.masterLayout(window.DATASETS) };
   function renderMaster() {
     const svg = d3.select("#master-svg");
-    if (svg.empty()) return;
+    if (svg.empty() || $("#master").classList.contains("collapsed")) return;
     const W = svg.node().clientWidth || 1000, L = master.layout, pad = 6;
     const x = (y) => pad + M.masterX(L, y) * (W - 2 * pad);
-    const rowH = 14, top = 15, axisY = top + L.rows * rowH + 3;
-    master.x = x; master.top = top; master.rowH = rowH; master.axisY = axisY;
-    svg.attr("height", axisY + 28);
     svg.selectAll("*").remove();
+    const measure = svg.append("text").attr("class", "m-label-measure");
+    const labels = L.periods.map((q) => {
+      const x0 = x(q.y0), x1 = Math.max(x0 + 4, x(q.y1));
+      measure.text(q.short).attr("font-weight", q.id === state.dsId ? 600 : 400);
+      return { q, x0, x1, width: measure.node().getComputedTextLength(), centre: (x0 + x1) / 2 };
+    });
+    measure.remove();
+    const lanes = { top: [], bottom: [] }, calloutH = 18;
+    labels.filter((l) => l.x1 - l.x0 < l.width + 8).sort((a, b) => a.centre - b.centre).forEach((l) => {
+      const half = l.width / 2, wanted = Math.max(pad + half, Math.min(W - pad - half, l.centre));
+      for (let row = 0; row < labels.length; row++) {
+        const sides = l.q.row === 0 ? ["top", "bottom"] : ["bottom", "top"];
+        for (const side of sides) {
+          const placed = lanes[side][row] || [];
+          const centre = Math.max(wanted, placed.length ? placed[placed.length - 1] + 8 + half : wanted);
+          if (centre + half > W - pad || centre - wanted > 40) continue;
+          l.callout = { side, row, centre };
+          (lanes[side][row] ||= []).push(centre + half);
+          break;
+        }
+        if (l.callout) break;
+      }
+    });
+    const rowH = 16, top = lanes.top.length ? 28 + calloutH * lanes.top.length : 15;
+    const axisY = top + L.rows * rowH + 3, gapY = axisY + 27 + calloutH * lanes.bottom.length;
+    master.x = x; master.top = top; master.rowH = rowH; master.axisY = axisY;
+    const height = axisY + 30 + calloutH * lanes.bottom.length + (L.periods.some((q) => q.gapAfter) ? 13 : 0);
+    svg.attr("height", height);
+    document.documentElement.style.setProperty("--master-height", `${height + 1}px`);
     const defs = svg.append("defs");
     const pat = defs.append("pattern").attr("id", "gap-hatch").attr("patternUnits", "userSpaceOnUse").attr("width", 8).attr("height", 8).attr("patternTransform", "rotate(45)");
     pat.append("rect").attr("width", 8).attr("height", 8).attr("fill", "#e8dfcf");
@@ -1795,7 +1889,7 @@
       const nx = Math.min(x(L.y1), x(q.y1 + 139));
       const gx0 = x(q.y1), gw = Math.max(20, nx - gx0);
       svg.append("rect").attr("class", "m-gap-band").attr("x", gx0).attr("y", top + q.row * rowH).attr("width", gw).attr("height", rowH - 3);
-      svg.append("text").attr("class", "m-gap m-gap-label").attr("x", gx0 + gw / 2).attr("y", axisY + 24).attr("text-anchor", "middle").text(q.gapAfter);
+      svg.append("text").attr("class", "m-gap m-gap-label").attr("x", gx0 + gw / 2).attr("y", gapY).attr("text-anchor", "middle").text(q.gapAfter);
     });
     const n = L.breaks.length - 1;
     if (n > 1 && W >= 1600) svg.append("text").attr("class", "m-scale").attr("x", x(L.breaks[n - 1]) - 4).attr("y", 4).attr("text-anchor", "end")
@@ -1808,16 +1902,20 @@
     g.append("title").text((q) => `${q.full}, ${q.from} – ${q.to}`);
     g.append("rect").attr("x", (q) => x(q.y0)).attr("y", (q) => top + q.row * rowH).attr("height", rowH - 3).attr("rx", 2)
       .attr("width", (q) => Math.max(4, x(q.y1) - x(q.y0)));
-    // Every bar is named: inside if it fits, otherwise just outside it, on whichever side has room before the next bar.
-    g.append("text").each(function (q) {
-      const x0 = x(q.y0), x1 = Math.max(x0 + 4, x(q.y1)), w = x1 - x0, need = q.short.length * 5.6 + 8, y = top + q.row * rowH + rowH - 6;
-      const same = L.periods.filter((o) => o !== q && o.row === q.row);
-      const roomR = Math.min(W - pad, ...same.filter((o) => o.y0 >= q.y1).map((o) => x(o.y0))) - x1;
-      const roomL = x0 - Math.max(pad, ...same.filter((o) => o.y1 <= q.y0).map((o) => x(o.y1)));
-      const t = d3.select(this).text(q.short).attr("y", y);
-      if (w > need) t.attr("class", "in").attr("x", x0 + 4);
-      else if (roomR > need || roomR >= roomL) t.attr("x", x1 + 4);
-      else t.attr("x", x0 - 4).attr("text-anchor", "end");
+    g.each(function (q) {
+      const l = labels.find((item) => item.q === q), group = d3.select(this), callout = l.callout;
+      if (!callout) {
+        group.append("text").attr("class", "in").attr("x", l.x0 + 4).attr("y", top + q.row * rowH + rowH - 6).text(q.short);
+        return;
+      }
+      const barX = l.centre, barY = top + q.row * rowH, labelY = callout.side === "top"
+        ? 24 + callout.row * calloutH : axisY + 27 + callout.row * calloutH;
+      const arrow = callout.side === "top"
+        ? `M${callout.centre},${labelY + 3} L${barX},${barY - 5} M${barX - 3},${barY - 7} L${barX},${barY - 2} L${barX + 3},${barY - 7}`
+        : `M${callout.centre},${labelY - 11} L${barX},${barY + rowH + 2} M${barX - 3},${barY + rowH + 5} L${barX},${barY + rowH - 1} L${barX + 3},${barY + rowH + 5}`;
+      group.append("path").attr("class", "m-callout-arrow").attr("d", arrow);
+      group.append("text").attr("class", "m-callout-label").attr("x", callout.centre).attr("y", labelY)
+        .attr("text-anchor", "middle").text(q.short);
     });
     if (p) {
       const fx = x(p.y0), tx = x(p.y1), wide = tx - fx > 110;
@@ -1838,11 +1936,11 @@
     updateMasterZoom();
   }
   function updateMasterCursor() {
-    if (!master.x || !state.cursor) return;
+    if (!state.cursor) return;
+    $("#cursor-date").textContent = state.ds.precision === "year" ? M.masterYear(state.cursor.getUTCFullYear()) : fmtCursor(state.cursor);
+    if (!master.x) return;
     const cx = master.x(M.yearOf(state.cursor));
     d3.select("#master-svg .m-cursor").attr("d", `M${cx},${master.axisY - 1} l-4,-6 h8 z`).attr("data-x", cx);
-    const yr = state.cursor.getUTCFullYear();
-    $("#cursor-date").textContent = state.ds.precision === "year" ? M.masterYear(yr) : fmtCursor(state.cursor);
   }
   /** The bracket under the open period: what the lower timeline is showing. Also writes "Showing …" on the timeline bar. */
   function updateMasterZoom() {
@@ -2013,8 +2111,45 @@
   let resizeTimer = null;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { const d = tlDomain(); setupTimeline(d); renderMaster(); }, 150);
+    resizeTimer = setTimeout(() => {
+      if (!$("#left").classList.contains("timeline-collapsed")) setupTimeline(tlDomain());
+      renderMaster();
+    }, 150);
   });
+
+  const paneControls = {
+    upper: { element: "#master", button: "#master-toggle", label: "upper timeline", expanded: "▴", collapsed: "▾" },
+    lower: { element: "#left", button: "#timeline-toggle", label: "lower timeline", expanded: "▾", collapsed: "▴" },
+    right: { element: "#panel", button: "#panel-toggle", label: "right pane", expanded: "›", collapsed: "‹" }
+  };
+  function setPane(name, collapsed, persist = true) {
+    const config = paneControls[name];
+    const el = $(config.element), button = $(config.button);
+    el.classList.toggle(name === "lower" ? "timeline-collapsed" : "collapsed", collapsed);
+    if (name === "right") $("#layout").classList.toggle("panel-collapsed", collapsed);
+    if (name === "upper" && collapsed) document.documentElement.style.setProperty("--master-height", "27px");
+    if (name === "lower" && collapsed) {
+      $("#investigations-drawer").hidden = true;
+      $("#investigations-btn").setAttribute("aria-expanded", "false");
+    }
+    button.textContent = collapsed ? config.collapsed : config.expanded;
+    button.setAttribute("aria-expanded", String(!collapsed));
+    button.setAttribute("aria-label", `${collapsed ? "Show" : "Hide"} ${config.label}`);
+    button.title = button.getAttribute("aria-label");
+    if (persist) localStorage.setItem(`history.pane.${name}`, collapsed ? "0" : "1");
+    if (!state.ds) return;
+    if ((name === "lower" && !collapsed) || (name === "right" && !$("#left").classList.contains("timeline-collapsed"))) {
+      setupTimeline(tlDomain());
+    }
+    renderMaster();
+  }
+  for (const name of Object.keys(paneControls)) {
+    setPane(name, localStorage.getItem(`history.pane.${name}`) === "0", false);
+    $(paneControls[name].button).addEventListener("click", () => {
+      const config = paneControls[name];
+      setPane(name, !$(config.element).classList.contains(name === "lower" ? "timeline-collapsed" : "collapsed"));
+    });
+  }
 
   // ---------------------------------------------------------------- start
   const p = M.parseHash(location.hash, window.DATASETS, DEFAULT_DS);

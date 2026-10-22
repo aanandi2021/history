@@ -892,6 +892,15 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
     let t = `<div class="head right">${esc(spec.head || spec.title)} <span class="folio">${esc(spec.folio ? +spec.folio + 1 : "")}</span></div>`;
     t += `<h1>${esc(spec.title)}</h1>`;
     if (spec.text && spec.text.intro) t += `<p class="intro">${esc(spec.text.intro)}</p>`;
+    const era = spec.viewer && spec.viewer.split("/")[0];
+    const ds = era && window.DATASETS[era];
+    const ch = ds && spec.viewer.split("/")[2] && window.HM.normalise(ds).byId.get(decodeURIComponent(spec.viewer.split("/")[2]));
+    const wiki = window.HM.wikiPair(
+      [spec.wiki, spec.title, ch && (ch.wiki || ch.title), window.HM.WIDE_WIKI[era]],
+      [window.HM.WIDE_WIKI[era], "World history"]
+    );
+    if (wiki.length) t += `<div class="wiki-context">${wiki.map((l) =>
+      `<a href="${esc(l.href)}" title="${esc(l.title)}" target="_blank" rel="noopener">${esc(l.label)}: ${esc(l.title)} ↗</a>`).join(" · ")}</div>`;
     let n = 0;
     for (const s of (spec.text && spec.text.sections) || []) {
       t += `<h2>${esc(s.heading)}</h2>`;
@@ -1058,4 +1067,3 @@ function drawSmallMultiplesFigure(container, fig, fi, w, h, uid) {
     show(pick());
   });
 })();
-
